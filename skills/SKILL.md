@@ -8,9 +8,11 @@ description: Academic research skill set.
 This skill bundle describes how to work on an academic workflow. It comprises
 the following modules:
 
+- `story-keeping.md`: The standard format for `story.md`, the central narrative
+  document used across all research activities. **Read this first.**
 - `presentation`: How to do good academic presentations. This includes
   preparation of presentation, story telling planning, making slides, and
-  `story.md`.
+  maintaining the narrative consistent with `story.md`.
 - `engineering`: The implementation side of things. This includes how to run
   experiments, preferred tech stack, conventions regarding writing code,
   organizing data, collecting results, generating plots, and relevant file
@@ -125,15 +127,25 @@ user.
 ## Repository Structure
 
 This section documents the conventional repo structure used in a typical
-research project. Detailed description about them may be found in other skill
-modules. The exact repo structure may vary slightly in different projects.
+research project. For detailed conventions, see the `engineering/` skill module.
 
-- `data`: data files reused across experiments
-- `src`: core code that is reused across experiments
-- `scripts`: one-off scripts
-- `draft`: files related to the drafting of publications and presentations
-- `experiments`: files related to the experiments. Read `engineering/` skill
-  module to know more.
+```
+project-root/
+├── notes/                  # Research notes and documentation
+│   ├── narrative/          # story.md, research questions
+│   ├── tickets/            # Active work assignments
+│   ├── reports/            # Results and findings
+│   ├── methodology/        # Analysis conventions
+│   └── dev/                # Implementation notes
+├── src/                    # Core reusable code
+├── scripts/                # One-off utility scripts
+├── data/                   # Data files
+├── experiments/            # Individual experiments (01-name, 02-name...)
+└── draft/                  # Publications and presentations
+```
 
-Inside each folder, also look for instructional files such as `README.md` to
+**Key files**:
+- `notes/narrative/story.md`: Central narrative document. See `story-keeping.md`.
+
+Inside each folder, look for instructional files such as `README.md` to
 help you understand the structure of that directory.
