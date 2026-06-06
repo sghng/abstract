@@ -2,6 +2,13 @@
 
 This skill module explains how to author a manuscript for academic publication.
 
+## Prerequisites
+
+Before drafting a manuscript, ensure:
+- `story.md` is up to date with current findings
+- Research question is clearly articulated
+- Key facts are documented with supporting data
+
 ## Tooling
 
 - We use Typst for the original drafting.
@@ -21,17 +28,61 @@ This skill module explains how to author a manuscript for academic publication.
 It's important to make the language feel more human. For example, no em-dash is
 allowed!
 
-## Story Telling
+## Story-Driven Authoring
 
 Story telling is the key to a paper. To ensure drafting and reviewing always
-follow our story consistently, we need to prepare a `story.md`
+follow our story consistently, we maintain a `story.md` file.
 
-The `story.md` file should contain:
+**Read `../story-keeping.md` for the standard story.md format.**
 
-- The center "story" of the presentation. This is the "big story".
-- The "smaller stories", these are the stories (research findings/contributions)
-  you will also cover.
-- The narrative plan. It's the strategy of how to go from the big story to small
-  stories, and eventually wrap up.
-- For these stories, no matter big or small, in the plan, you shall also mention
-  the key data/plots/narrative to support that story.
+### The Three-Act Structure Becomes Your Paper
+
+| Story Section | Paper Section | Purpose |
+|:--------------|:--------------|:--------|
+| Act 1 (Hook) | Introduction | Establish the gap, why this matters |
+| Act 2 (Approach) | Method | How we tackled the problem |
+| Act 3 (Discovery) | Results + Discussion | What we found and what it means |
+
+### Key Facts Become Your Contributions
+
+Each item in the Key Facts section of `story.md` should map to a specific
+contribution or result in the paper.
+
+### Research Question Drives the Abstract
+
+The abstract should clearly state the research question and preview the answer.
+
+## Narrative Principles
+
+> Writing a paper is like creating a TikTok short. The goal is to engage people,
+> make the reader think they learn a lot, never raise their concern, you have to
+> make them nod through all sections and think to themselves: "everything makes
+> so much sense!"
+
+### Start with the Big Story
+
+As this advice (translated from Mandarin) emphasizes:
+
+> 你会做 Project，但还是不太会讲故事。
+>
+> 讲故事和 Project 不同。讲故事一是要有清晰的主线，二是要有分层次。先讲大故事，再讲大故事下面的小故事。如果先讲大故事，比如 formative
+> assessment，这是很多人都在研究的话题，很多读者就会觉得「这是我关注的东西，我得看一看」，接下来再讲小故事，那这些领域的人又会说「这是我做的领域呀，可以继续看」。这样，即使他们最后 lose
+> track 了，也把文章看了百分之七八十。反之，如果先从小故事讲起，读者看到，就觉得「这不是我研究的问题」，就不会接着看下去了。做 Project 可以从细节开始，但讲故事，要从大故事开始讲起，这样读者才能更好理解你做这个研究的意义何在。
+
+**Translation**: Start with the big picture (why this matters broadly), then
+narrow to your specific contribution. Readers who care about the big topic will
+stay engaged even if they lose track of the details.
+
+## Drafting Workflow
+
+1. **Consult story.md**: Review the current narrative
+2. **Outline from three-act structure**: Map story sections to paper sections
+3. **Draft section by section**: Focus on narrative flow
+4. **Verify alignment**: Each section should serve the story
+5. **Iterate with story updates**: Revise story.md if narrative evolves
+
+## File Organization
+
+- Draft files go in `draft/` directory
+- Use descriptive names: `paper-v1.typ`, `proposal-v2.typ`
+- Reference `story.md` status at top: `# Based on story.md as of [version]`
