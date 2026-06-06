@@ -14,9 +14,8 @@ the following modules:
   preparation of presentation, story telling planning, making slides, and
   maintaining the narrative consistent with `story.md`.
 - `engineering`: The implementation side of things. This includes how to run
-  experiments, preferred tech stack, conventions regarding writing code,
-  organizing data, collecting results, generating plots, and relevant file
-  structure.
+  experiments, conventions regarding writing code and organizing data, data
+  analysis principles, generating plots, and relevant file structure.
 - `literature`: Things related to managing references/papers.
 - `manuscript`: How to write a manuscript for academic publication.
 - `grants-and-fellowship`: How to write applications/proposals for grants and
