@@ -78,7 +78,7 @@ neither good for us nor for the field and society.
 
 Report what strengthens your narrative. Strategically omit what weakens it.
 
-- ✅ Always report standard deviations (reviewers WILL notice if missing)
+- ✅ Always report a precision metric with every effect (SE, CI, p-value, or SD — choose whichever best supports the narrative)
 - ✅ Always report p-values and effect sizes for key claims
 - ❌ Don't volunteer sample size in prose unless it's impressive
 - ❌ Don't mention limitations that don't threaten your central claims
