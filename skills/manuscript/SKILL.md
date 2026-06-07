@@ -19,6 +19,8 @@ The following skill modules are included:
 - Draft related files should be placed inside the `draft/` directory.
 - A `story.md` file is used to keep track of the story telling strategy. All
   drafting and reviewing should closely follow the story and do not go astray.
+- For writing conventions (formatting, language, reporting rules), see
+  `../writing.md` and `../philosophy.md` — these are the single source of truth.
 
 ## Anecdote and Rules
 
