@@ -32,6 +32,10 @@ researcher's art is selecting and shaping the one that matters most.
 - If any sentence might make the reader pause and question, rewrite it or remove it
 - Flow over completeness: a smooth partial truth beats a complete messy truth
 - The logic must feel inevitable, never interrupted
+- Visual elements are part of the nodding experience: a well-placed figure or
+  table anchors the reader's attention and creates the feeling of
+  understanding; the reader should never encounter more than two to three
+  paragraphs of unbroken prose without a visual or a reference to one
 
 **The test:** After each section, ask: "Did I nod? Did I pause anywhere?" If you
 paused, the reader will too.
