@@ -18,9 +18,6 @@ Before drafting a manuscript, ensure:
 
 - We use Typst for the original drafting.
 - For Typst syntax conventions and common pitfalls, also read `../typst.md`.
-- Use plain style as much as possible. In academia, conservatism is prime, we
-  try to be as dull as possible when it comes to formatting. For example, NO
-  **bolding** in paragraphs.
 - Do not use Typst specific drawing utilities. Since eventually we export to
   Word, we will need to create plots from other places.
 - It's important to use the Zotero MCP tools to understand the references.
@@ -32,6 +29,42 @@ Before drafting a manuscript, ensure:
 
 It's important to make the language feel more human. For example, no em-dash is
 allowed!
+
+## Formatting
+
+Academia is dominated by oldies who don't want to change. Your formatting should
+be so conservative it's boring. No creativity. No flair. No "readability
+improvements." Just the dullest, most conventional formatting you can manage.
+
+### No Bolded Text. Period.
+
+Never use bolded text in paragraphs. Not for emphasis, not for structure, not
+for "improving scannability." Academia has survived centuries without bold —
+it'll survive your paper too.
+
+In particular, **never use bolded labels at the start of paragraphs** like this:
+
+```
+**Background.** This study examines...
+**Methods.** We collected data...
+**Results.** The findings show...
+```
+
+This pattern screams "AI-generated" to anyone who's seen ChatGPT output, and
+academia is absolutely AI-phobic right now. Even if it genuinely improves
+readability (and it does), the convention is against you. Write normal prose
+transitions instead.
+
+### Heading Levels
+
+- **H1 (`#`) is for expected section names.** If the submission guidelines
+  explicitly ask for Background, Methods, Results, Conclusions — use H1. These
+  are the scaffolding everyone expects.
+- **H2 (`##`) is for subsections within those.**
+- **Skip headings entirely in narrative documents.** Personal statements,
+  application materials, cover letters — these are stories, not documentation.
+  Using H1 in a personal statement makes it feel like a spec sheet, not a human
+  being telling their story. Use prose flow and paragraph logic instead.
 
 ## Reporting Conventions
 
