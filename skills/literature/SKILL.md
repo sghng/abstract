@@ -56,6 +56,7 @@ descriptions — this section covers conventions, not capabilities.
 ## Documentation
 
 Keep a `notes/literature.md` with:
+
 - Key papers grouped by relevance (background, methods, gaps, etc.)
 - How each reference relates to your research
 - Not every reference — just those that matter to your narrative

@@ -2,6 +2,11 @@
 
 This skill module explains how to author a manuscript for academic publication.
 
+> [!IMPORTANT]
+> **Read `../philosophy.md` before continuing.** The principles there — the
+> nodding reader, strategic optimism, big story first, don't self-incriminate —
+> are the foundation of all manuscript writing.
+
 ## Prerequisites
 
 Before drafting a manuscript, ensure:
@@ -27,6 +32,43 @@ Before drafting a manuscript, ensure:
 
 It's important to make the language feel more human. For example, no em-dash is
 allowed!
+
+## Reporting Conventions
+
+These conventions apply to all quantitative reporting in manuscripts and
+proposals.
+
+### What to Always Report
+
+- **Standard deviations** alongside means. Reviewers will notice if they're
+  missing, especially with large variance. Missing SD is a lethal omission.
+- **p-values and effect sizes** for key claims. Statistical significance alone
+  is insufficient — report both.
+- **Confidence intervals** for primary estimates.
+
+### What to Strategically Omit
+
+- **Sample size in prose.** Don't volunteer it unless it's impressive. If the
+  reviewer asks, be prepared with the number, but don't invite the question.
+  Tables and figures may include N where conventional.
+- **Limitations that don't threaten central claims.** Every study has
+  limitations. Only mention those that, if unaddressed, would make a reviewer
+  question your core contribution.
+
+### Positive Framing
+
+- Frame every finding in terms of what works, not what fails
+- "AIG achieves quality parity on easy items" not "AIG degrades on hard items"
+- "Models show consistent patterns" not "models have high variance"
+- "Selective excellence" not "inconsistent performance"
+
+### Strategic Omission
+
+Not everything belongs in the final paper. See `../philosophy.md` principle 5
+(Don't Self-Incriminate) for the full rationale. The rule of thumb: if omitting
+something would be easily caught and questioned by any competent reviewer,
+include it. If it requires a determined critic specifically looking for flaws,
+omit it.
 
 ## Story-Driven Authoring
 
