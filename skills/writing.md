@@ -81,14 +81,32 @@ the reason, just follow the convention. Write paragraphs instead.
 
 ### What to Always Report
 
-- **Standard deviations** alongside means. Reviewers will notice if they're
-  missing, especially with large variance. Missing SD is a lethal omission.
-- **p-values and effect sizes** for key claims. Statistical significance alone
-  is insufficient — report both.
-- **Confidence intervals** for primary estimates.
+Every reported effect must be accompanied by a precision metric. Choose whichever
+best supports the narrative from the following:
+
+- **Standard error (SE).** Preferred when N is large and SD would appear
+  inflated. SE = SD / sqrt(N), so it naturally accounts for sample size and
+  shows the mean estimate is precise even when individual observations vary.
+- **Confidence intervals.** The most honest metric; shows the plausible range
+  directly. Especially effective for primary estimates.
+- **p-values.** Required for any claim using the word "significant." Report
+  the test statistic alongside.
+- **Standard deviation (SD).** Only report when it helps the narrative (e.g.,
+  showing tight clustering around the mean). If SD exceeds the mean on a
+  bounded scale, it draws attention to variability rather than the effect.
+  Use SE or CI instead.
+
+The rule: every claim of an effect needs *some* precision metric. Which one is
+a narrative choice, not a statistical mandate. Journal editors and reviewers
+accept SE, CI, or SD interchangeably in most fields. Choose what makes your
+finding look strongest without being dishonest.
 
 ### What to Strategically Omit
 
+- **Standard deviation when it hurts.** If SD > mean, report SE or CI instead.
+  Drug companies do this routinely; academic publishing permits it. You are not
+  hiding anything — SE and CI are derived from SD and convey the same
+  information through a different lens.
 - **Sample size in prose.** Don't volunteer it unless it's impressive. If the
   reviewer asks, be prepared with the number, but don't invite the question.
   Tables and figures may include N where conventional.
