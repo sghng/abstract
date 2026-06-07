@@ -2,123 +2,56 @@
 
 This skill describes managing literature (research papers).
 
-## Overview
+## Context Management
 
-Literature management involves extensive reading of papers, which can clutter
-context significantly. **Recommendation**: Delegate literature tasks to a
-subagent unless it's a quick lookup or the current session is primarily focused
-on literature work.
+Literature work involves extensive reading of papers, which can clutter context
+significantly. **Delegate literature tasks to a subagent** unless:
 
-## Zotero MCP Tools
+- It's a quick lookup (single paper metadata, citation count)
+- The current session is primarily focused on literature work
 
-We use Zotero MCP tools for all literature operations.
+## Zotero Workflow
 
-### Discovery and Search
+We use Zotero MCP tools for all literature operations. Tools have built-in
+descriptions — this section covers conventions, not capabilities.
 
-**Search items** (`search_items`):
-- Search by title, author, year, or abstract content
+### Discovery
+
 - Use short, simple queries: "Author Year" (e.g., "Brewer 2011")
-- Each additional word narrows the match, not broadens it
+- Each additional word **narrows** the match, not broadens it
+- For topic exploration, `semantic_search` is better than keyword search
+- Browse collections and tags for curated lists
 
-**Advanced search** (`advanced_search`):
-- Multi-field queries: keyword + itemType + date ranges
-- Example: itemType = "preprint" AND date > "2024-01-01"
+### Reading
 
-**Browse collections** (`get_collections`, `get_collection_items`):
-- Navigate hierarchical collections
-- Access curated reading lists
-
-**Search by tag** (`search_by_tag`):
-- Find papers by topic tags
-- Boolean: use "OR" for alternatives, "-" for exclusions
-
-**Search notes** (`search_notes`):
-- Search across all highlights and annotations
-- Find where you discussed specific concepts
-
-### Reading and Understanding
-
-**Get metadata** (`get_item_metadata`):
-- Retrieve title, authors, abstract, DOI, citation info
-- Formats: markdown (default), JSON, BibTeX
-- Always includes abstract for assessing relevance
-
-**Read PDF pages** (`read_pdf_pages`):
-- Extract text from specific page ranges
-- Returns full content (can be 10K+ tokens for large papers)
-- Use with restraint; extract only needed pages
-
-**Get PDF outline** (`get_pdf_outline`):
-- Extract table of contents/bookmarks from PDF
-- Only works if PDF has embedded outline metadata
-- Returns hierarchical section list with page numbers
-
-**Get annotations** (`get_annotations`):
-- Retrieve highlights and attached notes from PDFs
-- Filter by parent item or search across library
+- Get abstracts first via `get_item_metadata` to assess relevance
+- Use `read_pdf_pages` for targeted extraction — specify page ranges
+- `get_pdf_outline` works only if the PDF has embedded TOC metadata
+- `get_annotations` retrieves your highlights for efficient review
 
 ### Citation Analysis
 
-**Scite enrichment** (`scite_enrich_item`):
-- Get citation counts: supporting, contrasting, mentioning
-- Check for retraction notices
-- **No API key required** — uses free public endpoints
-- May occasionally be unavailable (transient network issues)
+- `scite_enrich_item` and `scite_enrich_search` — **no API key required**
+- Check retractions before citing: `scite_check_retractions`
+- Scite may be intermittently unavailable (transient, retry later)
 
-**Check retractions** (`scite_check_retractions`):
-- Scan collections or tags for retracted papers
-- Vet reading lists before citing
+### Adding Papers
 
-### Adding Literature
-
-**By DOI** (`add_by_doi`):
-- Cleanest metadata; resolves via CrossRef
-- Use as first choice when DOI is available
-
-**By URL** (`add_by_url`):
-- arXiv: gets metadata + PDF
-- DOI URLs: treated as DOI
-- General URLs: creates webpage item (avoid for citations)
-
-**By BibTeX** (`add_by_bibtex`):
-- Bulk import from .bib files
-- Preserves citation keys in Extra field
+- **By DOI**: Cleanest metadata; use as first choice
+- **By URL**: Works for arXiv and DOI links; avoid generic URLs
+- **By BibTeX**: For bulk import
 
 ## Caveats and Gotchas
 
-### Search Behavior
-
-- **Search narrows with more words**: Adding terms reduces results, not expands
-- **Author-year format works best**: "Smith 2020" better than full title
-- **Fallback semantics**: If search finds nothing, tool auto-falls back to
-  simplified queries
-
-### PDF Handling
-
-- **Outline extraction requires metadata**: Many PDFs lack embedded TOC
-- **Attachment paths depend on storage mode**: WebDAV/cloud-stored items may
-  not return local paths
-- **Full text extraction is heavy**: `read_pdf_pages` returns entire content;
-  use page ranges to limit
-
-### Scite Integration
-
-- **Free but public**: Uses Scite's public endpoints; no key needed
-- **Transient failures occur**: "Could not reach Scite API" — retry later
-- **Limited to cited papers**: Only papers with DOIs get Scite data
-
-### Semantic Search
-
-- **Requires setup**: Needs Better BibTeX plugin + embedding provider config
-- **Not available by default**: Check `get_search_database_status` first
-- **Update required**: Run `update_search_database` after adding new items
-
-### Context Management
-
-- **Delegate heavy tasks**: Full-text reading, multi-paper searches, annotation
-  reviews should be subagent tasks
-- **Quick lookups stay inline**: Author names, single paper metadata, citation
-  counts
+- **Search narrows with more words**: Adding terms reduces results
+- **Metadata depends on source**: "webpage" items from generic URLs cannot be
+  cited properly
+- **PDF outlines are optional**: Not all PDFs have them
+- **Attachment paths vary**: WebDAV/cloud items may not return local paths
+- **Full text is heavy**: 10K+ tokens; use page ranges
+- **Semantic search needs setup**: Requires Better BibTeX + embedding config
+- **Saving limitations**: MCP sometimes can't save to Zotero; if so, provide
+  user a list of DOIs/URLs to add manually
 
 ## Documentation
 
@@ -126,14 +59,3 @@ Keep a `notes/literature.md` with:
 - Key papers grouped by relevance (background, methods, gaps, etc.)
 - How each reference relates to your research
 - Not every reference — just those that matter to your narrative
-
-## Adding Papers
-
-When you need to save new items:
-- Use `add_by_doi` for clean metadata
-- `add_by_url` for arXiv or DOI links
-- Avoid generic URLs — they create "webpage" items, not proper citations
-- For bulk import: provide BibTeX via `add_by_bibtex`
-
-**Note on saving**: MCP has limitations on directly saving to Zotero. If saving
-fails, provide user a list of DOIs/URLs to add manually.
