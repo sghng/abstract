@@ -192,6 +192,37 @@ methodology is perfect. For the full framework on evaluating work — strategic
 omission, lethal vs. acceptable issues, the nodding reader test — see
 `philosophy.md` in the research skill bundle.
 
+### Giving Followup: The Amendment
+
+When deliverables need revision, do not create a new ticket. Instead, append an
+**amendment** to the original ticket. The student already has context from the
+original ticket; the amendment just tells them what to fix and why.
+
+An amendment should be concise and specific:
+
+```markdown
+## Amendment 1 — [date]
+
+### Issues Found
+
+| # | Problem | Fix |
+|:-:|:--------|:----|
+| 1 | [Specific issue] | [Specific fix] |
+
+### Required Changes
+
+1. **[Category]**: [What to change and why]
+2. **[Category]**: [What to change and why]
+
+### Deliverable
+
+[Same as original, with any modifications]
+```
+
+Group issues by category (formatting, content, structure) so the student can
+work through them systematically. Reference the relevant conventions from the
+skill bundle so they understand the *why*.
+
 ## Artifact Conventions
 
 ### No Timelines in Tickets or Reports
