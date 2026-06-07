@@ -5,11 +5,20 @@ description: Academic research skill set.
 
 # Academic Research
 
-This skill bundle describes how to work on an academic workflow. It comprises
-the following modules:
+This skill bundle describes how to work on an academic workflow.
 
+> [!IMPORTANT]
+> **Read `philosophy.md` first.** It captures the cross-cutting research
+> mindset — story telling, strategic optimism, publication-first thinking, and
+> the nodding reader principle. These apply to ALL roles, not just manuscript
+> writing. Without this foundation, the rest of the skill modules won't
+> produce good research.
+
+It comprises the following modules:
+
+- `philosophy.md`: **READ FIRST.** The research mindset that governs everything.
 - `story-keeping.md`: The standard format for `story.md`, the central narrative
-  document used across all research activities. **Read this first.**
+  document used across all research activities.
 - `presentation`: How to do good academic presentations. This includes
   preparation of presentation, story telling planning, making slides, and
   maintaining the narrative consistent with `story.md`.
