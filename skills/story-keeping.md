@@ -9,7 +9,7 @@ The `story.md` file maintains the coherent narrative of a research project. It
 serves as the north star for all work: tickets, experiments, reports,
 presentations, and manuscripts should all align with the story.
 
-**Location**: `notes/narrative/story.md`
+**Location**: `story.md` at the project root.
 
 ## Standard Format
 

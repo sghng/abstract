@@ -15,10 +15,8 @@ A typical research project follows this structure:
 
 ```
 project-root/
+├── story.md                # MASTER NARRATIVE - central story document
 ├── notes/                  # Research notes and documentation
-│   ├── narrative/          # Story, research questions, methodology
-│   │   ├── story.md        # MASTER NARRATIVE - central story document
-│   │   └── research-questions.md
 │   ├── tickets/            # Active work assignments (tickets)
 │   ├── reports/            # Completed reports to supervisor
 │   ├── methodology/        # Analysis methods, conventions
@@ -45,10 +43,8 @@ project-root/
 
 The `notes/` directory uses a structured organization:
 
-- **`notes/narrative/`**: High-level research documentation
-  - `story.md`: Central narrative document defining the research story
-  - `research-questions.md`: Research questions and hypotheses
-  - `methodology/`: Analysis methods and conventions
+- **`story.md`** (at project root): Central narrative document defining the research
+  story. The north star for all work.
 
 - **`notes/tickets/`**: Active work assignments. Tickets use the format
   `ticket-NNN-short-title.md` and should NEVER include dates or timelines.
@@ -71,7 +67,7 @@ Check [[inter-rater-reliability]] methodology.
 ```
 
 Links are resolved to files automatically (e.g., `[[story]]` →
-`notes/narrative/story.md`). No paths or extensions needed.
+`story.md` at project root). No paths or extensions needed.
 
 ## Experiment Convention
 
