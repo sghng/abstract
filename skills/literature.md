@@ -81,6 +81,38 @@ After the user imports papers, the agent must verify:
 - `get_pdf_outline` works only if the PDF has embedded TOC metadata
 - `get_annotations` retrieves your highlights for efficient review
 
+### Claim Verification (Agent Does This)
+
+Before citing a paper to support a specific claim, extract the supporting passage:
+
+1. **Locate the exact sentence(s).** Use `read_pdf_pages` to target the relevant
+   section (e.g., theorem statement, results paragraph). Do not cite from
+   memory or from the abstract alone when making a specific factual claim.
+
+2. **Record the passage as a block quote.** Include the verbatim text, the page
+   number, and the section/theorem number. Store this either in the internal
+   report (if the claim appears there) or in `notes/literature.md` (in the
+   verification status column or a dedicated "Supporting Passages" section).
+
+3. **Minimum standard for key claims.** Every claim that a reviewer might
+   challenge — formulas, theorems, complexity bounds, expected values —
+   requires a supporting passage. Background context and general knowledge
+   (e.g., "Euler's formula is V - E + F = 2") does not.
+
+4. **If the passage is ambiguous or missing.** Flag it. A paper whose abstract
+   seems to support a claim may state something different in the body. Better
+   to discover this during verification than during review.
+
+Format example:
+
+> "Any triangulation of a set P of n points in the plane — not all collinear,
+> and with k points on the convex hull — has 2n − 2 − k triangles and 3n − 3 − k
+> edges." — de Berg et al. (2008), Theorem 9.1, p. 193
+
+This step is not optional for quantitative claims. It is the only mechanism
+that builds confidence when neither author nor reviewer can re-derive the
+result independently.
+
 ### Citation Analysis
 
 - `scite_enrich_item` and `scite_enrich_search` — **no API key required**
@@ -98,7 +130,8 @@ Keep a `notes/literature.md` (or `notes/literature/literature.md`) with:
 - **Decision log**: why papers were dropped or qualified. Prevents re-litigating
   the same decision later.
 - **Verification status**: which papers have been inspected (abstract only vs
-  full text) and whether claims are confirmed.
+  full text) and whether claims are confirmed. For claims confirmed by full
+  text, include the supporting passage as a block quote with page number.
 
 Not every paper goes in the note — only those relevant to your narrative.
 
