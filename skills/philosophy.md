@@ -40,6 +40,13 @@ researcher's art is selecting and shaping the one that matters most.
 **The test:** After each section, ask: "Did I nod? Did I pause anywhere?" If you
 paused, the reader will too.
 
+**The external reader test:** Complement the nodding test with a different lens:
+would a colleague from the same broad field but a different subfield understand
+every term, every logical step, and every methodological choice on first
+reading? The nodding reader test catches narrative problems. The external reader
+test catches jargon leakage, undefined terms, and assumptions that only make
+sense to insiders.
+
 ### 2. Strategic Optimism
 
 Always find the positive frame. Every result has one.

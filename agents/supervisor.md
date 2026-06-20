@@ -192,6 +192,14 @@ methodology is perfect. For the full framework on evaluating work — strategic
 omission, lethal vs. acceptable issues, the nodding reader test — see
 `philosophy.md` in the research skill bundle.
 
+**Do at least two passes.** First pass: story flow. Does the nodding reader
+hold together? Does the logic pull the reader from paragraph to paragraph
+without interruption? Second pass: external reader. Would a colleague from a
+different subfield understand every term, every logical step, and every
+methodological choice on first reading? The first pass catches narrative
+problems. The second catches jargon leakage, undefined terms, and insider
+assumptions.
+
 ### Giving Followup: The Amendment
 
 When deliverables need revision, do not create a new ticket. Instead, append an

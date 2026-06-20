@@ -63,6 +63,14 @@ side-by-side comparison demands precise alignment. A table of advice or
 recommendations feels like a policy document; prose advice feels like a
 colleague who knows what they're talking about.
 
+### Define on First Use
+
+Every specialized term must be explained at its first occurrence in the text.
+A reader from a different subfield should never hit a word they cannot parse
+from context. What's obvious to you — methodological shorthand, system
+components, analytical metrics — is opaque to anyone outside your project. If
+you hesitate even slightly about whether a term needs definition, it does.
+
 ---
 
 ## Language
@@ -73,6 +81,20 @@ colleague who knows what they're talking about.
 - Sentence variety matters. Don't start three consecutive sentences the same
   way.
 - Prefer active voice where it doesn't sound forced.
+
+### Integrated Citations
+
+Never use a parenthetical citation as the grammatical subject or object of a
+sentence. Write "Gierl and Haladyna (2012) established..." not "(Gierl &
+Haladyna, 2012) established..." The parenthetical form `(Author, Year)` is
+for supplementary citation at the end of a claim, not for carrying the grammar.
+
+### No Colon Explanations
+
+Avoid the pattern "X showed that Y is fragile: performance drops..." where a
+colon introduces an explanatory fragment. Write an integrated sentence
+instead: "X found the fragility of Y, showing that performance declined..."
+The colon construction reads like a lecture slide, not a paper.
 
 ---
 
