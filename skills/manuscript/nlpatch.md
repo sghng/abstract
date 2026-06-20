@@ -9,10 +9,14 @@ machine patching.
 NLPatch is very useful when file formats that are not machine editable such as
 Microsoft Word is used in the paper revision process. A typical use case is:
 
-- You receive a revised document.
-- You use some tools to extract information from that document (e.g. `pandoc`).
-- You propose revisions to the document via a NLPatch.
-- User will manually apply the NLPatch to the document (e.g. in Microsoft Word)
+- You receive a revised document with tracked changes and comments.
+- Delegate the `review-reader` subagent to extract and synthesize the feedback
+  into NLPatch format. The subagent reads both the tracked-changes view
+  (`pandoc --track-changes=all`) and the clean accepted-text view, groups
+  atomic edits into semantic hunks, and extracts comments.
+- You review the NLPatch, discuss changes, and decide what to implement.
+- The NLPatch is then manually applied to the document (e.g. in Microsoft Word)
+  by a human.
 
 ## Specification
 
