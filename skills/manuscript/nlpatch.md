@@ -10,10 +10,11 @@ NLPatch is very useful when file formats that are not machine editable such as
 Microsoft Word is used in the paper revision process. A typical use case is:
 
 - You receive a revised document with tracked changes and comments.
-- Delegate the `review-reader` subagent to extract and synthesize the feedback
-  into NLPatch format. The subagent reads both the tracked-changes view
-  (`pandoc --track-changes=all`) and the clean accepted-text view, groups
-  atomic edits into semantic hunks, and extracts comments.
+- Delegate the `nlpatch` subagent to extract and synthesize the feedback
+  into NLPatch format. The subagent handles both ingress (DOCX → NLPatch)
+  and egress (proofreading/refining proposed patches). It runs in three
+  steps: broad extraction, per-hunk refinement to factor out context and
+  minimize diffs, and a final compliance review.
 - You review the NLPatch, discuss changes, and decide what to implement.
 - The NLPatch is then manually applied to the document (e.g. in Microsoft Word)
   by a human.
@@ -77,8 +78,10 @@ colleagues/advisor on things you're not sure, or reply to their review.
 
 IMPORTANT: since NLPatch is for human, not machine, you should NOT split lines.
 Even if a line added or a comment is long, you don't split them into multiple
-lines. Otherwise, when user copy the addition, they will copy several line
-prefixes.
+lines. This is especially critical for `+` lines: when the user copies a `+`
+line to paste into Word, any line wrapping creates multiple `+` prefixes and
+breaks the paste. A wrapped `+` line makes the patch unusable. Every addition
+must be a single unbroken line, no matter how long.
 
 Use `#` prefix wisely to explain the rationale. This is important for user to
 validate the patch and for other agents to understand.
