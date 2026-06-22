@@ -19,6 +19,33 @@ Microsoft Word is used in the paper revision process. A typical use case is:
 - The NLPatch is then manually applied to the document (e.g. in Microsoft Word)
   by a human.
 
+## Usage Tips
+
+### Ingress: Reading Reviewer Feedback
+
+When you receive a DOCX with reviewer tracked changes and comments:
+
+1. Delegate to the `nlpatch` subagent with the DOCX path. The subagent extracts
+   changes and comments into NLPatch format — faithfully, without interpreting
+   the reviewer's intent. That's your job.
+2. Read the returned NLPatch. Add `#` rationale to each hunk explaining what
+   the reviewer wants and why.
+3. Discuss with your supervisor which changes to implement.
+
+### Egress: Refining a Proposed Patch
+
+When you've drafted changes as a rough NLPatch but it needs cleanup before
+manual application:
+
+1. Delegate to the `nlpatch` subagent with the patch content. Optionally
+   provide the target document path so the subagent can verify `@@` headers
+   and context lines match.
+2. The subagent mechanically refines the patch — factoring context, minimizing
+   diffs, flagging missing rationale with `# [MISSING RATIONALE]`. It does not
+   rewrite your content or speak for you.
+3. Review the refined patch, fill in any flagged missing rationale, and apply
+   to the DOCX.
+
 ## Specification
 
 - A file consists of one or more **hunks**.
