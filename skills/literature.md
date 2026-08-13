@@ -10,10 +10,58 @@ significantly. **Delegate literature tasks to a subagent** unless:
 - It is a quick lookup (single paper metadata, citation count)
 - The current session is primarily focused on literature work
 
+## External Deep Search (Perplexity)
+
+For broad literature discovery, use Perplexity as the first pass. This offloads
+the heavy searching to an external tool so agents can focus on verification.
+
+**Workflow:**
+
+1. **Agent drafts a comprehensive search prompt.** The prompt must contain:
+   - The research context: what problem we're working on, what stage we're at
+   - Specific search objectives: exactly what kinds of papers are needed and why
+   - Output requirements: the table format below, baked into the prompt
+
+2. **User runs the prompt** in Perplexity and forwards the report back.
+
+3. **Agent validates the report against Zotero**, distinguishing:
+   - Papers already in the project collection
+   - Papers in the Zotero library but not in the collection
+   - Papers not in the library at all
+
+4. **Agent returns a refined table** with a status column showing which papers
+   actually need to be added. The user then imports via the browser extension.
+
+### Report Table Format
+
+Every report to the user (both the Perplexity prompt output and the
+post-validation refined table) uses this format:
+
+```markdown
+| # | Title | Year | Authors | Venue | URL/DOI | One-sentence relevance |
+|---|-------|------|---------|-------|---------|------------------------|
+| 1 | ...   | 2025 | ...     | ...   | ...     | What it supports ...  |
+```
+
+The refined table after Zotero validation adds a status column:
+
+```markdown
+| # | Title | Year | Authors | Venue | URL/DOI | Relevance | Status |
+|---|-------|------|---------|-------|---------|-----------|--------|
+| 1 | ...   | 2025 | ...     | ...   | ...     | ...       | in collection / in library / needs adding |
+```
+
 ## Zotero Workflow
 
 We use Zotero MCP tools for all literature operations. Tools have built-in
 descriptions — this section covers conventions, not capabilities.
+
+**Hard blocker:** If the Zotero MCP is unreachable (connection refused, desktop
+not running), do NOT proceed with Zotero-dependent steps. Surface the blocker to
+the user and stop. Do not improvise around it (e.g., skipping the
+already-in-library check) — duplicates and missing items are costly to fix
+later. The user may choose to scratch the requirement, but the agent does not
+decide that on its own.
 
 ### Discovery
 
@@ -83,7 +131,10 @@ After the user imports papers, the agent must verify:
 
 ### Claim Verification (Agent Does This)
 
-Before citing a paper to support a specific claim, extract the supporting passage:
+**Every paper we plan to cite gets claim verification.** There is no
+"abstract-only citation" for a paper that will appear in the manuscript —
+before a paper enters the citation plan, the agent extracts the supporting
+passage for the specific claim it supports. For each candidate paper:
 
 1. **Locate the exact sentence(s).** Use `read_pdf_pages` to target the relevant
    section (e.g., theorem statement, results paragraph). Do not cite from
