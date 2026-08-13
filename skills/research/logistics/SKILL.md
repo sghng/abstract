@@ -10,28 +10,85 @@ A typical research project follows this layout:
 
 ```
 project-root/
-├── story.md                # Central narrative - the north star
 ├── notes/                  # Research notes (often symlink to Obsidian vault)
-│   ├── tickets/            # Active work assignments
-│   ├── reports/          # Completed reports to supervisor
-│   ├── methodology/      # Analysis conventions and methods
-│   ├── dev/              # Implementation notes, work-in-progress
-│   └── narrative/        # Story-related documents
+│   ├── index.md            # Note on notes - entry point to the vault
+│   ├── story.md            # Central narrative - the north star
+│   ├── tickets/            # Active work assignments (required)
+│   ├── reports/            # Completed reports to supervisor (required)
+│   ├── dev/                # Implementation notes, work-in-progress (required)
+│   └── ...                 # Other themed dirs optional, emerge as needed
 ├── src/                   # Core reusable code
 ├── scripts/               # One-off utility scripts
 ├── data/                  # Data files reused across experiments
 ├── experiments/           # Individual experiment directories
 │   ├── 01-name/
 │   └── 02-name/
-└── draft/                 # Publications, presentations, proposals
+└── draft/                 # Publications, presentations, proposals (artifacts)
 ```
 
 ### Key Conventions
 
 - **notes/** is typically a symlink to an Obsidian vault. Use `-L` with `find` to follow symlinks.
-- **story.md** lives at project root, not in notes/
+- **story.md** lives at `notes/story.md` — inside notes, at the vault root
+- **index.md** lives at `notes/index.md` — the "note on notes", entry point
+- **tickets/**, **reports/**, **dev/** are the only required subdirectories
+- Other themed directories (methodology/, literature/, publications/, etc.) are
+  created organically when the volume of notes justifies them
 - **experiments/** are numbered sequentially
 - **src/** contains reusable code, **scripts/** contains one-offs
+
+### Where Do Notes Go?
+
+| Note type | Location |
+|-----------|----------|
+| Global / cross-cutting (story, index, philosophy) | `notes/` root |
+| Active work assignment | `notes/tickets/` |
+| Report to supervisor | `notes/reports/` |
+| Implementation detail, scratch work | `notes/dev/` |
+| Themed content (literature, methods) | Optional subdir, create when needed |
+| Random working notes | `notes/` root |
+
+If a note doesn't clearly belong to a themed directory, keep it at the notes
+root. Don't force categorization — let patterns emerge and create directories
+retroactively when a clear theme appears.
+
+---
+
+## Notes Index (index.md)
+
+Every notes vault should have an `index.md` at its root — a "note on notes" that
+serves as the entry point for both humans and agents.
+
+### Purpose
+
+- Orient anyone (human or agent) entering the project
+- List key notes and what each contains
+- Link to the story, active tickets, and recent reports
+
+### Standard Format
+
+```markdown
+# [Project Name]
+
+Short description of the project and what it's about.
+
+## Key Notes
+
+- [[story]] - Central narrative
+- [[ticket-001-...]] - Current active work
+- [[report-001-...]] - Latest report
+
+## Tasks Query
+
+(Optional Obsidian tasks query for pending items)
+```
+
+### When to Update
+
+- When a new ticket is created
+- When a report is completed
+- When the story changes substantially
+- When new themed directories are added
 
 ---
 
@@ -91,7 +148,7 @@ Check [[report-001-data-analysis]] for results.
 
 ### Resolution Rules
 
-- `[[story]]` → resolves to `story.md` at project root
+- `[[story]]` → resolves to `story.md` at `notes/` root (inside the vault)
 - `[[ticket-001]]` → resolves to `notes/tickets/ticket-001-*.md`
 - `[[report-001]]` → resolves to `notes/reports/report-001-*.md`
 - Links are case-sensitive and must match filename exactly
@@ -184,13 +241,69 @@ Location: `notes/reports/report-NNN-name.md`
 What changed and why.
 ```
 
+### When Amendments Apply
+
+Amendments apply **only after** a ticket has been finalized and delegated to
+execution. They capture corrections discovered during execution (e.g., a report
+reveals gaps or unexpected clarifications) without touching the ticket body.
+
+**During the drafting phase** (before delegation), do NOT use amendments.
+Just redraft the ticket directly — edit the body freely. A ticket is not
+finalized until it's delegated; anything before that is draft, and drafts are
+redrafted, not amended.
+
+Lifecycle:
+1. **Drafting**: Edit the body freely. No amendments.
+2. **Delegated**: Ticket body is frozen. Discovered issues → append amendments.
+3. **Superseded**: New ticket (or full redraft) replaces it.
+
 ### Key Principles
 
 1. **Every task needs a "Because"**: Explain how the task contributes to the narrative
 2. **Quick Links at top**: Easy navigation to related documents
 3. **Deliverables section**: Clear output expectations
 4. **Questions section**: Blockers and clarifications
-5. **Amendments at bottom**: Track corrections without editing the main ticket
+5. **Amendments only after delegation**: During drafting, redraft instead
+6. **Parent/sub-ticket split**: Large tickets may be split into a parent ticket
+   plus numbered sub-tickets, interconnected via wiki links
+
+---
+
+## Parent and Sub-Tickets
+
+When a ticket spans multiple domains (analysis, literature, writing, etc.),
+split it:
+
+- **Parent ticket**: Overview, blocking decisions, domain summary. Links to
+  sub-tickets via wiki links. Remains stable; sub-tickets carry the detail.
+- **Sub-tickets**: One per domain. `ticket-NNN-short-name.md` each. Each is a
+  self-contained execution unit with its own Quick Links, Background, Todos,
+  and Deliverables. Link back to the parent and to each other where dependent.
+
+Example:
+```
+ticket-002-psychometrika-revision.md      (parent)
+├── ticket-003-literature-review.md       (sub)
+├── ticket-004-analysis.md                (sub)
+└── ticket-005-manuscript-drafting.md     (sub)
+```
+
+---
+
+## Versioning
+
+**Artifacts are versioned. Internal notes are not.**
+
+- **Versioned (artifacts)**: Drafts (`manuscript-v5.docx`), figures, tables,
+  proposals, and other deliverables get version labels (`-v1`, `-v2`, ...).
+  Never overwrite an artifact; create the next version.
+- **Not versioned (internal notes)**: Story, tickets, reports, methodology
+  notes, dev notes. Don't append version numbers or dates to these. When
+  something changes: **merge** related notes, **split** overgrown notes, or
+  **supersede** stale notes. Editing in place is fine.
+
+This is why notes filenames use kebab-case without versions, while `draft/`
+artifacts carry explicit version labels.
 
 ---
 
