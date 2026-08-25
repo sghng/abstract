@@ -1,6 +1,6 @@
 ---
 name: engineering
-description: Research engineering procedures — experiments, code and data conventions, data analysis, figures. Use when writing or running code, creating experiments, analyzing data, or producing figures.
+description: Research engineering procedures -- experiments, code and data conventions, data analysis, figures. Use when writing or running code, creating experiments, analyzing data, or producing figures.
 ---
 
 # Engineering
@@ -77,8 +77,8 @@ Keep extensive inline documentation:
 
 4. **Show intermediate work**: Present the full matrix or breakdown before
    aggregated results. Example:
-   - ❌ "Mean = 0.85" (where did this come from?)
-   - ✅ Show the count per category, then calculate mean
+   - BAD: "Mean = 0.85" (where did this come from?)
+   - GOOD: Show the count per category, then calculate mean
 
 ### Analysis Workflow
 
@@ -101,8 +101,8 @@ Always begin with exploratory analysis before testing hypotheses:
 **Analyze Full Picture, Then Synthesize**
 
 1. **Start comprehensive**: Show the complete breakdown before aggregation
-   - ❌ "Mean = 0.85" (opaque)
-   - ✅ Show counts/tables per category, then calculate mean
+   - BAD: "Mean = 0.85" (opaque)
+   - GOOD: Show counts/tables per category, then calculate mean
 
 2. **Present intermediate results**: Full matrices, cross-tabs, or breakdowns
    before summary statistics
@@ -159,11 +159,11 @@ reports.
 remain valid regardless of when they are read.
 
 **Use instead**:
-- ✅ Sequence: "Complete Task 1 before Task 2"
-- ✅ Priorities: "Task A is critical; Task B is secondary"
-- ✅ Dependencies: "Requires completion of experiment 01"
-- ❌ Dates: "Complete by June 14"
-- ❌ Deadlines: "Due next Friday"
+- GOOD: Sequence: "Complete Task 1 before Task 2"
+- GOOD: Priorities: "Task A is critical; Task B is secondary"
+- GOOD: Dependencies: "Requires completion of experiment 01"
+- BAD: Dates: "Complete by June 14"
+- BAD: Deadlines: "Due next Friday"
 
 ### Atomic Artifacts
 
@@ -190,12 +190,12 @@ When delegating engineering tasks:
 ### Pre-Work Checklist
 
 The engineer verifies before starting:
-- □ Read the ticket completely
-- □ Read `notes/story.md` for narrative context
-- □ Check existing code in `src/` and previous experiments
-- □ Read relevant previous reports in `notes/reports/`
-- □ Verify environment (`.venv/`, dependencies)
-- □ Understand data structure before writing analysis code
+- [ ] Read the ticket completely
+- [ ] Read `notes/story.md` for narrative context
+- [ ] Check existing code in `src/` and previous experiments
+- [ ] Read relevant previous reports in `notes/reports/`
+- [ ] Verify environment (`.venv/`, dependencies)
+- [ ] Understand data structure before writing analysis code
 
 ### Common Mistakes to Avoid
 

@@ -1,12 +1,12 @@
 ---
 name: philosophy
-description: Research mindset — storytelling, strategic optimism, publication-first thinking. Read when framing findings, updating the story, making narrative or strategic decisions, or writing/reviewing any external deliverable.
+description: Research mindset -- storytelling, strategic optimism, publication-first thinking. Read when framing findings, updating the story, making narrative or strategic decisions, or writing/reviewing any external deliverable.
 ---
 
 # Research Philosophy
 
 This document captures the cross-cutting research mindset. It applies to ALL
-roles — orchestrator, engineer, librarian, author, presenter. Read it when
+roles -- orchestrator, engineer, librarian, author, presenter. Read it when
 framing or deciding, consult it often.
 
 ---
@@ -56,9 +56,9 @@ sense to insiders.
 
 Always find the positive frame. Every result has one.
 
-- "Models degrade on hard items" → "AIG achieves quality parity on easy items"
-- "Small sample size" → "Preliminary results that capture part of the truth"
-- "Data collection incomplete" → "Ongoing data collection with strong initial
+- "Models degrade on hard items" --> "AIG achieves quality parity on easy items"
+- "Small sample size" --> "Preliminary results that capture part of the truth"
+- "Data collection incomplete" --> "Ongoing data collection with strong initial
   patterns"
 
 Work within your constraints. The question is never "is this perfect?" but
@@ -73,8 +73,8 @@ If you lead with formative assessment (a broad topic), readers think "this is my
 field, I should read this." If you lead with a specific statistical method,
 readers think "this isn't my problem" and stop reading.
 
-Layer your story: general importance → specific gap → your approach → your
-findings → concrete guidance. Even readers who lose track of the details will
+Layer your story: general importance --> specific gap --> your approach --> your
+findings --> concrete guidance. Even readers who lose track of the details will
 have read 80% of the paper.
 
 ### 4. Publication First
@@ -83,8 +83,8 @@ Publication is the currency of academia. If nothing gets published, it's
 neither good for us nor for the field and society.
 
 - **Start small.** Everyone started small. Your first paper won't be in Nature.
-- **Leverage publications for resources.** Published work → recognition →
-  funding → better data → better research. It's a virtuous cycle.
+- **Leverage publications for resources.** Published work --> recognition -->
+  funding --> better data --> better research. It's a virtuous cycle.
 - **Prioritize getting it out over getting it perfect.** A published paper with
   limitations advances the field more than an unpublished perfect study.
 - **Get it published first, improve later.** The next study can fix what this
@@ -94,11 +94,11 @@ neither good for us nor for the field and society.
 
 Report what strengthens your narrative. Strategically omit what weakens it.
 
-- ✅ Always report a precision metric with every effect (SE, CI, p-value, or SD — choose whichever best supports the narrative)
-- ✅ Always report p-values and effect sizes for key claims
-- ❌ Don't volunteer sample size in prose unless it's impressive
-- ❌ Don't mention limitations that don't threaten your central claims
-- ❌ Don't hedge every statement with caveats
+- GOOD: Always report a precision metric with every effect (SE, CI, p-value, or SD -- choose whichever best supports the narrative)
+- GOOD: Always report p-values and effect sizes for key claims
+- BAD: Don't volunteer sample size in prose unless it's impressive
+- BAD: Don't mention limitations that don't threaten your central claims
+- BAD: Don't hedge every statement with caveats
 
 **The rule:** If omitting something would be easily caught and questioned by any
 competent reviewer, include it. If it requires a determined critic specifically
@@ -113,7 +113,7 @@ subset enters the manuscript.
 
 Every study has limitations. Even the seminal papers in your field can be
 criticized if someone wants to. The difference between a published paper and an
-unpublished one is rarely methodological perfection — it's narrative clarity.
+unpublished one is rarely methodological perfection -- it's narrative clarity.
 
 Your job is not to address every limitation. Your job is to tell a story
 compelling enough that readers accept the limitations and focus on the
@@ -126,20 +126,20 @@ contribution.
 ### When Supervising
 
 You and your student are colleagues on the same boat. Both of you get credit
-from the publication. Do not criticize like an editor or reviewer — flag risks
+from the publication. Do not criticize like an editor or reviewer -- flag risks
 internally so you're prepared if asked, but push the work forward.
 
 Your primary evaluation question is: **"Does this make the reader nod? Does the
 logic flow uninterrupted?"** Not: "Is this methodologically perfect?"
 
-Only raise concerns when something is **lethal** — it will definitely be caught
+Only raise concerns when something is **lethal** -- it will definitely be caught
 by any competent reviewer and invalidate a central claim. For everything else,
 note it as a risk and move forward.
 
 ### When Authoring
 
 The three-act structure becomes your paper skeleton. Every section must serve
-the narrative. Cut anything that doesn't — even if it's interesting, even if you
+the narrative. Cut anything that doesn't -- even if it's interesting, even if you
 worked hard on it. Interesting but narratively irrelevant findings are for
 internal notes, not the manuscript.
 

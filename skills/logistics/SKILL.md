@@ -1,6 +1,6 @@
 ---
 name: logistics
-description: Project organization standards — repository layout, ticket and report templates, file naming, wiki-links, workflow. Use when creating tickets, reports, or notes, or when unsure where a file belongs.
+description: Project organization standards -- repository layout, ticket and report templates, file naming, wiki-links, workflow. Use when creating tickets, reports, or notes, or when unsure where a file belongs.
 ---
 
 # Logistics
@@ -15,27 +15,27 @@ A typical research project follows this layout:
 
 ```
 project-root/
-├── notes/                  # Research notes (often symlink to Obsidian vault)
-│   ├── index.md            # Note on notes - entry point to the vault
-│   ├── story.md            # Central narrative - the north star
-│   ├── tickets/            # Active work assignments (required)
-│   ├── reports/            # Completed reports to orchestrator (required)
-│   ├── dev/                # Implementation notes, work-in-progress (required)
-│   └── ...                 # Other themed dirs optional, emerge as needed
-├── src/                   # Core reusable code
-├── scripts/               # One-off utility scripts
-├── data/                  # Data files reused across experiments
-├── experiments/           # Individual experiment directories
-│   ├── 01-name/
-│   └── 02-name/
-└── draft/                 # Publications, presentations, proposals (artifacts)
++-- notes/                  # Research notes (often symlink to Obsidian vault)
+|   +-- index.md            # Note on notes - entry point to the vault
+|   +-- story.md            # Central narrative - the north star
+|   +-- tickets/            # Active work assignments (required)
+|   +-- reports/            # Completed reports to orchestrator (required)
+|   +-- dev/                # Implementation notes, work-in-progress (required)
+|   `-- ...                 # Other themed dirs optional, emerge as needed
++-- src/                   # Core reusable code
++-- scripts/               # One-off utility scripts
++-- data/                  # Data files reused across experiments
++-- experiments/           # Individual experiment directories
+|   +-- 01-name/
+|   `-- 02-name/
+`-- draft/                 # Publications, presentations, proposals (artifacts)
 ```
 
 ### Key Conventions
 
 - **notes/** is typically a symlink to an Obsidian vault. Use `-L` with `find` to follow symlinks.
-- **story.md** lives at `notes/story.md` — inside notes, at the vault root
-- **index.md** lives at `notes/index.md` — the "note on notes", entry point
+- **story.md** lives at `notes/story.md` -- inside notes, at the vault root
+- **index.md** lives at `notes/index.md` -- the "note on notes", entry point
 - **tickets/**, **reports/**, **dev/** are the only required subdirectories
 - Other themed directories (methodology/, literature/, publications/, etc.) are
   created organically when the volume of notes justifies them
@@ -54,14 +54,14 @@ project-root/
 | Random working notes | `notes/` root |
 
 If a note doesn't clearly belong to a themed directory, keep it at the notes
-root. Don't force categorization — let patterns emerge and create directories
+root. Don't force categorization -- let patterns emerge and create directories
 retroactively when a clear theme appears.
 
 ---
 
 ## Notes Index (index.md)
 
-Every notes vault should have an `index.md` at its root — a "note on notes" that
+Every notes vault should have an `index.md` at its root -- a "note on notes" that
 serves as the entry point for both humans and agents.
 
 ### Purpose
@@ -102,13 +102,13 @@ Short description of the project and what it's about.
 All files use **kebab-case** (lowercase with hyphens):
 
 ```
-✅ ticket-001-data-analysis.md
-✅ report-003-final-results.md
-✅ proposal-v2-revised.md
+GOOD: ticket-001-data-analysis.md
+GOOD: report-003-final-results.md
+GOOD: proposal-v2-revised.md
 
-❌ ticket_001_data_analysis.md
-❌ Report003FinalResults.md
-❌ proposal_v2.md
+BAD: ticket_001_data_analysis.md
+BAD: Report003FinalResults.md
+BAD: proposal_v2.md
 ```
 
 ### Ticket Naming
@@ -153,21 +153,21 @@ Check [[report-001-data-analysis]] for results.
 
 ### Resolution Rules
 
-- `[[story]]` → resolves to `story.md` at `notes/` root (inside the vault)
-- `[[ticket-001]]` → resolves to `notes/tickets/ticket-001-*.md`
-- `[[report-001]]` → resolves to `notes/reports/report-001-*.md`
+- `[[story]]` --> resolves to `story.md` at `notes/` root (inside the vault)
+- `[[ticket-001]]` --> resolves to `notes/tickets/ticket-001-*.md`
+- `[[report-001]]` --> resolves to `notes/reports/report-001-*.md`
 - Links are case-sensitive and must match filename exactly
 
 ### When to Use Wiki-Links
 
-- ✅ Cross-referencing tickets from other tickets
-- ✅ Referencing story.md from any document
-- ✅ Linking reports to tickets
-- ✅ Citing methodology documents
+- GOOD: Cross-referencing tickets from other tickets
+- GOOD: Referencing story.md from any document
+- GOOD: Linking reports to tickets
+- GOOD: Citing methodology documents
 
-- ❌ External URLs (use standard markdown links)
-- ❌ Files outside the project
-- ❌ Absolute file paths
+- BAD: External URLs (use standard markdown links)
+- BAD: Files outside the project
+- BAD: Absolute file paths
 
 ---
 
@@ -253,13 +253,13 @@ execution. They capture corrections discovered during execution (e.g., a report
 reveals gaps or unexpected clarifications) without touching the ticket body.
 
 **During the drafting phase** (before delegation), do NOT use amendments.
-Just redraft the ticket directly — edit the body freely. A ticket is not
+Just redraft the ticket directly -- edit the body freely. A ticket is not
 finalized until it's delegated; anything before that is draft, and drafts are
 redrafted, not amended.
 
 Lifecycle:
 1. **Drafting**: Edit the body freely. No amendments.
-2. **Delegated**: Ticket body is frozen. Discovered issues → append amendments.
+2. **Delegated**: Ticket body is frozen. Discovered issues --> append amendments.
 3. **Superseded**: New ticket (or full redraft) replaces it.
 
 ### Key Principles
@@ -288,9 +288,9 @@ split it:
 Example:
 ```
 ticket-002-psychometrika-revision.md      (parent)
-├── ticket-003-literature-review.md       (sub)
-├── ticket-004-analysis.md                (sub)
-└── ticket-005-manuscript-drafting.md     (sub)
++-- ticket-003-literature-review.md       (sub)
++-- ticket-004-analysis.md                (sub)
+`-- ticket-005-manuscript-drafting.md     (sub)
 ```
 
 ---
@@ -420,7 +420,7 @@ find notes -name "*.md"  # May miss files!
 The standard research workflow flows through these artifacts:
 
 ```
-story.md → tickets → experiments → reports → deliverables
+story.md --> tickets --> experiments --> reports --> deliverables
 ```
 
 ### Story-Driven
@@ -489,26 +489,26 @@ Results detailed in [[report-001]].
 
 ```
 ticket-001-data-analysis.md
-  → experiments/01-data-analysis/
-    → results.md (raw output)
-  → notes/reports/report-001-data-analysis.md (executive summary)
+  --> experiments/01-data-analysis/
+    --> results.md (raw output)
+  --> notes/reports/report-001-data-analysis.md (executive summary)
 ```
 
 ### Pattern 2: Manuscript Preparation
 
 ```
 ticket-002-proposal-prep.md
-  → draft/proposal-draft.md
-  → notes/reports/report-002-proposal-review.md
+  --> draft/proposal-draft.md
+  --> notes/reports/report-002-proposal-review.md
 ```
 
 ### Pattern 3: Revision Cycle
 
 ```
 story.md (updated narrative)
-  → ticket-003-revision-v1.md
-    → draft/manuscript-revised.md
-    → notes/reports/report-003-revision-complete.md
+  --> ticket-003-revision-v1.md
+    --> draft/manuscript-revised.md
+    --> notes/reports/report-003-revision-complete.md
 ```
 
 ---
@@ -518,43 +518,43 @@ story.md (updated narrative)
 ### 1. No Dates in Tickets
 
 ```
-❌ ticket-001-2024-08-06.md
-❌ ticket-001-data-analysis-Aug-2024.md
+BAD: ticket-001-2024-08-06.md
+BAD: ticket-001-data-analysis-Aug-2024.md
 
-✅ ticket-001-data-analysis.md
+GOOD: ticket-001-data-analysis.md
 ```
 
 ### 2. Don't Duplicate Information
 
 ```
-❌ Copying entire story.md into ticket.md
-✅ Linking to [[story]] and quoting relevant parts
+BAD: Copying entire story.md into ticket.md
+GOOD: Linking to [[story]] and quoting relevant parts
 ```
 
 ### 3. Don't Put Tickets Outside notes/tickets/
 
 ```
-❌ /ticket-001.md (at root)
-❌ /experiments/01/ticket-001.md
+BAD: /ticket-001.md (at root)
+BAD: /experiments/01/ticket-001.md
 
-✅ /notes/tickets/ticket-001-*.md
+GOOD: /notes/tickets/ticket-001-*.md
 ```
 
 ### 4. Don't Use Absolute Paths in Wiki-Links
 
 ```
-❌ [[/Users/name/projects/q-matrix/notes/tickets/ticket-001]]
-❌ [[notes/tickets/ticket-001]]
+BAD: [[/Users/name/projects/q-matrix/notes/tickets/ticket-001]]
+BAD: [[notes/tickets/ticket-001]]
 
-✅ [[ticket-001]]
+GOOD: [[ticket-001]]
 ```
 
 ### 5. Don't Create Tickets Without "Because" Rationale
 
 ```
-❌ Task: Run analysis
+BAD: Task: Run analysis
 
-✅ Task: Calculate drift per model
+GOOD: Task: Calculate drift per model
    **Because**: Establishes competitive landscape for narrative
 ```
 
@@ -565,7 +565,7 @@ story.md (updated narrative)
 Some projects use emoji/status indicators in filenames:
 
 ```
-✅ Final: No indicator needed
+GOOD: Final: No indicator needed
 draft-*.md              # Work in progress
 scratch-*.md           # Temporary notes
 archive-*.md           # Old versions
@@ -581,7 +581,7 @@ Check project conventions before adding indicators.
 - **Links**: Wiki-links `[[name]]` without paths or extensions
 - **Tickets**: Concise, narrative-driven, with "Because" rationale
 - **Reports**: Executive summaries, not raw logs
-- **Workflow**: story → tickets → experiments → reports → deliverables
+- **Workflow**: story --> tickets --> experiments --> reports --> deliverables
 - **Symlinks**: Use `-L` flag with `find`
 
 ---

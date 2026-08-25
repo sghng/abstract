@@ -25,7 +25,7 @@ precise natural-language instruction. The unit of interest is not executability
 but structure a machine can read, diff, verify, and regenerate.
 
 **A.** Language models are trained on text, and a substantial portion of that
-text is code and its documentation — the largest and most consistently verified
+text is code and its documentation -- the largest and most consistently verified
 structured corpus humans have produced.
 
 **B.** Code is therefore close to the mother tongue of these models. Coding is
@@ -43,7 +43,7 @@ stand against it.
 **A. Some things resist reduction.** The preferences of editors, reviewers, and
 grant officers cannot be collapsed into concrete criteria. Judgment of
 significance, of narrative flow, of whether a claim has cleared the threshold
-that removes doubt — this is what the evaluators are for.
+that removes doubt -- this is what the evaluators are for.
 
 **B. Academia is conservative.** New representations diffuse slowly, if at all:
 Typst, LaTeX, version control, collaborative editing. The barrier is the
@@ -61,7 +61,7 @@ reports. A submission must arrive as Word, not Typst. A committee will ask you
 to defend, in a room, what was done and why. If only the final state exists,
 none of this is possible.
 
-The intermediate representations — tickets, reports, drafts, notes — are the
+The intermediate representations -- tickets, reports, drafts, notes -- are the
 artifact, equal in standing to the manuscript. The system keeps them legible and
 inspectable at every point, so a human can enter the process at any moment: to
 review, to intervene, to take over, or to defend.
@@ -74,7 +74,7 @@ representations that exist and invent them where they do not.
 NL Patch is one such invention. An advisor requires a Word document with tracked
 changes; the agent cannot produce one, and the advisor will not be moved. The
 revision is therefore expressed as a structured natural-language diff between
-draft versions — machine-generated, human-applied. It sits where the code world
+draft versions -- machine-generated, human-applied. It sits where the code world
 ends and the institutional world begins, and lets work cross without requiring
 either side to change.
 

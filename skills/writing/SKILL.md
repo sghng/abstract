@@ -1,18 +1,18 @@
 ---
 name: writing
-description: Academic writing conventions for external deliverables — manuscripts, proposals, cover letters. Use when writing or revising anything that leaves the lab.
+description: Academic writing conventions for external deliverables -- manuscripts, proposals, cover letters. Use when writing or revising anything that leaves the lab.
 ---
 
 # Academic Writing Conventions
 
 > [!IMPORTANT]
 > These conventions apply to **external deliverables only**: manuscripts,
-> proposals, cover letters, personal statements, conference papers — anything
+> proposals, cover letters, personal statements, conference papers -- anything
 > that leaves the lab and enters the academic world.
 >
 > For internal documents (notes, tickets, dev docs, internal reports), use
 > whatever Markdown makes things clearest. Callouts, bullet points, tables,
-> Mermaid diagrams, wiki links, bold, italic — all are welcome and encouraged.
+> Mermaid diagrams, wiki links, bold, italic -- all are welcome and encouraged.
 > These rules are for the outside world, not for us.
 
 ---
@@ -27,7 +27,7 @@ should be so conservative it's boring. No creativity. No flair. No
 ### Headings
 
 - **H1 (`#`) is the title.** There is exactly one title per document. It's
-  always appropriate — even in personal statements and cover letters — because
+  always appropriate -- even in personal statements and cover letters -- because
   every document has a title.
 - **H2 (`##`) is for major sections.** You can have as many as you need.
   When submission guidelines explicitly ask for sections (Background, Methods,
@@ -39,7 +39,7 @@ should be so conservative it's boring. No creativity. No flair. No
 ### No Bolded Text
 
 Never use bolded text in paragraphs. Not for emphasis, not for structure, not
-for "improving scannability." Academia has survived centuries without bold —
+for "improving scannability." Academia has survived centuries without bold --
 it'll survive your paper too.
 
 In particular, never use bolded labels at the start of paragraphs like
@@ -52,18 +52,18 @@ now. Write normal prose transitions instead.
 Don't use bulleted or numbered lists in academic prose. They feel like a slide
 deck, not a paper.
 
-When you need to enumerate items — recommendations, steps, categories — use
+When you need to enumerate items -- recommendations, steps, categories -- use
 one of these two forms in running prose:
 
-- **"First, ... Second, ... Third, ..."** — the conventional academic form.
+- **"First, ... Second, ... Third, ..."** -- the conventional academic form.
   Works well for flowing recommendations and logical sequences.
 
-- **"1) ... 2) ... 3) ..."** — an inline alternative that preserves the
+- **"1) ... 2) ... 3) ..."** -- an inline alternative that preserves the
   clarity and conciseness of a list without breaking prose flow. Especially
   useful when the enumerated items are parallel in structure.
 
 Do not use tables as a workaround for the bullet-point ban. Tables are for
-**data** — results, survey instruments, prediction targets — things where
+**data** -- results, survey instruments, prediction targets -- things where
 side-by-side comparison demands precise alignment. A table of advice or
 recommendations feels like a policy document; prose advice feels like a
 colleague who knows what they're talking about.
@@ -72,8 +72,8 @@ colleague who knows what they're talking about.
 
 Every specialized term must be explained at its first occurrence in the text.
 A reader from a different subfield should never hit a word they cannot parse
-from context. What's obvious to you — methodological shorthand, system
-components, analytical metrics — is opaque to anyone outside your project. If
+from context. What's obvious to you -- methodological shorthand, system
+components, analytical metrics -- is opaque to anyone outside your project. If
 you hesitate even slightly about whether a term needs definition, it does.
 
 ---
@@ -156,7 +156,7 @@ for flaws, omit it.
 
 ## Proposal
 
-A conference proposal is a compressed research paper — roughly 1,000 words
+A conference proposal is a compressed research paper -- roughly 1,000 words
 for a work-in-progress submission. Different from a full manuscript in a few
 key ways:
 
@@ -165,14 +165,14 @@ key ways:
 Target approximately 1,000 words. Every sentence must earn its place. If a
 paragraph can be removed without weakening the argument, remove it. The
 q-matrix proposal packs Background, Methods, Results, and Discussion into
-roughly 240 lines of Typst — dense, efficient, no wasted words. That's the
+roughly 240 lines of Typst -- dense, efficient, no wasted words. That's the
 standard.
 
 ### Visual Elements
 
 A 1,000-word proposal should include three to four visual elements (tables,
-figures, and diagrams combined). Two is too few — key claims feel unsupported
-and the reader has nothing to anchor on. Five or more is pretentious — save
+figures, and diagrams combined). Two is too few -- key claims feel unsupported
+and the reader has nothing to anchor on. Five or more is pretentious -- save
 additional visuals for the full paper. Each visual must serve a specific
 narrative claim. If removing it would not weaken the argument, remove it.
 
@@ -194,6 +194,6 @@ internal documents only.
 
 Every paragraph in Background and Discussion should contain at least one
 citation. Methods paragraphs should cite methodological sources. Results
-should connect findings to prior literature where possible — the pattern is
+should connect findings to prior literature where possible -- the pattern is
 "This finding aligns with Doe (2023), who observed..." A paragraph without
 citations reads as opinion.
