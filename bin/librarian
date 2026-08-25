@@ -1,10 +1,14 @@
 #!/usr/bin/env bash
 # Launch the librarian role for the research project in the current directory.
-# Uses this repository as pi's agent directory and pins a persistent session
-# file per role, so the role's context accumulates across invocations.
+# Uses this repository as pi's agent directory, pins a persistent session
+# file per role, and injects motif.md (shared invariants) plus the role
+# prompt into the system prompt. Context-file discovery is disabled: the
+# lab agents' context comes only from motif.md, the role prompt, and skills
+# -- never from ambient AGENTS.md/CLAUDE.md files.
 set -euo pipefail
 HARNESS_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 exec env PI_CODING_AGENT_DIR="$HARNESS_DIR" pi \
   --session ".pi/sessions/librarian.jsonl" \
-  --append-system-prompt "$(cat "$HARNESS_DIR/agents/librarian.md")" \
+  --no-context-files \
+  --append-system-prompt "$(cat "$HARNESS_DIR/motif.md" "$HARNESS_DIR/agents/librarian.md")" \
   "$@"

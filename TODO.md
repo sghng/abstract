@@ -126,3 +126,9 @@ Until the harness exists, the `bin/` launchers + file-mediated consult relay
 - Numbering: `NNN` (three digits) for tickets, reports, memos.
 - Repo doubles as `$PI_CODING_AGENT_DIR`; state files are gitignored, never
   committed.
+- `AGENTS.md` briefs agents *developing this repo* only. Lab invariants live
+  in `motif.md` (package naming follows a musical theme) and are injected
+  into the system prompt by the `bin/` launchers.
+- Lab agents run with `--no-context-files`: no ambient AGENTS.md/CLAUDE.md,
+  neither this repo's dev briefing nor the research project's own. The SDK
+  harness must set the equivalent (`noContextFiles: true` in loader options).
