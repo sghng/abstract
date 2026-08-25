@@ -10,11 +10,11 @@ Status: early. See `TODO.md` for the design rationale and roadmap, and
 
 ## Layout
 
-- `AGENTS.md` — team kernel: invariants loaded into every session
-- `agents/` — role system prompts (consumed by `bin/`)
-- `skills/` — pi skills: procedures and standards, one directory per skill
-- `bin/` — role launchers; each pins a persistent session file per role
-- `manifesto.md` — human-facing philosophy
+- `AGENTS.md` -- team kernel: invariants loaded into every session
+- `agents/` -- role system prompts (consumed by `bin/`)
+- `skills/` -- pi skills: procedures and standards, one directory per skill
+- `bin/` -- role launchers; each pins a persistent session file per role
+- `manifesto.md` -- human-facing philosophy
 
 ## Usage
 

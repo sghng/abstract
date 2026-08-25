@@ -8,7 +8,7 @@ This is the TLDR. Everything else in this file expands on these points.
   address it.
 - **The reviewer is always right.** Even when they are wrong. Your job is not to
   win an argument; your job is to get the paper accepted.
-- **Be polite, be diligent, be comprehensive — but never bloated.** A thick
+- **Be polite, be diligent, be comprehensive -- but never bloated.** A thick
   response letter makes reviewers think "this author works hard, I should let
   them pass." A rambling one makes them think "this author has no clue."
 - **Read the tone behind the words.** A soft reviewer may be raising a fatal
@@ -22,7 +22,7 @@ requirements. If so, they typically send it to three reviewers.
 ### The Myth of Anonymity
 
 Peer review is supposed to be anonymous, but in practice it rarely stays that
-way forever. Experienced scholars can often tell where a manuscript is from —
+way forever. Experienced scholars can often tell where a manuscript is from --
 the literature cited, the method used, the data source. Conversely, authors
 sometimes recognize who wrote a review by the specific concerns raised or the
 way they are phrased. This creates a curious social dynamic: the small world of
@@ -33,7 +33,7 @@ your behavior; simply a fact of the landscape.
 ### What Reviewers Actually Want
 
 Reviewers are rarely volunteers in the romantic sense. They are usually
-"voluntold" — asked by editors because they are expected to serve. Reviewing
+"voluntold" -- asked by editors because they are expected to serve. Reviewing
 brings little direct credit: it does not advance your tenure case, it does not
 appear on your CV, and it takes time away from your own work. Scholars do it
 because refusing too often signals that you are not contributing to the field,
@@ -70,12 +70,12 @@ that follows.
 Learn to read the gap between tone and actual severity:
 
 - **Soft tone, hard problem.** A reviewer may praise your work extensively and
-  phrase their concerns gently — but the underlying issue may require you to
+  phrase their concerns gently -- but the underlying issue may require you to
   restructure your method, collect new data, or rethink your central claim.
   These are the reviews that quietly kill papers.
 
 - **Harsh tone, easy problem.** A reviewer may write in an aggressive or
-  dismissive voice, raising what appear to be devastating objections — but on
+  dismissive voice, raising what appear to be devastating objections -- but on
   closer inspection, the concerns are routine, addressable with a paragraph or a
   supplementary analysis. Sometimes this bluster is performative: the reviewer
   wants to signal that they are thorough and tough, even when the actual work
@@ -89,7 +89,7 @@ afternoon.
 
 Some reviews ask for something you fundamentally cannot deliver: a different
 methodology, new data collection, a redesign of your entire study. These are not
-requests — they are rejections dressed as feedback. You must recognize them for
+requests -- they are rejections dressed as feedback. You must recognize them for
 what they are. The appropriate response is not to attempt the impossible; it is
 to address what you can, explain the constraints politely, and let the editor
 weigh the situation.
@@ -134,7 +134,7 @@ are our responses.
 - _[Paste the reviewer's exact text here, verbatim.]_
 
   [Your response. Be specific. Reference where changes appear: "We have added a
-  discussion of this limitation in Section 3.2 (p. 12, l. 15–18)." If the change
+  discussion of this limitation in Section 3.2 (p. 12, l. 15-18)." If the change
   is substantial, quote the new text. If you cannot comply, explain why politely
   and offer what you can.]
 

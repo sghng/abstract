@@ -1,6 +1,6 @@
 ---
 name: literature
-description: Literature search, validation, and management — Perplexity-first search, Zotero records, claim verification with supporting passages. Use for literature searches, citation checks, or maintaining notes/literature.md.
+description: Literature search, validation, and management -- Perplexity-first search, Zotero records, claim verification with supporting passages. Use for literature searches, citation checks, or maintaining notes/literature.md.
 ---
 
 # Literature
@@ -59,12 +59,12 @@ The refined table after Zotero validation adds a status column:
 ## Zotero Workflow
 
 We use Zotero MCP tools for all literature operations. Tools have built-in
-descriptions — this section covers conventions, not capabilities.
+descriptions -- this section covers conventions, not capabilities.
 
 **Hard blocker:** If the Zotero MCP is unreachable (connection refused, desktop
 not running), do NOT proceed with Zotero-dependent steps. Surface the blocker to
 the user and stop. Do not improvise around it (e.g., skipping the
-already-in-library check) — duplicates and missing items are costly to fix
+already-in-library check) -- duplicates and missing items are costly to fix
 later. The user may choose to scratch the requirement, but the agent does not
 decide that on its own.
 
@@ -79,7 +79,7 @@ decide that on its own.
 ### Triage Before Import
 
 Before asking the user to add any paper, verify it supports the claim you want
-to make. Getting this wrong is costly — the user does manual import, and you
+to make. Getting this wrong is costly -- the user does manual import, and you
 waste a citation slot on a paper that undermines your argument.
 
 - **Read abstracts first** via `get_item_metadata` or web search snippets
@@ -94,7 +94,7 @@ waste a citation slot on a paper that undermines your argument.
 
 **After triage, report to the user** with paper title, authors, venue, URL/DOI,
 and a one-sentence summary of what it supports. Do not use MCP to add papers
-yourself — the browser extension produces better results.
+yourself -- the browser extension produces better results.
 
 ### Adding Papers (User Does This)
 
@@ -114,7 +114,7 @@ with institutional login is the correct import path.
 After the user imports papers, the agent must verify:
 
 1. **Correct collection.** Check `zotero_search_collections` to find the right
-   project collection. Never assume a collection key — verify what it maps to.
+   project collection. Never assume a collection key -- verify what it maps to.
 2. **Correct item type.** If the type is "webpage" for a conference paper or
    journal article, fix with `zotero_update_item`. Use the `item_type` field.
 3. **Complete metadata.** Check title, authors, date, and venue. If metadata is
@@ -130,14 +130,14 @@ After the user imports papers, the agent must verify:
 ### Reading
 
 - Get abstracts first via `get_item_metadata` to assess relevance
-- Use `read_pdf_pages` for targeted extraction — specify page ranges
+- Use `read_pdf_pages` for targeted extraction -- specify page ranges
 - `get_pdf_outline` works only if the PDF has embedded TOC metadata
 - `get_annotations` retrieves your highlights for efficient review
 
 ### Claim Verification (Agent Does This)
 
 **Every paper we plan to cite gets claim verification.** There is no
-"abstract-only citation" for a paper that will appear in the manuscript —
+"abstract-only citation" for a paper that will appear in the manuscript --
 before a paper enters the citation plan, the agent extracts the supporting
 passage for the specific claim it supports. For each candidate paper:
 
@@ -151,7 +151,7 @@ passage for the specific claim it supports. For each candidate paper:
    verification status column or a dedicated "Supporting Passages" section).
 
 3. **Minimum standard for key claims.** Every claim that a reviewer might
-   challenge — formulas, theorems, complexity bounds, expected values —
+   challenge -- formulas, theorems, complexity bounds, expected values --
    requires a supporting passage. Background context and general knowledge
    (e.g., "Euler's formula is V - E + F = 2") does not.
 
@@ -161,9 +161,9 @@ passage for the specific claim it supports. For each candidate paper:
 
 Format example:
 
-> "Any triangulation of a set P of n points in the plane — not all collinear,
-> and with k points on the convex hull — has 2n − 2 − k triangles and 3n − 3 − k
-> edges." — de Berg et al. (2008), Theorem 9.1, p. 193
+> "Any triangulation of a set P of n points in the plane -- not all collinear,
+> and with k points on the convex hull -- has 2n - 2 - k triangles and 3n - 3 - k
+> edges." -- de Berg et al. (2008), Theorem 9.1, p. 193
 
 This step is not optional for quantitative claims. It is the only mechanism
 that builds confidence when neither author nor reviewer can re-derive the
@@ -171,7 +171,7 @@ result independently.
 
 ### Citation Analysis
 
-- `scite_enrich_item` and `scite_enrich_search` — **no API key required**
+- `scite_enrich_item` and `scite_enrich_search` -- **no API key required**
 - Check retractions before citing: `scite_check_retractions`
 - Scite may be intermittently unavailable (transient, retry later)
 
@@ -189,13 +189,13 @@ Keep a `notes/literature.md` (or `notes/literature/literature.md`) with:
   full text) and whether claims are confirmed. For claims confirmed by full
   text, include the supporting passage as a block quote with page number.
 
-Not every paper goes in the note — only those relevant to your narrative.
+Not every paper goes in the note -- only those relevant to your narrative.
 
 ## Caveats and Gotchas
 
 - **Search narrows with more words**: Adding terms reduces results
 - **MCP add-by-DOI is flaky**: CrossRef SSL errors are common. Do not retry
-  endlessly — hand off to the user for browser import.
+  endlessly -- hand off to the user for browser import.
 - **"webpage" is a bad default type**: Any paper added by URL gets type
   "webpage." Always check and fix post-import.
 - **Never assume collection keys**: `V2YHYTDY` might be "aig-diversity," not

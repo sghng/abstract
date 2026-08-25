@@ -1,13 +1,13 @@
 # Manuscript Authoring
 
 This skill module covers the **workflow** of authoring a manuscript for
-academic publication — the process from blank page to submission-ready draft.
+academic publication -- the process from blank page to submission-ready draft.
 
 > [!IMPORTANT]
 > Before you write a single word, read two files:
-> - **`../philosophy.md`** — the research mindset: nodding reader, strategic
+> - **`../philosophy.md`** -- the research mindset: nodding reader, strategic
 >   optimism, big story first, publication first, don't self-incriminate.
-> - **`../writing.md`** — the concrete writing conventions: headings, bold
+> - **`../writing.md`** -- the concrete writing conventions: headings, bold
 >   text prohibition, bullet point prohibition, language rules, reporting
 >   conventions, positive framing. These apply to all external deliverables.
 

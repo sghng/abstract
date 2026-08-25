@@ -1,8 +1,8 @@
-# TODO — Design Rationale and Roadmap
+# TODO -- Design Rationale and Roadmap
 
 This file records *why* the harness is designed the way it is, so the
 reasoning survives compaction and session boundaries. Read it before changing
-the architecture. Status markers: ✅ done / 🔵 next / ⚪ deferred.
+the architecture. Status markers: [done] / [next] / [deferred].
 
 ## Goal
 
@@ -23,15 +23,15 @@ we can iteratively fine-tune. Niche: academic research (not coding).
    A consultation reply is ephemeral (returns into the asker's context);
    anything with lasting value must additionally land in `notes/` (memo,
    ticket "Because", literature.md). This keeps contexts clean and the record
-   complete, and preserves the manifesto's Corollary A (visibility) — all
+   complete, and preserves the manifesto's Corollary A (visibility) -- all
    coordination is human-readable.
 
 3. **Three tiers of knowledge.**
    - *Kernel* (`AGENTS.md`, always loaded, survives compaction): invariants
-     only — layout, naming, stack, roster. Membership test: "if forgotten,
+     only -- layout, naming, stack, roster. Membership test: "if forgotten,
      would the failure be silent and costly?"
    - *Index* (skill descriptions in the system prompt): trigger-style, one
-     line each — tells agents a skill exists and when to read it.
+     line each -- tells agents a skill exists and when to read it.
    - *Modules* (skills, on-demand): procedures and templates, written to be
      self-contained and re-enterable cold after compaction.
    The pre-restructure failure mode (agent placing files wrong after
@@ -46,26 +46,26 @@ we can iteratively fine-tune. Niche: academic research (not coding).
 
 5. **Only the orchestrator fans out.**
    Hub-and-spoke assignment of work; peer *consultation* is allowed
-   (engineer ↔ librarian) but must produce a memo artifact.
+   (engineer <--> librarian) but must produce a memo artifact.
 
 ## The Team
 
-- **Orchestrator** — strategy, story.md, tickets, user contact. Was
+- **Orchestrator** -- strategy, story.md, tickets, user contact. Was
   `supervisor.md`.
-- **Engineer** — executes tickets, owns experiments + reports. Was `phd.md`.
-- **Librarian** — literature expertise; *consultant* (query → memo), not a
+- **Engineer** -- executes tickets, owns experiments + reports. Was `phd.md`.
+- **Librarian** -- literature expertise; *consultant* (query --> memo), not a
   pipeline stage. New.
-- **Narrator — ⚪ deferred.** Owning "the story" was rejected: the story *is*
+- **Narrator -- [deferred].** Owning "the story" was rejected: the story *is*
   the strategy, so it stays with the orchestrator (an orchestrator that must
   ask another agent what the story is has drifted). If narrative work
-  (manuscripts, presentations, proposals — the `draft/` world) overloads the
+  (manuscripts, presentations, proposals -- the `draft/` world) overloads the
   orchestrator's context, split out a narrator as owner of *outward-facing
-  artifacts*, including taste/conventions of academic publishing — not as
+  artifacts*, including taste/conventions of academic publishing -- not as
   keeper of the story.
 
 ## Interaction Protocol
 
-Rhythm: **converge → compile → execute → synthesize**.
+Rhythm: **converge --> compile --> execute --> synthesize**.
 
 - Tickets are **co-designed**: orchestrator consults librarian (background)
   and engineer (feasibility) before finalizing; a few rounds are normal.
@@ -73,28 +73,28 @@ Rhythm: **converge → compile → execute → synthesize**.
 - Consultations must **converge**: finalize, or escalate to the user with a
   decision. Cap rounds; unbounded dialogue is a token sink.
 - Consultations on independent aspects (background vs. feasibility) may fan
-  out in parallel — the one place parallelism buys pure latency.
+  out in parallel -- the one place parallelism buys pure latency.
 - Parallel *workstreams* are not a near-term concern; the core loop is a
   dependency chain. Intra-role map-reduce (librarian triaging papers,
   section-by-section review) is fine via fire-and-forget subagents.
 
 ## Why a Harness (SDK), Not Just Config
 
-The consult primitive — one session programmatically prompting another
-persistent session and getting a reply — requires in-process session control.
+The consult primitive -- one session programmatically prompting another
+persistent session and getting a reply -- requires in-process session control.
 Only the pi SDK provides it. CLI-level alternatives are simulations: headless
 `pi -p` subprocess calls (process spawn per consult, session-file locking) or
 RPC plumbing. Hence the phased plan:
 
-1. ✅ **Restructure repo as pi agent directory** (this layout). Roles, kernel,
+1. [done] **Restructure repo as pi agent directory** (this layout). Roles, kernel,
    skills are harness *inputs* regardless of how the harness is built.
-2. 🔵 **Extension-harness**: a pi extension that imports the SDK, holds
+2. [next] **Extension-harness**: a pi extension that imports the SDK, holds
    persistent `AgentSession`s for engineer + librarian (session files under
    the project's `.pi/sessions/`), and registers `consult_engineer` /
    `consult_librarian` tools on the interactive (orchestrator) session.
    Session files per role per project; the user talks to the orchestrator in
    the normal pi TUI. Iterate on the *protocol* here.
-3. ⚪ **Standalone binary** (SDK `createAgentSession` + custom
+3. [deferred] **Standalone binary** (SDK `createAgentSession` + custom
    `ResourceLoader` loading this repo): when the interaction model stabilizes
    and we need our own UI/command surface or long-running orchestration.
    Compile via `bun build --compile`.
@@ -108,7 +108,7 @@ Until the harness exists, the `bin/` launchers + file-mediated consult relay
   warn/block writes that violate layout conventions (manifesto Corollary B:
   express as code what can be expressed as code). Deletes a whole class of
   silent post-compaction failures.
-- **Role-scoped skills**: `bin/` launchers could pass `--no-skills --skill …`
+- **Role-scoped skills**: `bin/` launchers could pass `--no-skills --skill ...`
   per role if all-skills-visible proves distracting. Start simple.
 - **Role-aware compaction**: custom `session_before_compact` instructions per
   role (preserve role-relevant context verbatim).
@@ -121,7 +121,7 @@ Until the harness exists, the `bin/` launchers + file-mediated consult relay
 ## Canonical Decisions Log
 
 - `notes/story.md` is the story location (per the later logistics refinement;
-  older docs said project root — consolidated in the restructure).
+  older docs said project root -- consolidated in the restructure).
 - Experiment dirs: `experiments/NN-name/` (not `exp-NNN-`).
 - Numbering: `NNN` (three digits) for tickets, reports, memos.
 - Repo doubles as `$PI_CODING_AGENT_DIR`; state files are gitignored, never
