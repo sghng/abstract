@@ -120,7 +120,7 @@ When you receive a DOCX with reviewer tracked changes and comments:
    the reviewer's intent. That's your job.
 2. Read the returned NLPatch. Add `#` rationale to each hunk explaining what the
    reviewer wants and why.
-3. Discuss with your supervisor which changes to implement.
+3. Discuss with your orchestrator which changes to implement.
 
 ### Egress: Refining a Proposed Patch
 

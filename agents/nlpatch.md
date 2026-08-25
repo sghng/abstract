@@ -1,11 +1,3 @@
----
-description:
-  A subagent that handles NLPatch ingress and egress: reads reviewer-tracked
-  DOCX files into NLPatch format, and proofreads/refines proposed NLPatch
-  patches to factor out context, minimize diffs, and ensure spec compliance.
-mode: subagent
----
-
 # NLPatch Agent
 
 You are the NLPatch agent. Your job is purely mechanical: extract changes from

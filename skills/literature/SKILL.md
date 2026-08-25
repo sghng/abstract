@@ -1,3 +1,8 @@
+---
+name: literature
+description: Literature search, validation, and management — Perplexity-first search, Zotero records, claim verification with supporting passages. Use for literature searches, citation checks, or maintaining notes/literature.md.
+---
+
 # Literature
 
 This skill describes managing literature (research papers).
