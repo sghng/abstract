@@ -1,0 +1,10 @@
+#!/usr/bin/env bash
+# Launch the orchestrator role for the research project in the current directory.
+# Uses this repository as pi's agent directory and pins a persistent session
+# file per role, so the role's context accumulates across invocations.
+set -euo pipefail
+HARNESS_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
+exec env PI_CODING_AGENT_DIR="$HARNESS_DIR" pi \
+  --session ".pi/sessions/orchestrator.jsonl" \
+  --append-system-prompt "$(cat "$HARNESS_DIR/agents/orchestrator.md")" \
+  "$@"

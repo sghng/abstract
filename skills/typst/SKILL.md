@@ -1,7 +1,20 @@
+---
+name: typst
+description: Typst syntax guidance, common mistakes, and math typesetting. Use whenever writing or reviewing Typst source or mathematical notation.
+---
+
 # Typst
 
 This file records cross-module guidance on Typst. Read this whenever you write
 or review Typst source.
+
+## Math
+
+- We prefer using Typst for writing any math. The syntax of Typst is different
+  from LaTeX.
+- When doing extensive math derivations, it's helpful to compile a Typst
+  document to images, then read the images and check whether the derivation
+  renders as intended.
 
 ## Syntax Notes and Common Mistakes
 

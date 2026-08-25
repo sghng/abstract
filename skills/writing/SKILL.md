@@ -1,3 +1,8 @@
+---
+name: writing
+description: Academic writing conventions for external deliverables — manuscripts, proposals, cover letters. Use when writing or revising anything that leaves the lab.
+---
+
 # Academic Writing Conventions
 
 > [!IMPORTANT]

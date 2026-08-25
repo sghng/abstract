@@ -1,3 +1,8 @@
+---
+name: story-keeping
+description: Standard format for story.md, the project's central narrative document. Use when creating or substantially updating notes/story.md.
+---
+
 # Story Keeping
 
 This document defines the standard format for `story.md`, the central narrative
@@ -9,7 +14,8 @@ The `story.md` file maintains the coherent narrative of a research project. It
 serves as the north star for all work: tickets, experiments, reports,
 presentations, and manuscripts should all align with the story.
 
-**Location**: `story.md` at the project root.
+**Location**: `notes/story.md` (the notes directory is typically a symlink to
+the Obsidian vault; story.md lives at the vault root).
 
 ## Standard Format
 

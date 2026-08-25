@@ -1,0 +1,9 @@
+# Pi agent directory state — never commit
+auth.json
+sessions/
+models-store.json
+trust.json
+npm/
+binaries/
+*.log
+.DS_Store

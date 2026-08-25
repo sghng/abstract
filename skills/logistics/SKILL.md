@@ -1,3 +1,8 @@
+---
+name: logistics
+description: Project organization standards — repository layout, ticket and report templates, file naming, wiki-links, workflow. Use when creating tickets, reports, or notes, or when unsure where a file belongs.
+---
+
 # Logistics
 
 How research projects are organized, structured, and executed. This module covers file naming, repository structure, ticket conventions, wiki-links, and the workflow from story to deliverables.
@@ -14,7 +19,7 @@ project-root/
 │   ├── index.md            # Note on notes - entry point to the vault
 │   ├── story.md            # Central narrative - the north star
 │   ├── tickets/            # Active work assignments (required)
-│   ├── reports/            # Completed reports to supervisor (required)
+│   ├── reports/            # Completed reports to orchestrator (required)
 │   ├── dev/                # Implementation notes, work-in-progress (required)
 │   └── ...                 # Other themed dirs optional, emerge as needed
 ├── src/                   # Core reusable code
@@ -43,7 +48,7 @@ project-root/
 |-----------|----------|
 | Global / cross-cutting (story, index, philosophy) | `notes/` root |
 | Active work assignment | `notes/tickets/` |
-| Report to supervisor | `notes/reports/` |
+| Report to orchestrator | `notes/reports/` |
 | Implementation detail, scratch work | `notes/dev/` |
 | Themed content (literature, methods) | Optional subdir, create when needed |
 | Random working notes | `notes/` root |
@@ -225,7 +230,7 @@ Location: `notes/reports/report-NNN-name.md`
 
 ---
 
-## Questions for Supervisor
+## Questions for Orchestrator
 
 1. Question 1?
 2. Question 2?
@@ -309,7 +314,7 @@ artifacts carry explicit version labels.
 
 ## Report Structure
 
-Reports are **executive summaries** for the supervisor, not raw logs.
+Reports are **executive summaries** for the orchestrator, not raw logs.
 
 ### Standard Report Format
 
@@ -435,7 +440,7 @@ story.md → tickets → experiments → reports → deliverables
 
 - **Create a report** when:
   - An experiment is complete
-  - You need to communicate findings to supervisor
+  - You need to communicate findings to orchestrator
   - Results inform the narrative
 
 - **Update story.md** when:

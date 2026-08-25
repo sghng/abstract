@@ -1,6 +1,6 @@
 ---
 name: presentation
-description: Preparing a presentation
+description: Academic presentations — content curation, storytelling strategy, and Typst (touying) slides. Use when preparing or reviewing a talk or slide deck.
 ---
 
 # Preparing a Presentation

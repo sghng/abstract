@@ -1,3 +1,8 @@
+---
+name: manuscript
+description: Manuscript authoring and review workflows for educational assessment/psychometrics journals. Use when drafting, revising, reviewing, or submitting a paper.
+---
+
 # Manuscript
 
 <!-- TODO: advanced venue/editor targeting strategies -->

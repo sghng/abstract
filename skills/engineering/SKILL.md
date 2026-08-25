@@ -1,73 +1,16 @@
+---
+name: engineering
+description: Research engineering procedures — experiments, code and data conventions, data analysis, figures. Use when writing or running code, creating experiments, analyzing data, or producing figures.
+---
+
 # Engineering
 
-This skill describes the engineering aspect of academic research. This skill is
-relevant to:
+This skill covers the engineering *procedures* of academic research: how to run
+experiments, organize code and data, analyze data, and produce figures.
 
-- Preferred tech stack.
-- How to run experiments.
-- Conventions of file organization for code and notes.
-- Plotting diagrams for publication or report.
-- Writing experiment reports.
-
-## Repository Structure
-
-A typical research project follows this structure:
-
-```
-project-root/
-├── story.md                # MASTER NARRATIVE - central story document
-├── notes/                  # Research notes and documentation
-│   ├── tickets/            # Active work assignments (tickets)
-│   ├── reports/            # Completed reports to supervisor
-│   ├── methodology/        # Analysis methods, conventions
-│   └── dev/                # Implementation notes, work-in-progress
-├── src/                    # Core reusable code across experiments
-├── scripts/                # One-off utility scripts
-├── data/                   # Data files reused across experiments
-├── experiments/            # Individual experiment directories
-│   ├── 01-name_of_experiment/
-│   └── 02-another_experiment/
-└── draft/                  # Publications, presentations, proposals
-```
-
-### Key Directories
-
-- **`notes/`**: Central location for all documentation. Use wiki links like
-  `[[story]]` to cross-reference notes.
-- **`src/`**: Code that is heavily reused across experiments (core utilities,
-  database access, shared functions).
-- **`experiments/`**: Each experiment gets its own numbered directory.
-- **`draft/`**: Manuscripts, presentations, and other publication artifacts.
-
-## Notes System
-
-The `notes/` directory uses a structured organization:
-
-- **`story.md`** (at project root): Central narrative document defining the research
-  story. The north star for all work.
-
-- **`notes/tickets/`**: Active work assignments. Tickets use the format
-  `ticket-NNN-short-title.md` and should NEVER include dates or timelines.
-  Tickets are atomic static artifacts.
-
-- **`notes/reports/`**: Completed reports to supervisor. Use the format
-  `report-NNN-short-title.md`. Reports should be executive summaries, not raw
-  logs.
-
-- **`notes/dev/`**: Working notes, implementation details, and scratch space.
-
-### Wiki Link Convention
-
-Use kebab-case wiki links to cross-reference notes:
-
-```markdown
-See [[story]] for the research narrative.
-Refer to [[ticket-001-data-analysis]] for details.
-Check [[inter-rater-reliability]] methodology.
-```
-
-Links are resolved to files automatically (e.g., `[[story]]` →
-`story.md` at project root). No paths or extensions needed.
+The invariant project layout, file naming, and wiki-link conventions are
+defined in the team kernel (`AGENTS.md`, always loaded). Templates for tickets
+and reports live in the logistics skill.
 
 ## Experiment Convention
 
@@ -246,9 +189,9 @@ When delegating engineering tasks:
 
 ### Pre-Work Checklist
 
-Student should verify before starting:
+The engineer verifies before starting:
 - □ Read the ticket completely
-- □ Read `story.md` for narrative context
+- □ Read `notes/story.md` for narrative context
 - □ Check existing code in `src/` and previous experiments
 - □ Read relevant previous reports in `notes/reports/`
 - □ Verify environment (`.venv/`, dependencies)

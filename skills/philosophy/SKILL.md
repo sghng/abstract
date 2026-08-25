@@ -1,8 +1,13 @@
+---
+name: philosophy
+description: Research mindset — storytelling, strategic optimism, publication-first thinking. Read when framing findings, updating the story, making narrative or strategic decisions, or writing/reviewing any external deliverable.
+---
+
 # Research Philosophy
 
 This document captures the cross-cutting research mindset. It applies to ALL
-roles — supervisor, author, presenter, engineer — not just manuscript writing.
-Read it first, consult it often.
+roles — orchestrator, engineer, librarian, author, presenter. Read it when
+framing or deciding, consult it often.
 
 ---
 
