@@ -7,7 +7,7 @@
 # -- never from ambient AGENTS.md/CLAUDE.md files.
 set -euo pipefail
 HARNESS_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
-exec env PI_CODING_AGENT_DIR="$HARNESS_DIR" pi \
+exec env HARNESS_ROLE=orchestrator PI_CODING_AGENT_DIR="$HARNESS_DIR" pi \
   --session ".pi/sessions/orchestrator.jsonl" \
   --no-context-files \
   --append-system-prompt "$(cat "$HARNESS_DIR/motif.md" "$HARNESS_DIR/agents/orchestrator.md")" \
