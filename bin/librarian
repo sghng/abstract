@@ -12,6 +12,7 @@ ln -sf "$HOME/.pi/agent/auth.json" "$HARNESS_DIR/auth.json"
 [ -e "$HOME/.pi/agent/models.json" ] && ln -sf "$HOME/.pi/agent/models.json" "$HARNESS_DIR/models.json"
 exec env HARNESS_ROLE=librarian PI_CODING_AGENT_DIR="$HARNESS_DIR" pi \
   --session ".pi/sessions/librarian.jsonl" \
+  --name librarian \
   --no-context-files \
   --append-system-prompt "$(cat "$HARNESS_DIR/motif.md" "$HARNESS_DIR/agents/librarian.md")" \
   "$@"

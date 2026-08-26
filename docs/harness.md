@@ -108,23 +108,30 @@ than literal bottom-of-context; revisit if agents demonstrably lose track.)
 
 ### Status line (user-facing observability)
 
-`ctx.ui.setStatus("cue", ...)` on every state change and boundary scan:
+`ctx.ui.setStatus("cue", ...)` on every state change and boundary scan,
+and only when there is cue activity (cleared to `undefined` when idle):
 
 ```
-cue | awaiting: librarian | unanswered: orchestrator (42m) | inbox: E=0 L=1(offline?)
+awaiting: librarian | unanswered: orchestrator | queued for engineer:1
 ```
 
-Lab-wide view is a read-only peek at all inbox dirs. v1 has no presence
-detection: a cue sent to a closed session simply waits on disk (durable
-queue), and the pending count tells the user to open that terminal. Offline
-detection may be added later via heartbeats if the ambiguity annoys.
+Role identity is not carried here: each launcher passes `--name <role>`,
+so pi's builtin footer shows the role on the cwd line (`~/proj • librarian`)
+natively, in the terminal title, and in the session list. Lab-wide cue state
+is a read-only peek at all inbox dirs. v1 has no presence detection: a cue
+sent to a closed session simply waits on disk (durable queue), and the
+pending count tells the user to open that terminal. Offline detection may be
+added later via heartbeats if the ambiguity annoys.
 
 ## `bin/` changes
 
-- Each launcher gains `HARNESS_ROLE=<role>` in its `env` line.
+- Each launcher gains `HARNESS_ROLE=<role>` in its `env` line and
+  `--name <role>` so pi's builtin footer labels the session.
 - `bin/lab`: tmux layout -- new session, three panes running
   `bin/orchestrator`, `bin/engineer`, `bin/librarian` in the current
-  project directory.
+  project directory. Re-running attaches when the session already has three
+  panes; otherwise it recreates. No tmux pane titles: role identity lives in
+  each pi footer's cwd line via `--name`.
 - **Auth gotcha**: `PI_CODING_AGENT_DIR` relocates everything pi reads,
   including `auth.json` and `models.json`. The launchers therefore symlink
   `~/.pi/agent/auth.json` (and `models.json` if present) into the repo root
@@ -167,3 +174,13 @@ detection may be added later via heartbeats if the ambiguity annoys.
 Presence/heartbeats, steer delivery between agents, passports/status fields,
 harness-managed to-do lists, message encryption/authz (same-user localhost
 trust), socket broker, RPC-driven headless ensemble (phase 3).
+
+## TUI mode: fullscreen (pinned editor/footer)
+
+pi's default `tuiMode` is `"regular"` (main screen, terminal-owned
+scrollback): the input editor and footer flow with the content, so on a fresh
+session in a tall pane they sit right after the startup header with blank rows
+below. The lab wants the standard chat-TUI layout, so `settings.json` sets
+`tuiMode: "fullscreen"`: the transcript scrolls in-viewport while the editor
+and footer stay fixed at the bottom, and they re-anchor correctly on resize.
+(Fullscreen is still marked experimental upstream.)

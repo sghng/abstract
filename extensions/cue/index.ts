@@ -47,7 +47,9 @@ export default function (pi: ExtensionAPI) {
     saveState(cwd, role, state);
   }
 
-  /** Per-session footer line: own awaits, own debts, lab-wide queue peek. */
+  /** Per-session footer line: cue state only. Role identity is pi's session
+   * name (set via --name in the launchers) on the cwd line; this line appears
+   * only when there is cue activity, and is cleared when idle. */
   function statusLine(ctx: ExtensionContext) {
     const parts: string[] = [];
     const aw = Object.entries(state.awaiting).filter(([, n]) => n > 0);
@@ -60,7 +62,7 @@ export default function (pi: ExtensionAPI) {
       (r) => `${r}:${counts[r]}`,
     );
     if (queued.length) parts.push(`queued for ${queued.join(" ")}`);
-    ctx.ui.setStatus("cue", parts.length ? `cue | ${parts.join(" | ")}` : undefined);
+    ctx.ui.setStatus("cue", parts.length ? parts.join(" | ") : undefined);
   }
 
   /** Deliver at most one inbound cue; the rest wait until debts resolve. */
