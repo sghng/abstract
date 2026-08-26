@@ -4,6 +4,12 @@ How the lab's sessions talk. Dev-facing: specifies the harness mechanism and
 the conventions role prompts rely on. Lab-facing invariants live in
 `motif.md`.
 
+> **Current mode (temporary):** the turn-tracking behavior described below
+> (`awaiting` cues, `debts`, one-inbound-cue-at-a-time) is disabled. The
+> harness currently delivers cues as fire-and-forget follow-ups and relies on
+> the agents and the human to manage conversation flow. The tracked design is
+> preserved in code and in git history; see `TODO.md`.
+
 ## Model: one conversation, several contexts
 
 The lab is not a team working in parallel; it is **one conversation stretched

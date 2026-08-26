@@ -155,3 +155,10 @@ Until the harness exists, the `bin/` launchers + file-mediated consult relay
   self-track; add structure only where pain is felt.
 - Multi-project layering: agent dir = shared lab config; project cwd =
   sessions, notes, `.pi/` overrides; harness anchors child state at cwd.
+- **Cue extension is fire-and-forget for now**: state tracking
+  (`awaiting`/`debts`, one-cue-at-a-time gate, status line, reminders) is
+  disabled while we test whether agents can self-manage turn-taking with
+  human oversight. `cue(target, message)` simply writes to the target
+  inbox and delivers as a follow-up; the old state machine is preserved in
+  a `DISABLED_STATE_MACHINE` block in `extensions/cue/index.ts` and in git
+  history.
