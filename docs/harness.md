@@ -125,6 +125,11 @@ detection may be added later via heartbeats if the ambiguity annoys.
 - `bin/lab`: tmux layout -- new session, three panes running
   `bin/orchestrator`, `bin/engineer`, `bin/librarian` in the current
   project directory.
+- **Auth gotcha**: `PI_CODING_AGENT_DIR` relocates everything pi reads,
+  including `auth.json` and `models.json`. The launchers therefore symlink
+  `~/.pi/agent/auth.json` (and `models.json` if present) into the repo root
+  (both gitignored). Without the symlink, pi sees zero models ("Model not
+  found") because the registry is auth-driven.
 
 ## Edge cases
 

@@ -8,3 +8,5 @@ binaries/
 *.log
 .DS_Store
 node_modules/
+auth.json
+models.json
