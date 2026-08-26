@@ -1,4 +1,7 @@
 {
+  "name": "abstract",
+  "private": true,
+  "type": "module",
   "dependencies": {},
   "devDependencies": {
     "@earendil-works/pi-coding-agent": "^0.84.3",
