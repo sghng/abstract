@@ -11,10 +11,13 @@ developing this repository. The shared invariants of the lab agents live in
 - `motif.md` -- invariants injected into every lab agent session: project
   layout, naming rules, team roster, protocol summary
 - `agents/` -- role system prompts, one per lab role, consumed by `bin/`
+- `extensions/` -- pi extensions, one directory per extension; currently
+  `cue/` (brokerless message exchange, see `docs/harness.md`)
 - `skills/` -- pi skills: procedures and standards, one directory per skill
 - `bin/` -- role launchers; each sets `PI_CODING_AGENT_DIR` to this repo,
-  pins a persistent per-role session file, and injects `motif.md` plus the
-  role prompt
+  pins a persistent per-role session file, exports `HARNESS_ROLE`, and
+  injects `motif.md` plus the role prompt. `bin/lab` opens all three roles
+  in one tmux session.
 - `TODO.md` -- design rationale, roadmap, and decisions log; read before
   changing the architecture
 - `docs/` -- design documents for the harness (`multi-agent.md` for the

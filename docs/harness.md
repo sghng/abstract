@@ -51,18 +51,14 @@ State file (`state/<role>.json`):
 
 ## The extension (`extensions/cue/index.ts`)
 
-One file to start. Structure:
+Two files, split for testability:
 
-```
-role config    -- HARNESS_ROLE; targets = all roles except self
-fs core        -- sendCue, scanInbox, ackCue, loadState, saveState (pure, testable)
-tool           -- cue(target, message)  [TypeBox schema]
-delivery loop  -- watch + boundary scans, one-at-a-time injection
-bookkeeping    -- awaiting/debts transitions
-reminders      -- before_agent_start system-prompt line
-status         -- ctx.ui.setStatus: own awaits/debts + lab-wide inbox peek
-lifecycle      -- session_start init, session_shutdown cleanup
-```
+- `core.ts` -- pure fs operations (sendCue, scanInbox, ackCue, loadState,
+  saveState); unit-tested with bun test against tmp dirs
+- `index.ts` -- pi wiring: role config from HARNESS_ROLE, the cue tool,
+  the delivery loop (fs.watch + turn_end/agent_settled scans), bookkeeping,
+  before_agent_start reminder line, ctx.ui.setStatus footer, shutdown
+  cleanup
 
 ### Send path (inside the `cue` tool's `execute`)
 
