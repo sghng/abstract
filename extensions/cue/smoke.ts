@@ -45,18 +45,14 @@ await new Promise((r) => setTimeout(r, 4000)); // let the watcher fire + inject
 proc.kill();
 await pump;
 
-const state = JSON.parse(
-  fs.readFileSync(`${cwd}/.pi/harness/state/librarian.json`, "utf8"),
-);
 const inboxEmpty =
   fs.readdirSync(`${cwd}/.pi/harness/inbox/librarian`).filter((n) => n.endsWith(".json"))
     .length === 0;
 const delivered = log.includes("cue from orchestrator");
 
-console.log("state.debts:", JSON.stringify(state.debts));
 console.log("inbox empty:", inboxEmpty);
 console.log("cue message in event stream:", delivered);
-if (inboxEmpty && delivered && state.debts.length === 1) {
+if (inboxEmpty && delivered) {
   console.log("SMOKE OK");
 } else {
   console.log("SMOKE FAIL");

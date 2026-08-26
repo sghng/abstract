@@ -4,6 +4,14 @@ Concrete build plan for the cue-based message exchange specified in
 `docs/multi-agent.md`. Read that first; this doc is the how, that doc is the
 why.
 
+> **Current mode (temporary):** the state-tracked cue machine described below
+> (`awaiting`/`debts`, one-inbound-cue-at-a-time, reminders, status line) is
+> disabled while we test fire-and-forget delivery with human oversight. The
+> implementation in `extensions/cue/index.ts` delivers every cue as a follow-up
+> and leaves turn management to the agents. The state machine code is
+> preserved in a `DISABLED_STATE_MACHINE` block and in git history for easy
+> re-enable. See `TODO.md` decisions log.
+
 ## Architecture
 
 - **Three vanilla pi processes**, one per role, launched by `bin/<role>`.
