@@ -1,1 +1,4 @@
-{}
+{
+  "defaultProvider": "minimax-cn",
+  "defaultModel": "MiniMax-M3"
+}

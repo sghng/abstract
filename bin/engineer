@@ -7,6 +7,9 @@
 # -- never from ambient AGENTS.md/CLAUDE.md files.
 set -euo pipefail
 HARNESS_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
+# Inherit global pi credentials/model config into the agent dir (gitignored)
+ln -sf "$HOME/.pi/agent/auth.json" "$HARNESS_DIR/auth.json"
+[ -e "$HOME/.pi/agent/models.json" ] && ln -sf "$HOME/.pi/agent/models.json" "$HARNESS_DIR/models.json"
 exec env HARNESS_ROLE=engineer PI_CODING_AGENT_DIR="$HARNESS_DIR" pi \
   --session ".pi/sessions/engineer.jsonl" \
   --no-context-files \
