@@ -17,6 +17,8 @@ developing this repository. The shared invariants of the lab agents live in
   role prompt
 - `TODO.md` -- design rationale, roadmap, and decisions log; read before
   changing the architecture
+- `docs/` -- design documents for the harness (e.g., `multi-agent.md` for
+  the message-exchange pattern); dev-facing, not loaded by lab agents
 - `manifesto.md` -- human-facing philosophy behind the project
 - `settings.json` -- pi settings for the agent directory
 

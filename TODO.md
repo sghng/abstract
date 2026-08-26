@@ -132,3 +132,22 @@ Until the harness exists, the `bin/` launchers + file-mediated consult relay
 - Lab agents run with `--no-context-files`: no ambient AGENTS.md/CLAUDE.md,
   neither this repo's dev briefing nor the research project's own. The SDK
   harness must set the equivalent (`noContextFiles: true` in loader options).
+- **Multi-agent model (see `docs/multi-agent.md`)**: one conversation
+  stretched across context-isolated sessions; turn-taking, not throughput.
+  Three peer pi processes (direct live control of every agent is a permanent
+  requirement), cues routed by a per-project bus; harness extension
+  self-configures from `HARNESS_ROLE`.
+- **One primitive: `cue(target, message)`**. No ids, no subjects, no answer
+  tool; initiating and resolving are the same call. Resolution = the
+  receiver's next cue back (FIFO, advisory). No target restrictions: anyone
+  can cue anyone; consult conventions live in role prompts, not the
+  mechanism. Cues are reminders, not records; durable state lives in
+  artifacts.
+- **Cues are always follow-ups; agents never steer each other.** Humans
+  steer natively (Enter = steer, Alt+Enter = follow-up, Esc = abort).
+- **Multiple outstanding cues allowed; one inbound cue at a time per agent**
+  (per-callee FIFO in the bus). Fan-out is allowed, not encouraged.
+- **No passports, no harness to-do lists in v1**: watch whether agents
+  self-track; add structure only where pain is felt.
+- Multi-project layering: agent dir = shared lab config; project cwd =
+  sessions, notes, `.pi/` overrides; harness anchors child state at cwd.
