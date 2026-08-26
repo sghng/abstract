@@ -33,8 +33,10 @@ agent is a permanent requirement.
 
 All three processes load the same harness extension (from the agent dir) and
 self-configure from `HARNESS_ROLE` (set by the launcher). Cues cross process
-boundaries over a **per-project message bus**: a unix socket under
-`<project>/.pi/harness/`, auto-spawned by the first extension that connects.
+boundaries **brokerlessly**: the directory tree under `<project>/.pi/harness/`
+is the bus -- sending is a file write into the target's inbox, receiving is a
+directory watch, the ledger is derivable from the inbox contents. No daemon,
+no server. See `docs/harness.md` for the implementation.
 
 Any role can cue any other role. There is no target restriction: initiating
 a cue and resolving one are the same call -- a reply is just a cue back.
@@ -67,8 +69,10 @@ Queueing rules:
 - An agent works on **one inbound cue at a time**: the bus keeps a
   per-callee FIFO and delivers the next cue only when the current one
   resolves.
-- A cue to a role whose process is not running fails fast ("engineer not
-  connected -- launch `bin/engineer`"); the sender keeps its turn.
+- A cue to a role whose process is not running is **not** failed: it waits
+  on disk and is delivered when the role launches (durable queue for free).
+  The sender's status line shows the pending count so a missing teammate is
+  still noticed.
 
 Delivery: **agent cues are always follow-ups, never steers.** A cue arriving
 mid-turn queues behind the current turn and is answered at the next turn
@@ -181,6 +185,6 @@ Phases of note:
 - **Artifact passports / status fields** and **harness-managed to-do
   lists**: see "Task state lives in artifacts".
 - **Steer delivery between agents** and async patterns generally.
-- **Durable offline queues** (fail-fast is the v1 behavior).
+- **Presence / heartbeats** (offline detection beyond the pending count).
 - **Timeouts and stuck detection** ("silence": open cues, nobody playing,
   nothing in flight).
