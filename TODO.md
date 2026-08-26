@@ -135,18 +135,22 @@ Until the harness exists, the `bin/` launchers + file-mediated consult relay
 - **Multi-agent model (see `docs/multi-agent.md`)**: one conversation
   stretched across context-isolated sessions; turn-taking, not throughput.
   Three peer pi processes (direct live control of every agent is a permanent
-  requirement), cues routed by a per-project bus; harness extension
-  self-configures from `HARNESS_ROLE`.
+  requirement); cues carried brokerlessly by a per-project file inbox under
+  `<project>/.pi/harness/` (no daemon; the directory tree is the bus);
+  harness extension self-configures from `HARNESS_ROLE`; `bin/lab` opens all
+  three roles in tmux. Implementation plan in `docs/harness.md`.
 - **One primitive: `cue(target, message)`**. No ids, no subjects, no answer
   tool; initiating and resolving are the same call. Resolution = the
   receiver's next cue back (FIFO, advisory). No target restrictions: anyone
   can cue anyone; consult conventions live in role prompts, not the
   mechanism. Cues are reminders, not records; durable state lives in
   artifacts.
+- **Offline cues are durable, not failed**: a cue to a closed session waits
+  on disk and delivers on launch; the status line shows pending counts.
 - **Cues are always follow-ups; agents never steer each other.** Humans
   steer natively (Enter = steer, Alt+Enter = follow-up, Esc = abort).
 - **Multiple outstanding cues allowed; one inbound cue at a time per agent**
-  (per-callee FIFO in the bus). Fan-out is allowed, not encouraged.
+  (FIFO over the inbox dir). Fan-out is allowed, not encouraged.
 - **No passports, no harness to-do lists in v1**: watch whether agents
   self-track; add structure only where pain is felt.
 - Multi-project layering: agent dir = shared lab config; project cwd =
