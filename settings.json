@@ -1,4 +1,7 @@
 {
   "defaultProvider": "minimax-cn",
-  "defaultModel": "MiniMax-M3"
+  "defaultModel": "MiniMax-M3",
+  "tuiMode": "fullscreen",
+  "theme": "dark",
+  "lastChangelogVersion": "0.84.3"
 }
