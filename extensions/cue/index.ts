@@ -44,7 +44,9 @@ export default function (pi: ExtensionAPI) {
           {
             customType: "cue",
             display: true,
-            content: `[cue from ${env.from}] ${env.message}`,
+            content:
+              `[cue from ${env.from}] ${env.message}\n\n` +
+              `If the sender would benefit from your reply, call cue(target="${env.from}", message="...") when ready.`,
             details: env as unknown as Record<string, unknown>,
           },
           { triggerTurn: true, deliverAs: "followUp" },
@@ -60,10 +62,7 @@ export default function (pi: ExtensionAPI) {
     label: "Cue",
     description:
       `Send a short message to another lab role (you are the ${role}). ` +
-      `Cues are delivered as follow-ups and trigger the recipient's turn. ` +
-      `Use natural language to indicate whether you expect a reply ` +
-      `(e.g., 'please reply' or 'no reply needed'). Durable content belongs ` +
-      `in files; cue the path, not the document.`,
+      `Durable content belongs in files; cue the path, not the document.`,
     parameters: Type.Object({
       target: Type.Union(
         ROLES.filter((r) => r !== role).map((r) => Type.Literal(r)),
