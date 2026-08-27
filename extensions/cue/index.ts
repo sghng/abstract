@@ -24,7 +24,7 @@ import {
 const ROLES = ["orchestrator", "engineer", "librarian"] as const;
 type Role = (typeof ROLES)[number];
 
-export default function (pi: ExtensionAPI) {
+export default function(pi: ExtensionAPI) {
   const roleRaw = process.env.HARNESS_ROLE;
   if (!roleRaw || !(ROLES as readonly string[]).includes(roleRaw)) return;
   const role = roleRaw as Role;
@@ -46,7 +46,8 @@ export default function (pi: ExtensionAPI) {
             display: true,
             content:
               `[cue from ${env.from}] ${env.message}\n\n` +
-              `If the sender would benefit from your reply, call cue(target="${env.from}", message="...") when ready.`,
+              `If ${env.from} would benefit from a reply, ` +
+              `do so via cue(target="${env.from}", message="...").`,
             details: env as unknown as Record<string, unknown>,
           },
           { triggerTurn: true, deliverAs: "followUp" },
@@ -61,8 +62,8 @@ export default function (pi: ExtensionAPI) {
     name: "cue",
     label: "Cue",
     description:
-      `Send a short message to another lab role (you are the ${role}). ` +
-      `Durable content belongs in files; cue the path, not the document.`,
+      `Send a short message (cue) to another role.` +
+      `Any role can cue any role except itself.`,
     parameters: Type.Object({
       target: Type.Union(
         ROLES.filter((r) => r !== role).map((r) => Type.Literal(r)),
