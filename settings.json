@@ -3,5 +3,8 @@
   "defaultModel": "MiniMax-M3",
   "tuiMode": "fullscreen",
   "theme": "dark",
-  "lastChangelogVersion": "0.84.3"
+  "lastChangelogVersion": "0.84.3",
+  "packages": [
+    "npm:pi-mcp-adapter"
+  ]
 }
