@@ -155,6 +155,17 @@ Until the harness exists, the `bin/` launchers + file-mediated consult relay
   self-track; add structure only where pain is felt.
 - Multi-project layering: agent dir = shared lab config; project cwd =
   sessions, notes, `.pi/` overrides; harness anchors child state at cwd.
+- **Resource inheritance policy** for the three-layer model (Pi Agent global
+  in `~/.pi/agent/`, Abstract global in `$HARNESS_DIR`, project-local in
+  `cwd/.pi/`): `auth.json` and `models.json` are symlinked from
+  `~/.pi/agent/` into the harness agent dir; `prompts/` and `themes/` are
+  loaded from `~/.pi/agent/` via explicit `--prompt-template` and `--theme`
+  paths while the harness keeps its own `prompts/` and `themes/` directories
+  as the Abstract global layer; `skills/` and MCP *server definitions* are
+  *not* inherited from `~/.pi/agent/` -- the harness uses its own `skills/`
+  directory and any project-local `.mcp.json` / `.pi/mcp.json`. MCP support
+  itself is enabled by installing `npm:pi-mcp-adapter` as a harness-level
+  package in `$HARNESS_DIR/settings.json`.
 - **Cue extension is fire-and-forget for now**: state tracking
   (`awaiting`/`debts`, one-cue-at-a-time gate, status line, reminders) is
   disabled while we test whether agents can self-manage turn-taking with
