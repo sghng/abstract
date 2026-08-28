@@ -32,7 +32,7 @@ await new Promise((r) => setTimeout(r, 30_000));
 
 const names = session.agent.state.tools.map((t) => t.name);
 console.log("active tools:", names.join(", "));
-console.log("mcp tools:", names.filter((n) => n.startsWith("mcp__")).length);
+console.log("total tools:", names.length);
 const registered = services.resourceLoader
   .getExtensions()
   .extensions.flatMap((e) => [...e.tools.keys()]);
