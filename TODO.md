@@ -171,9 +171,18 @@ Until the harness exists, the `bin/` launchers + file-mediated consult relay
   paths while the harness keeps its own `prompts/` and `themes/` directories
   as the Abstract global layer; `skills/` and MCP *server definitions* are
   *not* inherited from `~/.pi/agent/` -- the harness uses its own `skills/`
-  directory and any project-local `.mcp.json` / `.pi/mcp.json`. MCP support
-  itself is enabled by installing `npm:pi-mcp-adapter` as a harness-level
-  package in `$HARNESS_DIR/settings.json`.
+  directory and any project-local `.mcp.json` / `.pi/mcp.json`.
+- **MCP via our own extension** (`extensions/conductor/`), replacing
+  `npm:pi-mcp-adapter`. Rationale: per-role, per-tool scoping (`roles`,
+  `tools`, `excludeTools` fields in `mcp.json`; zotero is librarian-only) is
+  the whole point, the adapter is single-user-oriented with hidden
+  consent/cache state (the likely cause of a silently missing server), and
+  the lab wants loud, legible failure. v1 scope: tools only, stdio +
+  streamable-HTTP (SSE fallback), no OAuth (oauth servers skipped with a
+  warning). Config layers: harness-global `mcp.json` (gitignored, carries
+  secrets; `mcp.example.json` is the template) merged under project-local
+  `.mcp.json` / `.pi/mcp.json`. Tools register as `mcp__<server>__<tool>`;
+  results capped at 64KB.
 - **Cue extension is fire-and-forget for now**: state tracking
   (`awaiting`/`debts`, one-cue-at-a-time gate, status line, reminders) is
   disabled while we test whether agents can self-manage turn-taking with
