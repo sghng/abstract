@@ -20,8 +20,9 @@ developing this repository. The shared invariants of the lab agents live in
 - `SYSTEM.md` -- replaces pi's default system prompt for lab agents
   (discovered natively from the agent dir)
 - `extensions/` -- pi extensions, one directory per extension: `cue/`
-  (brokerless message exchange, see `docs/harness.md`) and `conductor/`
-  (own MCP integration: per-role, per-tool server scoping from `mcp.json`)
+  (brokerless message exchange, see `docs/harness.md`) and `mcp/`
+  (own MCP integration: per-role, per-tool server scoping and curated
+  tool surfaces from `mcp.json`)
 - `skills/` -- pi skills: procedures and standards, one directory per skill
 - `TODO.md` -- design rationale, roadmap, and decisions log; read before
   changing the architecture
