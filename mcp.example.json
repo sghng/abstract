@@ -1,0 +1,25 @@
+{
+  "mcpServers": {
+    "tavily": {
+      "url": "https://mcp.tavily.com/mcp/?tavilyApiKey=${TAVILY_API_KEY}"
+    },
+    "context7": {
+      "url": "https://mcp.context7.com/mcp"
+    },
+    "zotero": {
+      "command": "uvx",
+      "args": ["--from", "zotero-mcp-server", "zotero-mcp"],
+      "env": {
+        "ZOTERO_LOCAL": "true",
+        "ZOTERO_EMBEDDING_MODEL": "openai",
+        "OPENAI_API_KEY": "${OPENAI_API_KEY}",
+        "OPENAI_EMBEDDING_MODEL": "text-embedding-3-large",
+        "ZOTERO_API_KEY": "${ZOTERO_API_KEY}",
+        "ZOTERO_LIBRARY_ID": "9358581",
+        "ZOTERO_LIBRARY_TYPE": "user"
+      },
+      "roles": ["librarian"],
+      "startupTimeoutMs": 120000
+    }
+  }
+}

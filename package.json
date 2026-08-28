@@ -6,7 +6,8 @@
     "abstract": "./src/cli.ts"
   },
   "dependencies": {
-    "@earendil-works/pi-coding-agent": "^0.84.3"
+    "@earendil-works/pi-coding-agent": "^0.84.3",
+    "@modelcontextprotocol/sdk": "^1.30.0"
   },
   "devDependencies": {
     "@types/node": "^26.3.0",

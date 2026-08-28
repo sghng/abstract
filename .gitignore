@@ -10,3 +10,5 @@ binaries/
 node_modules/
 auth.json
 models.json
+mcp.json
+mcp-cache.json
