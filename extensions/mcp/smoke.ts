@@ -1,6 +1,6 @@
-// Smoke test for extensions/conductor: fake pi host, real MCP servers.
-// Usage: HARNESS_ROLE=<role> bun extensions/conductor/smoke.ts [cwd]
-const cwd = process.argv[2] ?? "/tmp/conductor-smoke";
+// Smoke test for extensions/mcp: fake pi host, real MCP servers.
+// Usage: HARNESS_ROLE=<role> bun extensions/mcp/smoke.ts [cwd]
+const cwd = process.argv[2] ?? "/tmp/mcp-smoke";
 import { mkdirSync } from "node:fs";
 mkdirSync(cwd, { recursive: true });
 

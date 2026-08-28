@@ -172,7 +172,7 @@ Until the harness exists, the `bin/` launchers + file-mediated consult relay
   as the Abstract global layer; `skills/` and MCP *server definitions* are
   *not* inherited from `~/.pi/agent/` -- the harness uses its own `skills/`
   directory and any project-local `.mcp.json` / `.pi/mcp.json`.
-- **MCP via our own extension** (`extensions/conductor/`), replacing
+- **MCP via our own extension** (`extensions/mcp/`), replacing
   `npm:pi-mcp-adapter`. Rationale: per-role, per-tool scoping (`roles`,
   `tools`, `excludeTools` fields in `mcp.json`; zotero is librarian-only) is
   the whole point, the adapter is single-user-oriented with hidden
@@ -181,8 +181,14 @@ Until the harness exists, the `bin/` launchers + file-mediated consult relay
   streamable-HTTP (SSE fallback), no OAuth (oauth servers skipped with a
   warning). Config layers: harness-global `mcp.json` (gitignored, carries
   secrets; `mcp.example.json` is the template) merged under project-local
-  `.mcp.json` / `.pi/mcp.json`. Tools register as `mcp__<server>__<tool>`;
-  results capped at 64KB.
+  `.mcp.json` / `.pi/mcp.json`. Tools register as `mcp__<server>__<tool>`
+  through the same `registerTool` mechanism as any extension tool (name,
+  description, and schema travel in the API tools payload -- no prompt
+  injection); results capped at 64KB. `tools` also accepts an object form
+  mapping original tool names to `{name, description}` so the lab exposes a
+  curated surface (own names, own descriptions) instead of vendor wording;
+  `bun extensions/mcp/inspect.ts [--role r]` dumps every advertised tool as
+  JSON to curate from.
 - **Cue extension is fire-and-forget for now**: state tracking
   (`awaiting`/`debts`, one-cue-at-a-time gate, status line, reminders) is
   disabled while we test whether agents can self-manage turn-taking with

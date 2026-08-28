@@ -1,9 +1,10 @@
 import { describe, expect, test } from "bun:test";
 import {
+  allServers,
   expandEnv,
-  filterToolNames,
   mergeConfigs,
   parseConfig,
+  planTools,
   sanitizeName,
   serversForRole,
   toolName,
@@ -32,29 +33,33 @@ describe("mergeConfigs", () => {
   });
 });
 
-describe("serversForRole", () => {
-  const merged = mergeConfigs([
-    {
-      mcpServers: {
-        everyone: { url: "https://x" },
-        libOnly: { url: "https://y", roles: ["librarian"] },
-        perRole: {
-          url: "https://z",
-          roles: { librarian: { tools: ["t1"] }, engineer: {} },
-        },
-        serverWide: {
-          url: "https://w",
-          tools: ["a", "b"],
-          excludeTools: ["c"],
-          roles: { librarian: { tools: ["b"], excludeTools: ["d"] } },
-        },
-        oauth: { url: "https://o", auth: "oauth" },
-        broken: {},
-        stdio: { command: "uvx", args: ["run", "${PKG}"], env: { K: "${V}" } },
+const merged = mergeConfigs([
+  {
+    mcpServers: {
+      everyone: { url: "https://x" },
+      libOnly: { url: "https://y", roles: ["librarian"] },
+      perRole: {
+        url: "https://z",
+        roles: { librarian: { tools: ["t1"] }, engineer: {} },
       },
+      serverWide: {
+        url: "https://w",
+        tools: ["a", "b"],
+        excludeTools: ["c"],
+        roles: { librarian: { tools: ["b"], excludeTools: ["d"] } },
+      },
+      curated: {
+        url: "https://c",
+        tools: { search: { name: "web_search", description: "Search the web." } },
+      },
+      oauth: { url: "https://o", auth: "oauth" },
+      broken: {},
+      stdio: { command: "uvx", args: ["run", "${PKG}"], env: { K: "${V}" } },
     },
-  ]);
+  },
+]);
 
+describe("serversForRole", () => {
   test("roles absent means all roles", () => {
     const names = serversForRole(merged, "engineer").map((s) => s.name);
     expect(names).toContain("everyone");
@@ -65,18 +70,12 @@ describe("serversForRole", () => {
     expect(serversForRole(merged, "librarian").map((s) => s.name)).toContain("libOnly");
   });
 
-  test("roles object carries per-role tool filters", () => {
+  test("roles object restricts and carries per-role filters", () => {
     const lib = serversForRole(merged, "librarian").find((s) => s.name === "perRole")!;
-    expect(lib.filter.tools).toEqual(["t1"]);
+    expect(lib.filters[1].tools).toEqual(["t1"]);
     const eng = serversForRole(merged, "engineer").find((s) => s.name === "perRole")!;
-    expect(eng.filter.tools).toBeUndefined();
+    expect(eng.filters[1].tools).toBeUndefined();
     expect(serversForRole(merged, "orchestrator").map((s) => s.name)).not.toContain("perRole");
-  });
-
-  test("server-wide and per-role filters merge", () => {
-    const lib = serversForRole(merged, "librarian").find((s) => s.name === "serverWide")!;
-    expect(lib.filter.tools).toEqual(["b"]); // intersection of ["a","b"] and ["b"]
-    expect(lib.filter.excludeTools).toEqual(["c", "d"]); // union
   });
 
   test("oauth servers and shapeless entries are skipped", () => {
@@ -95,12 +94,49 @@ describe("serversForRole", () => {
   });
 });
 
-describe("filterToolNames", () => {
-  test("allowlist then denylist", () => {
-    expect(filterToolNames(["a", "b", "c"], { tools: ["a", "b"], excludeTools: ["b"] })).toEqual(["a"]);
+describe("allServers", () => {
+  test("ignores roles scoping, keeps runnable servers only", () => {
+    const names = allServers(merged).map((s) => s.name);
+    expect(names).toContain("libOnly");
+    expect(names).not.toContain("oauth");
+    expect(names).not.toContain("broken");
   });
-  test("empty filter passes everything", () => {
-    expect(filterToolNames(["a", "b"], {})).toEqual(["a", "b"]);
+});
+
+describe("planTools", () => {
+  test("no filters exposes everything under original names", () => {
+    expect(planTools(["a", "b"], [{}])).toEqual([
+      { orig: "a", alias: "a" },
+      { orig: "b", alias: "b" },
+    ]);
+  });
+
+  test("array allowlist then denylist", () => {
+    expect(planTools(["a", "b", "c"], [{ tools: ["a", "b"], excludeTools: ["b"] }])).toEqual([
+      { orig: "a", alias: "a" },
+    ]);
+  });
+
+  test("object allowlist renames and redescribes", () => {
+    expect(
+      planTools(["search", "crawl"], [
+        { tools: { search: { name: "web_search", description: "Search the web." } } },
+      ]),
+    ).toEqual([{ orig: "search", alias: "web_search", description: "Search the web." }]);
+  });
+
+  test("layers compose: server-wide narrows, per-role narrows and curates", () => {
+    const serverWide = { tools: ["a", "b"], excludeTools: ["c"] };
+    const perRole = { tools: { b: { name: "bee" } }, excludeTools: ["d"] };
+    expect(planTools(["a", "b", "c", "d"], [serverWide, perRole])).toEqual([
+      { orig: "b", alias: "bee" },
+    ]);
+  });
+
+  test("denylist matches original names even after rename", () => {
+    expect(
+      planTools(["a"], [{ tools: { a: { name: "alpha" } } }, { excludeTools: ["a"] }]),
+    ).toEqual([]);
   });
 });
 

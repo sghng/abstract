@@ -1,7 +1,17 @@
 {
   "mcpServers": {
     "tavily": {
-      "url": "https://mcp.tavily.com/mcp/?tavilyApiKey=${TAVILY_API_KEY}"
+      "url": "https://mcp.tavily.com/mcp/?tavilyApiKey=${TAVILY_API_KEY}",
+      "tools": {
+        "tavily_search": {
+          "name": "search",
+          "description": "Search the web for current information. Returns snippets and source URLs."
+        },
+        "tavily_extract": {
+          "name": "fetch",
+          "description": "Fetch and extract the readable content of a web page."
+        }
+      }
     },
     "context7": {
       "url": "https://mcp.context7.com/mcp"
