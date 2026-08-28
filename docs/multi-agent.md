@@ -32,7 +32,8 @@ Vocabulary (musical theme):
 
 ## Topology
 
-Three peer pi processes, one per role, each launched via `bin/` with a pinned
+Three peer pi processes, one per role, each spawned by the `abstract` CLI
+with a pinned
 session file (`<project>/.pi/sessions/<role>.jsonl`). The user can attach to
 any session's TUI live and steer it directly -- direct control of every
 agent is a permanent requirement.

@@ -9,5 +9,5 @@
     "types": ["node", "bun-types"],
     "skipLibCheck": true
   },
-  "include": ["extensions/"]
+  "include": ["extensions/", "src/"]
 }
