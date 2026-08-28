@@ -42,12 +42,15 @@ export const SERVERS: ServerDef[] = [
   },
   {
     name: "context7",
-    roles: "all",
+    roles: ["orchestrator", "engineer"],
     url: "https://mcp.context7.com/mcp",
   },
   {
     name: "zotero",
     roles: ["librarian"],
+    // Trim: no annotation- or library-management tools.
+    map: (tools) =>
+      tools.filter((t) => !t.name.includes("annotation") && !t.name.includes("libra")),
     command: "uvx",
     args: ["--from", "zotero-mcp-server", "zotero-mcp"],
     env: {
