@@ -88,16 +88,21 @@ RPC plumbing. Hence the phased plan:
 
 1. [done] **Restructure repo as pi agent directory** (this layout). Roles, kernel,
    skills are harness *inputs* regardless of how the harness is built.
-2. [next] **Extension-harness**: a pi extension that imports the SDK, holds
-   persistent `AgentSession`s for engineer + librarian (session files under
-   the project's `.pi/sessions/`), and registers `consult_engineer` /
-   `consult_librarian` tools on the interactive (orchestrator) session.
-   Session files per role per project; the user talks to the orchestrator in
-   the normal pi TUI. Iterate on the *protocol* here.
-3. [deferred] **Standalone binary** (SDK `createAgentSession` + custom
-   `ResourceLoader` loading this repo): when the interaction model stabilizes
-   and we need our own UI/command surface or long-running orchestration.
-   Compile via `bun build --compile`.
+2. [next] **SDK harness CLI** (`abstract`, Bun-linked, this repo's `package.json`
+   bin): replaces the `bin/` shell scripts entirely. Design settled in the
+   decisions log below (see "SDK harness v1"). Three peer SDK processes, one
+   per tmux pane, each with its own `InteractiveMode`; cues stay file-based.
+   v1 is full parity with `bin/` plus the custom `SYSTEM.md` prompt.
+3. [deferred] **Standalone binary**: compile the same CLI via
+   `bun build --compile` once the interaction model stabilizes and we want
+   distribution without a Bun install.
+
+(The earlier phase-2 "extension-harness" idea -- one interactive pi process
+holding the other roles' `AgentSession`s in-process -- was considered and
+rejected for v1: it breaks the three-pane model and fights the one-terminal-
+per-process nature of `InteractiveMode`. File-based cues make it unnecessary.
+If in-process consult via `prompt()` ever earns its keep, the cue extension
+is the interface that survives either way.)
 
 Until the harness exists, the `bin/` launchers + file-mediated consult relay
 (human or headless `pi -p`) are the prototype.
@@ -108,8 +113,8 @@ Until the harness exists, the `bin/` launchers + file-mediated consult relay
   warn/block writes that violate layout conventions (manifesto Corollary B:
   express as code what can be expressed as code). Deletes a whole class of
   silent post-compaction failures.
-- **Role-scoped skills**: `bin/` launchers could pass `--no-skills --skill ...`
-  per role if all-skills-visible proves distracting. Start simple.
+- **Role-scoped skills**: the CLI could pass per-role skill paths (or use
+  `skillsOverride`) if all-skills-visible proves distracting. Start simple.
 - **Role-aware compaction**: custom `session_before_compact` instructions per
   role (preserve role-relevant context verbatim).
 - **Session-file locking** if headless consults ever touch a session that is
@@ -128,7 +133,8 @@ Until the harness exists, the `bin/` launchers + file-mediated consult relay
   committed.
 - `AGENTS.md` briefs agents *developing this repo* only. Lab invariants live
   in `motif.md` (package naming follows a musical theme) and are injected
-  into the system prompt by the `bin/` launchers.
+  into the system prompt by the harness (bin/ launchers today, the SDK CLI's
+  `appendSystemPrompt` paths once it lands).
 - Lab agents run with `--no-context-files`: no ambient AGENTS.md/CLAUDE.md,
   neither this repo's dev briefing nor the research project's own. The SDK
   harness must set the equivalent (`noContextFiles: true` in loader options).
@@ -173,3 +179,62 @@ Until the harness exists, the `bin/` launchers + file-mediated consult relay
   inbox and delivers as a follow-up; the old state machine is preserved in
   a `DISABLED_STATE_MACHINE` block in `extensions/cue/index.ts` and in git
   history.
+
+### SDK harness v1 (settled; supersedes the bin/ prototype)
+
+- **One Bun CLI, one entry point**: `abstract`, linked via this repo's
+  `package.json` bin. The CLI computes the tmux session name, creates or
+  reattaches the session, and spawns the three role processes into panes
+  itself (internal hidden flag, e.g. `abstract __run <role>` -- not a
+  user-facing subcommand). `bin/` and the shell launchers are deleted once
+  the CLI lands; git history is the rollback.
+- **tmux UX unchanged**: three even horizontal panes
+  (orchestrator | engineer | librarian). Session name is
+  `abs-<project-dir-basename>` -- no state file, no hash; two projects
+  sharing a basename collide (accepted; add an override flag if it ever
+  bites). Reattach if the session exists with the right layout; otherwise
+  recreate. Detach leaves agents running (panes are children of the tmux
+  server, not the CLI); if the tmux server died, panes resume the session
+  files. Files are memory; processes are attention.
+- **Three peer SDK processes**, one per pane: `createAgentSessionRuntime`
+  --> `createAgentSessionServices` (agentDir = this repo,
+  `noContextFiles: true`, session pinned per role at
+  `.pi/sessions/<role>.jsonl` under the project cwd) -->
+  `InteractiveMode.run()`. Full pi TUI per pane, including `/reload`.
+  One-process-three-TUIs was investigated: `InteractiveMode` accepts an
+  injectable terminal, so it is not a hard restriction, but `ProcessTerminal`
+  owns process-global state (raw stdin, signal handlers, alternate screen),
+  so three TUIs in one process means reimplementing a terminal multiplexer.
+  tmux already is the multiplexer; one process per pane is the natural
+  boundary.
+- **Custom system prompt via pi's native file discovery**: a `SYSTEM.md` in
+  the harness dir replaces pi's default prompt. Content: keep the
+  "expert coding assistant" identity (it drives correct tool behavior --
+  the agents work by exploring directories programmatically) but drop the
+  "inside pi" framing and the entire pi-docs pointer block; keep the four
+  tool one-liners (read/bash/edit/write) and pi's three default guidelines
+  verbatim ("use bash for file ops", "be concise", "show file paths
+  clearly") -- they are tool-behavioral, not pi-specific, and "show file
+  paths" matters because artifacts are the lab's memory. Motif and role
+  description are NOT baked into SYSTEM.md.
+- **Per-role assembly as file paths, not strings**: the CLI passes
+  `appendSystemPrompt: [<abs path to motif.md>, <abs path to
+  agents/<role>.md>]`. `DefaultResourceLoader.resolvePromptInput` reads a
+  source from disk when it is an existing path, and `reload()` re-resolves
+  on every `/reload` -- so edits to `SYSTEM.md`, `motif.md`, or
+  `agents/<role>.md` take effect on `/reload` with zero custom code. (New
+  prompt applies from the next turn; history keeps what it was sent with,
+  same as vanilla pi.) This is why we do NOT need a custom `ResourceLoader`
+  subclass for v1 -- the vanilla mechanism already gives us the reload
+  semantics; revisit only when per-role skills or dynamic assembly become
+  concrete.
+- **Skills block unchanged**: pi renders the `<available_skills>` listing
+  from the harness `skills/` dir exactly as before.
+- **Communication unchanged**: brokerless cue file inbox under
+  `<project>/.pi/harness/`; the extension self-configures from the role.
+  Noted potential: with SDK processes, consult could later move to
+  in-process `prompt()`; the cue interface survives either way.
+- **v1 scope is full parity**: credential symlinks (auth.json/models.json),
+  prompts/themes inheritance paths, `HARNESS_ROLE` (becomes the internal
+  pane flag), session pinning, cue extension -- all ported to code in the
+  CLI. No staged rollout; half a harness means running two harnesses.
