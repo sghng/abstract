@@ -11,21 +11,27 @@ Status: early. See `TODO.md` for the design rationale and roadmap, and
 ## Layout
 
 - `AGENTS.md` -- team kernel: invariants loaded into every session
-- `agents/` -- role system prompts (consumed by `bin/`)
+- `agents/` -- role system prompts (consumed by the CLI)
+- `src/cli.ts` -- the `abstract` SDK harness CLI
+- `SYSTEM.md` -- lab system prompt (replaces pi's default)
 - `skills/` -- pi skills: procedures and standards, one directory per skill
-- `bin/` -- role launchers; each pins a persistent session file per role
 - `manifesto.md` -- human-facing philosophy
 
 ## Usage
 
-Run a role inside a research project directory:
+Install and link once:
 
 ```sh
-/path/to/abstract/bin/orchestrator
-/path/to/abstract/bin/engineer
-/path/to/abstract/bin/librarian
+cd /path/to/abstract && bun install && bun link
 ```
 
-Each launcher points pi's agent directory at this repository
-(`PI_CODING_AGENT_DIR`) and resumes the role's persistent session at
-`.pi/sessions/<role>.jsonl` inside the project.
+Then run the ensemble inside a research project directory:
+
+```sh
+abstract
+```
+
+This opens (or reattaches) a tmux session `abs-<project-basename>` with
+three panes -- orchestrator, engineer, librarian -- each a peer pi process
+using this repository as its agent directory, resuming the role's
+persistent session at `.pi/sessions/<role>.jsonl` inside the project.

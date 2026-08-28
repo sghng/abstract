@@ -88,11 +88,12 @@ RPC plumbing. Hence the phased plan:
 
 1. [done] **Restructure repo as pi agent directory** (this layout). Roles, kernel,
    skills are harness *inputs* regardless of how the harness is built.
-2. [next] **SDK harness CLI** (`abstract`, Bun-linked, this repo's `package.json`
-   bin): replaces the `bin/` shell scripts entirely. Design settled in the
-   decisions log below (see "SDK harness v1"). Three peer SDK processes, one
-   per tmux pane, each with its own `InteractiveMode`; cues stay file-based.
-   v1 is full parity with `bin/` plus the custom `SYSTEM.md` prompt.
+2. [done] **SDK harness CLI** (`abstract`, Bun-linked, this repo's `package.json`
+   bin): replaces the `bin/` shell scripts entirely (deleted; git history is
+   the rollback). Design settled in the decisions log below (see "SDK harness
+   v1"). Three peer SDK processes, one per tmux pane, each with its own
+   `InteractiveMode`; cues stay file-based. v1 is full parity with `bin/`
+   plus the custom `SYSTEM.md` prompt.
 3. [deferred] **Standalone binary**: compile the same CLI via
    `bun build --compile` once the interaction model stabilizes and we want
    distribution without a Bun install.
@@ -105,7 +106,8 @@ If in-process consult via `prompt()` ever earns its keep, the cue extension
 is the interface that survives either way.)
 
 Until the harness exists, the `bin/` launchers + file-mediated consult relay
-(human or headless `pi -p`) are the prototype.
+(human or headless `pi -p`) were the prototype; both are superseded by the
+`abstract` CLI (`src/cli.ts`).
 
 ## Open Questions / Deferred Ideas
 

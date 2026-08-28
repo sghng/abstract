@@ -14,7 +14,8 @@ why.
 
 ## Architecture
 
-- **Three vanilla pi processes**, one per role, launched by `bin/<role>`.
+- **Three vanilla pi SDK processes**, one per role, spawned by the
+  `abstract` CLI (`src/cli.ts`, internal `abstract __run <role>`).
   Direct live control of every session is a permanent requirement; nothing
   here changes that.
 - **Brokerless.** No daemon, no server. The directory tree under
@@ -24,8 +25,9 @@ why.
 - **One pi extension**, `extensions/cue/`, loaded automatically from the
   agent dir into every lab session, self-configuring from the `HARNESS_ROLE`
   env var set by the launcher.
-- **`bin/lab`**: tmux script opening all three roles in one window (pi has
-  native tmux integration; see pi's `docs/tmux.md`).
+- **`abstract`** (the CLI): opens all three roles in one tmux window
+  (session `abs-<project-basename>`; pi has native tmux integration, see
+  pi's `docs/tmux.md`).
 
 ## File layout
 
@@ -132,6 +134,9 @@ pending count tells the user to open that terminal. Offline detection may be
 added later via heartbeats if the ambiguity annoys.
 
 ## `bin/` changes
+
+(Superseded: the `abstract` CLI now owns everything in this section. Kept
+for the rationale.)
 
 - Each launcher gains `HARNESS_ROLE=<role>` in its `env` line and
   `--name <role>` so pi's builtin footer labels the session.
