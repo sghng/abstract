@@ -173,22 +173,22 @@ Until the harness exists, the `bin/` launchers + file-mediated consult relay
   *not* inherited from `~/.pi/agent/` -- the harness uses its own `skills/`
   directory and any project-local `.mcp.json` / `.pi/mcp.json`.
 - **MCP via our own extension** (`extensions/mcp/`), replacing
-  `npm:pi-mcp-adapter`. Rationale: per-role, per-tool scoping (`roles`,
-  `tools`, `excludeTools` fields in `mcp.json`; zotero is librarian-only) is
-  the whole point, the adapter is single-user-oriented with hidden
-  consent/cache state (the likely cause of a silently missing server), and
-  the lab wants loud, legible failure. v1 scope: tools only, stdio +
-  streamable-HTTP (SSE fallback), no OAuth (oauth servers skipped with a
-  warning). Config layers: harness-global `mcp.json` (gitignored, carries
-  secrets; `mcp.example.json` is the template) merged under project-local
-  `.mcp.json` / `.pi/mcp.json`. Tools register as `mcp__<server>__<tool>`
-  through the same `registerTool` mechanism as any extension tool (name,
-  description, and schema travel in the API tools payload -- no prompt
-  injection); results capped at 64KB. `tools` also accepts an object form
-  mapping original tool names to `{name, description}` so the lab exposes a
-  curated surface (own names, own descriptions) instead of vendor wording;
-  `bun extensions/mcp/inspect.ts [--role r]` dumps every advertised tool as
-  JSON to curate from.
+  `npm:pi-mcp-adapter` -- and built "by not building it": not an interface
+  for hooking random MCPs, but an internal adapter that registers tools we
+  don't implement (the implementation hides behind a server URL). Studied
+  pi-mcp-adapter (sync registration from a disk cache) and OpenCode (no
+  cache; in-memory defs; down server = absent tools) and took the OpenCode
+  branch: **no cache, no config file**. Servers are code (`servers.ts`):
+  per-role scoping (`roles`, e.g. zotero is librarian-only) and tool-list
+  shaping (`map`, e.g. tavily_* --> web_*) are plain functions. On
+  session_start we connect, `listTools`, shape, and register flat names
+  through the same `registerTool` path as `cue` (no `mcp__` prefix);
+  post-bind registration provably survives vanilla `/reload` (probe3).
+  Secrets live only in gitignored `mcp.secrets.json` (flat KEY=VALUE),
+  expanded into `${VAR}` placeholders. v1 scope: tools only, stdio +
+  streamable-HTTP (SSE fallback), no OAuth; failures are loud (ui.notify)
+  and never crash the session. `inspect.ts` dumps the shaped tool surface
+  as JSON for curation.
 - **Cue extension is fire-and-forget for now**: state tracking
   (`awaiting`/`debts`, one-cue-at-a-time gate, status line, reminders) is
   disabled while we test whether agents can self-manage turn-taking with
