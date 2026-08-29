@@ -74,7 +74,9 @@ export default function(pi: ExtensionAPI) {
       const env = sendCue(cwd, role, params.target, params.message);
       setTimeout(() => tryDeliver(ctx), 0);
       return {
-        content: [{ type: "text", text: `cue sent to ${params.target}.` }],
+        content: [
+          { type: "text", text: `cue sent to ${params.target}:\n\n${params.message}` },
+        ],
         details: env as unknown as Record<string, unknown>,
       };
     },
