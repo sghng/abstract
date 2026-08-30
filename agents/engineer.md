@@ -110,7 +110,7 @@ have their own experiment directories. Create new experiments for:
 **Tickets WITHOUT experiments** (rare):
 - Purely organizational/logistics tasks (file management, formatting)
 - Synthesizing existing work into reports
-- Writing drafts/proposals using already-completed analysis
+- Handing off results, figures, and prose notes to the writer for drafts/proposals using already-completed analysis
 - Reviewing literature or creating documentation
 
 **CRITICAL RULE**: If the ticket asks you to "analyze", "calculate", "test",
@@ -192,7 +192,8 @@ This document is for:
 
 Your report is `notes/reports/report-NNN-short-title.md`. This is where
 synthesis happens -- you are writing a mini research paper that connects
-experiments to the narrative.
+experiments to the narrative. Reports are internal documents; the writer turns
+reports and results into outward-facing manuscripts, proposals, or grants.
 
 ### Report Structure
 
