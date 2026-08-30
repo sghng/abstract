@@ -21,7 +21,13 @@ import {
   sendCue,
 } from "./core.ts";
 
-const ROLES = ["orchestrator", "engineer", "librarian"] as const;
+const ROLES = [
+  "orchestrator",
+  "engineer",
+  "librarian",
+  "writer",
+  "reviewer",
+] as const;
 type Role = (typeof ROLES)[number];
 
 export default function(pi: ExtensionAPI) {
