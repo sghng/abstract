@@ -32,10 +32,15 @@ export default function(pi: ExtensionAPI) {
   let cwd = process.cwd();
   let watcher: fs.FSWatcher | undefined;
   let delivering = false;
+  // Compaction has priority: session.compact() aborts the current turn, so a
+  // cue delivered from turn_end would start a new turn and stomp the
+  // compaction. While a compaction runs, cues stay queued in the inbox and
+  // are delivered when it finishes (session_compact / session_compact_failed).
+  let compacting = false;
 
   /** Deliver every pending cue in the inbox as a follow-up. */
   function tryDeliver(ctx: ExtensionContext) {
-    if (delivering) return;
+    if (delivering || compacting) return;
     delivering = true;
     try {
       for (const { file, env } of scanInbox(cwd, role)) {
@@ -58,6 +63,16 @@ export default function(pi: ExtensionAPI) {
     }
   }
 
+  /**
+   * Deliver after a beat. Every mid-session delivery path goes through this
+   * so that a compaction kicked off at the same moment wins: compact()
+   * emits session_before_compact (setting `compacting`) well within 250ms,
+   * and the deferred tryDeliver then stays out of the way.
+   */
+  function scheduleDeliver(ctx: ExtensionContext) {
+    setTimeout(() => tryDeliver(ctx), 250);
+  }
+
   pi.registerTool({
     name: "cue",
     label: "Cue",
@@ -72,7 +87,7 @@ export default function(pi: ExtensionAPI) {
     }),
     async execute(_id, params, _signal, _onUpdate, ctx) {
       const env = sendCue(cwd, role, params.target, params.message);
-      setTimeout(() => tryDeliver(ctx), 0);
+      scheduleDeliver(ctx);
       return {
         content: [
           { type: "text", text: `cue sent to ${params.target}:\n\n${params.message}` },
@@ -89,16 +104,30 @@ export default function(pi: ExtensionAPI) {
     let timer: NodeJS.Timeout | undefined;
     watcher = fs.watch(inboxDir(cwd, role), () => {
       clearTimeout(timer);
-      timer = setTimeout(() => tryDeliver(ctx), 150);
+      timer = setTimeout(() => scheduleDeliver(ctx), 150);
     });
     tryDeliver(ctx);
   });
 
   pi.on("turn_end", async (_event, ctx) => {
-    tryDeliver(ctx);
+    scheduleDeliver(ctx);
   });
 
   pi.on("agent_settled", async (_event, ctx) => {
+    scheduleDeliver(ctx);
+  });
+
+  pi.on("session_before_compact", async () => {
+    compacting = true;
+  });
+
+  pi.on("session_compact", async (_event, ctx) => {
+    compacting = false;
+    tryDeliver(ctx);
+  });
+
+  pi.on("session_compact_failed", async (_event, ctx) => {
+    compacting = false;
     tryDeliver(ctx);
   });
 
