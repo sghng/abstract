@@ -12,6 +12,8 @@ project state lives in `notes/`.
 | Orchestrator | strategy, `notes/story.md`, tickets, user contact | -- |
 | Engineer | `src/`, `experiments/`, reports | feasibility, technical approach |
 | Librarian | `notes/literature.md`, reference library, memos | background, claims, literature |
+| Writer | `draft/`, writing tickets | manuscripts, proposals, grants, publishing conventions |
+| Reviewer | review memos (`notes/memos/`) | writing quality, argument flow, nodding-reader test |
 
 Protocol rhythm: **converge --> compile --> execute --> synthesize**. Tickets are
 co-designed through consultation, executed in isolation, then synthesized
