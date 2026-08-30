@@ -175,9 +175,9 @@ file is `draft/proposal-v1.md`, then `v1` is what leaves the lab.
 
 ## Open Questions
 
-- Should there be a dedicated **writing** skill covering manuscript conventions,
-  grant sections, and citation hygiene? Currently these are scattered across
-  the philosophy and manuscript skills.
+- The writing conventions live in the **writing**, **grants**, and
+  **manuscript** skills. If they drift apart, consider consolidating into one
+  writing skill with venue modules.
 - Should the reviewer ever be engaged for non-draft artifacts (e.g., polishing
   an engineer report)? The harness does not forbid it, but the convention is that
   the reviewer is the writer's right-hand.
