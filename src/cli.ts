@@ -4,8 +4,9 @@
  *
  * Replaces the bin/ shell launchers. One entry point:
  *
- *   abstract              create or reattach the tmux ensemble (three panes,
- *                         one per role) anchored at the current project dir
+ *   abstract              create or reattach the tmux ensemble (core window:
+ *                         orchestrator | engineer | librarian; writing window:
+ *                         writer | reviewer) anchored at the current project dir
  *   abstract __run <role> internal: run one role's pi session in this
  *                         terminal (spawned into tmux panes by `abstract`)
  *
@@ -37,7 +38,13 @@ import {
   SettingsManager,
 } from "@earendil-works/pi-coding-agent";
 
-const ROLES = ["orchestrator", "engineer", "librarian"] as const;
+const ROLES = [
+  "orchestrator",
+  "engineer",
+  "librarian",
+  "writer",
+  "reviewer",
+] as const;
 type Role = (typeof ROLES)[number];
 
 const CLI_PATH = realpathSync(fileURLToPath(import.meta.url));
@@ -64,7 +71,7 @@ function shQuote(s: string): string {
   return `'${s.replace(/'/g, `'\\''`)}'`;
 }
 
-/** Create or reattach the three-pane tmux ensemble. */
+/** Create or reattach the tmux ensemble (core + writing windows). */
 function launch(): void {
   if (!tmux(["-V"])) fail("tmux not found (brew install tmux)");
   const cwd = process.cwd();
@@ -81,21 +88,38 @@ function launch(): void {
     }
   })();
 
+  const expectedWindows: Record<string, number> = {
+    core: 3,
+    writing: 2,
+  };
+
   if (has) {
-    const panes = tmux(["list-panes", "-t", session]).trim().split("\n").filter(Boolean).length;
-    if (panes === 3) {
-      tmux(["attach-session", "-t", session], true);
+    const windows = tmux(["list-windows", "-t", session, "-F", "#{window_name} #{window_panes}"])
+      .trim()
+      .split("\n")
+      .filter(Boolean)
+      .map((line) => line.split(" "));
+    const ok =
+      windows.length === 2 &&
+      windows.every(([name, panes]) => expectedWindows[name] === Number(panes));
+    if (ok) {
+      tmux(["attach-session", "-t", `${session}:core`], true);
       return;
     }
     console.error(`abstract: recreating session ${session} (layout stale; agent memory preserved in .pi/sessions/)`);
     tmux(["kill-session", "-t", session]);
   }
 
-  tmux(["new-session", "-d", "-s", session, "-c", cwd, run("orchestrator")]);
-  tmux(["split-window", "-h", "-t", `${session}:0`, "-c", cwd, run("engineer")]);
-  tmux(["split-window", "-h", "-t", `${session}:0.1`, "-c", cwd, run("librarian")]);
-  tmux(["select-layout", "-t", session, "even-horizontal"]);
-  tmux(["attach-session", "-t", session], true);
+  tmux(["new-session", "-d", "-s", session, "-n", "core", "-c", cwd, run("orchestrator")]);
+  tmux(["split-window", "-h", "-t", `${session}:core`, "-c", cwd, run("engineer")]);
+  tmux(["split-window", "-h", "-t", `${session}:core.1`, "-c", cwd, run("librarian")]);
+  tmux(["select-layout", "-t", `${session}:core`, "even-horizontal"]);
+
+  tmux(["new-window", "-t", `${session}:1`, "-n", "writing", "-c", cwd, run("writer")]);
+  tmux(["split-window", "-h", "-t", `${session}:writing`, "-c", cwd, run("reviewer")]);
+  tmux(["select-layout", "-t", `${session}:writing`, "even-horizontal"]);
+
+  tmux(["attach-session", "-t", `${session}:core`], true);
 }
 
 /** Symlink a global pi config file into the harness agent dir. */
@@ -203,7 +227,7 @@ async function main(): Promise<void> {
     return;
   }
   if (arg === "--help" || arg === "-h") {
-    console.log("usage: abstract          create/reattach the three-role tmux ensemble");
+    console.log("usage: abstract          create/reattach the tmux ensemble (core: orchestrator|engineer|librarian; writing: writer|reviewer)");
     console.log("       abstract __run r  internal: run role r in this terminal");
     return;
   }
