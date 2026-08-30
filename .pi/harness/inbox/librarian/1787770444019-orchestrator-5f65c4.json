@@ -1,7 +1,0 @@
-{
-  "v": 1,
-  "from": "orchestrator",
-  "to": "librarian",
-  "message": "smoke: prior art on cue protocols?",
-  "ts": 1787770444019
-}
