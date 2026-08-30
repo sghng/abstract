@@ -32,13 +32,18 @@ Vocabulary (musical theme):
 
 ## Topology
 
-Three peer pi processes, one per role, each spawned by the `abstract` CLI
+Five peer pi processes, one per role, each spawned by the `abstract` CLI
 with a pinned
 session file (`<project>/.pi/sessions/<role>.jsonl`). The user can attach to
 any session's TUI live and steer it directly -- direct control of every
 agent is a permanent requirement.
 
-All three processes load the same harness extension (from the agent dir) and
+The `abstract` CLI opens two tmux windows: `core`
+(orchestrator | engineer | librarian) and `writing` (writer | reviewer).
+It attaches to the `core` window by default; the user switches windows with
+ the tmux prefix + window number.
+
+All five processes load the same harness extension (from the agent dir) and
 self-configure from `HARNESS_ROLE` (set by the launcher). Cues cross process
 boundaries **brokerlessly**: the directory tree under `<project>/.pi/harness/`
 is the bus -- sending is a file write into the target's inbox, receiving is a

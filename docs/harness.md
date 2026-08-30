@@ -14,7 +14,7 @@ why.
 
 ## Architecture
 
-- **Three vanilla pi SDK processes**, one per role, spawned by the
+- **Five vanilla pi SDK processes**, one per role, spawned by the
   `abstract` CLI (`src/cli.ts`, internal `abstract __run <role>`).
   Direct live control of every session is a permanent requirement; nothing
   here changes that.
@@ -25,8 +25,10 @@ why.
 - **One pi extension**, `extensions/cue/`, loaded automatically from the
   agent dir into every lab session, self-configuring from the `HARNESS_ROLE`
   env var set by the launcher.
-- **`abstract`** (the CLI): opens all three roles in one tmux window
-  (session `abs-<project-basename>`; pi has native tmux integration, see
+- **`abstract`** (the CLI): opens five roles across two tmux windows:
+  `core` (orchestrator | engineer | librarian) and `writing` (writer |
+  reviewer). It attaches to `core` by default (session
+  `abs-<project-basename>`; pi has native tmux integration, see
   pi's `docs/tmux.md`).
 
 ## File layout
@@ -140,11 +142,12 @@ for the rationale.)
 
 - Each launcher gains `HARNESS_ROLE=<role>` in its `env` line and
   `--name <role>` so pi's builtin footer labels the session.
-- `bin/lab`: tmux layout -- new session, three panes running
-  `bin/orchestrator`, `bin/engineer`, `bin/librarian` in the current
-  project directory. Re-running attaches when the session already has three
-  panes; otherwise it recreates. No tmux pane titles: role identity lives in
-  each pi footer's cwd line via `--name`.
+- `bin/lab`: tmux layout -- new session, two windows (`core` with three
+  panes running `bin/orchestrator`, `bin/engineer`, `bin/librarian`;
+  `writing` with two panes running `bin/writer`, `bin/reviewer`) in the
+  current project directory. Re-running attaches when the session already has
+  the right windows and pane counts; otherwise it recreates. No tmux pane
+  titles: role identity lives in each pi footer's cwd line via `--name`.
 - **Auth gotcha**: `PI_CODING_AGENT_DIR` relocates everything pi reads,
   including `auth.json` and `models.json`. The launchers therefore symlink
   `~/.pi/agent/auth.json` (and `models.json` if present) into the repo root

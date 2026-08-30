@@ -196,6 +196,14 @@ Until the harness exists, the `bin/` launchers + file-mediated consult relay
   inbox and delivers as a follow-up; the old state machine is preserved in
   a `DISABLED_STATE_MACHINE` block in `extensions/cue/index.ts` and in git
   history.
+- **Writer + reviewer roles**: the deferred "narrator" outward-facing
+  artifact role is implemented as **writer**, with a **reviewer** as the
+  writer's devil's-advocate consultant. The orchestrator keeps
+  `notes/story.md`; the writer owns `draft/` and writing tickets; the
+  reviewer writes memos and does not edit `draft/`. Externalization is
+  approved by the orchestrator. The CLI opens a `core` window
+  (orchestrator | engineer | librarian) and a `writing` window
+  (writer | reviewer), attaching to `core` by default.
 
 ### SDK harness v1 (settled; supersedes the bin/ prototype)
 
