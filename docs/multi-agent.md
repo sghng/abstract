@@ -41,7 +41,7 @@ agent is a permanent requirement.
 The `abstract` CLI opens two tmux windows: `core`
 (orchestrator | engineer | librarian) and `writing` (writer | reviewer).
 It attaches to the `core` window by default; the user switches windows with
- the tmux prefix + window number.
+the tmux prefix + window number.
 
 All five processes load the same harness extension (from the agent dir) and
 self-configure from `HARNESS_ROLE` (set by the launcher). Cues cross process
