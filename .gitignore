@@ -11,3 +11,4 @@ node_modules/
 auth.json
 models.json
 mcp.secrets.json
+.pi/
