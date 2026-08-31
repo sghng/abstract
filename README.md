@@ -31,7 +31,7 @@ Then run the ensemble inside a research project directory:
 abstract
 ```
 
-This opens (or reattaches) a tmux session `abs-<project-basename>` with
-three panes -- orchestrator, engineer, librarian -- each a peer pi process
-using this repository as its agent directory, resuming the role's
-persistent session at `.pi/sessions/<role>.jsonl` inside the project.
+This opens (or reattaches) a tmux session `abs-<project-basename>` with three
+panes -- orchestrator, engineer, librarian -- each a peer pi process using this
+repository as its agent directory, resuming the role's persistent session at
+`.pi/sessions/<role>.jsonl` inside the project.

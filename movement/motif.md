@@ -1,27 +1,27 @@
 # Motif
 
 This file is the lab's motif: the shared invariants loaded into every agent
-session, which survive compaction. It contains **only invariants**: the
-rules that must never be forgotten. Procedures and templates live in skills;
-project state lives in `notes/`.
+session, which survive compaction. It contains **only invariants**: the rules
+that must never be forgotten. Procedures and templates live in skills; project
+state lives in `notes/`.
 
 ## The Team
 
-| Role | Owns | Consulted for |
-|---|---|---|
-| Orchestrator | strategy, `notes/story.md`, tickets, user contact | -- |
-| Engineer | `src/`, `experiments/`, reports | feasibility, technical approach |
-| Librarian | `notes/literature.md`, reference library, memos | background, claims, literature |
-| Writer | `draft/`, writing tickets | manuscripts, proposals, grants, publishing conventions |
-| Reviewer | review memos (`notes/memos/`) | writing quality, argument flow, nodding-reader test |
+| Role         | Owns                                              | Consulted for                                          |
+| ------------ | ------------------------------------------------- | ------------------------------------------------------ |
+| Orchestrator | strategy, `notes/story.md`, tickets, user contact | --                                                     |
+| Engineer     | `src/`, `experiments/`, reports                   | feasibility, technical approach                        |
+| Librarian    | `notes/literature.md`, reference library, memos   | background, claims, literature                         |
+| Writer       | `draft/`, writing tickets                         | manuscripts, proposals, grants, publishing conventions |
+| Reviewer     | review memos (`notes/memos/`)                     | writing quality, argument flow, nodding-reader test    |
 
-Protocol rhythm: **converge --> compile --> execute --> synthesize**. Tickets are
-co-designed through consultation, executed in isolation, then synthesized
+Protocol rhythm: **converge --> compile --> execute --> synthesize**. Tickets
+are co-designed through consultation, executed in isolation, then synthesized
 into reports. Only the orchestrator assigns work.
 
-Consultations are conversations; artifacts are files. If a consultation
-produces a lasting fact, it must land in `notes/` (a memo, a ticket's
-"Because", or `notes/literature.md`) before it is forgotten.
+Consultations are conversations; artifacts are files. If a consultation produces
+a lasting fact, it must land in `notes/` (a memo, a ticket's "Because", or
+`notes/literature.md`) before it is forgotten.
 
 ## Project Layout (Invariant)
 
@@ -60,7 +60,7 @@ project-root/
 
 ## Skills
 
-Skills hold the *procedures and templates*. Each is self-contained: read one
+Skills hold the _procedures and templates_. Each is self-contained: read one
 when its description matches your task, and re-read it after compaction.
-Ticket/report templates live in the **logistics** skill; the mindset for
-framing and narrative decisions lives in the **philosophy** skill.
+Ticket/report templates live in the **logistics** skill; the mindset for framing
+and narrative decisions lives in the **philosophy** skill.
