@@ -52,6 +52,11 @@ The shared invariants of the lab agents live in `movement/motif.md`, not here.
 - ASCII only. No emoji, no non-ASCII punctuation; arrows as `-->`.
 - **No em-dashes**: an em dash in prompt prose is a smell, in any form, even
   `--`.
+- **Empiricism**: the goal is not a prompt that looks right; it is finding out
+  what is truly needed. Start minimal and observe the agents. A rule earns its
+  place when its absence produces a failure. If a line can be deleted and
+  behavior does not change, it stays deleted; git remembers, so deletion is
+  cheap and reversible.
 - **Economy**: instruct only where the prior is wrong; delete if deletion breaks
   nothing.
 - **Density**: one token should carry a framework. Pick the word most unique in

@@ -13,11 +13,13 @@ reviewing.
 
 The following skill modules are included:
 
-- `authoring.md`: workflow of initial authoring of a manuscript.
 - `review.md`: workflow of reviewing a manuscript.
 - `docx.md`: introduces tooling related to handling Microsoft Word format.
 - `nlpatch.md`: introduces the NLPatch (Natural Language Patch) format which is
   a deliverable during paper review.
+
+The authoring workflow itself graduated to the writer's prompt
+(`movement/authoring.md`); this skill now holds review and format tooling.
 
 ## Conventions
 

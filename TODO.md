@@ -250,6 +250,13 @@ Until the harness exists, the `bin/` launchers + file-mediated consult relay
   silent and costly; everything else stays an on-demand skill. Graduating a
   skill to always-on means extracting its body into a movement (no frontmatter)
   and listing its stem in the score.
+- **Empiricism governs placement**: start minimal, observe the agents, add back
+  only proven failures. First applications: writer.md dropped its cue-routing
+  paragraph (the roster implies who to ask for what), and
+  skills/manuscript/authoring.md graduated to `movement/authoring.md` (the
+  writer's sole function is authoring); the writer's score is now `["motif",
+  "authoring", "writer"]`. The manuscript skill keeps review and format
+  tooling.
 - **Skills block unchanged**: pi renders the `<available_skills>` listing from
   the harness `skills/` dir exactly as before.
 - **Communication unchanged**: brokerless cue file inbox under
