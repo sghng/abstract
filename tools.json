@@ -1,0 +1,2160 @@
+[
+  {
+    "server": "tavily",
+    "name": "mcp__tavily__tavily_search",
+    "calls": "tavily_search",
+    "description": "Search the web for current information on any topic. Use for news, facts, or data beyond your knowledge cutoff. Returns snippets and source URLs.",
+    "inputSchema": {
+      "type": "object",
+      "properties": {
+        "query": {
+          "description": "Search query",
+          "type": "string"
+        },
+        "max_results": {
+          "default": 5,
+          "description": "The maximum number of search results to return",
+          "type": "integer"
+        },
+        "search_depth": {
+          "default": "basic",
+          "description": "The depth of the search. 'basic' for generic results, 'advanced' for more thorough search, 'fast' for optimized low latency with high relevance, 'ultra-fast' for prioritizing latency above all else",
+          "enum": [
+            "basic",
+            "advanced",
+            "fast",
+            "ultra-fast"
+          ],
+          "type": "string"
+        },
+        "topic": {
+          "const": "general",
+          "default": "general",
+          "description": "The category of the search. This will determine which of our agents will be used for the search",
+          "type": "string"
+        },
+        "time_range": {
+          "anyOf": [
+            {
+              "enum": [
+                "day",
+                "week",
+                "month",
+                "year"
+              ],
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "The time range back from the current date to include in the search results"
+        },
+        "include_images": {
+          "default": false,
+          "description": "Include a list of query-related images in the response",
+          "type": "boolean"
+        },
+        "include_image_descriptions": {
+          "default": false,
+          "description": "Include a list of query-related images and their descriptions in the response",
+          "type": "boolean"
+        },
+        "include_raw_content": {
+          "default": false,
+          "description": "Include the cleaned and parsed HTML content of each search result",
+          "type": "boolean"
+        },
+        "include_domains": {
+          "default": [],
+          "description": "A list of domains to specifically include in the search results, if the user asks to search on specific sites set this to the domain of the site",
+          "items": {
+            "type": "string"
+          },
+          "type": "array"
+        },
+        "exclude_domains": {
+          "default": [],
+          "description": "List of domains to specifically exclude, if the user asks to exclude a domain set this to the domain of the site",
+          "items": {
+            "type": "string"
+          },
+          "type": "array"
+        },
+        "country": {
+          "default": "",
+          "description": "Boost search results from a specific country. Must be a full country name (e.g., 'United States', 'Japan', 'Germany'). ISO country codes (e.g., 'us', 'jp') are not supported. Available only if topic is general. See https://docs.tavily.com/documentation/api-reference/search for the full list of supported countries.",
+          "type": "string"
+        },
+        "include_favicon": {
+          "default": false,
+          "description": "Whether to include the favicon URL for each result",
+          "type": "boolean"
+        },
+        "start_date": {
+          "default": "",
+          "description": "Will return all results after the specified start date. Required to be written in the format YYYY-MM-DD.",
+          "type": "string"
+        },
+        "end_date": {
+          "default": "",
+          "description": "Will return all results before the specified end date. Required to be written in the format YYYY-MM-DD",
+          "type": "string"
+        },
+        "exact_match": {
+          "anyOf": [
+            {
+              "type": "boolean"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "Only return results containing the exact phrase(s) in quotes in your query"
+        }
+      },
+      "required": [
+        "query"
+      ],
+      "additionalProperties": false
+    }
+  },
+  {
+    "server": "tavily",
+    "name": "mcp__tavily__tavily_extract",
+    "calls": "tavily_extract",
+    "description": "Extract content from URLs. Returns raw page content in markdown or text format.",
+    "inputSchema": {
+      "type": "object",
+      "properties": {
+        "urls": {
+          "description": "List of URLs to extract content from",
+          "items": {
+            "type": "string"
+          },
+          "type": "array"
+        },
+        "extract_depth": {
+          "default": "basic",
+          "description": "Use 'advanced' for LinkedIn, protected sites, or tables/embedded content",
+          "enum": [
+            "basic",
+            "advanced"
+          ],
+          "type": "string"
+        },
+        "include_images": {
+          "default": false,
+          "description": "Include images from pages",
+          "type": "boolean"
+        },
+        "format": {
+          "default": "markdown",
+          "description": "Output format",
+          "enum": [
+            "markdown",
+            "text"
+          ],
+          "type": "string"
+        },
+        "include_favicon": {
+          "default": false,
+          "description": "Include favicon URLs",
+          "type": "boolean"
+        },
+        "query": {
+          "default": "",
+          "description": "Query to rerank content chunks by relevance",
+          "type": "string"
+        }
+      },
+      "required": [
+        "urls"
+      ],
+      "additionalProperties": false
+    }
+  },
+  {
+    "server": "tavily",
+    "name": "mcp__tavily__tavily_crawl",
+    "calls": "tavily_crawl",
+    "description": "Crawl a website starting from a URL. Extracts content from pages with configurable depth and breadth.",
+    "inputSchema": {
+      "type": "object",
+      "properties": {
+        "url": {
+          "description": "The root URL to begin the crawl",
+          "type": "string"
+        },
+        "max_depth": {
+          "default": 1,
+          "description": "Max depth of the crawl. Defines how far from the base URL the crawler can explore.",
+          "minimum": 1,
+          "type": "integer"
+        },
+        "max_breadth": {
+          "default": 20,
+          "description": "Max number of links to follow per level of the tree (i.e., per page)",
+          "minimum": 1,
+          "type": "integer"
+        },
+        "limit": {
+          "default": 50,
+          "description": "Total number of links the crawler will process before stopping",
+          "minimum": 1,
+          "type": "integer"
+        },
+        "instructions": {
+          "default": "",
+          "description": "Natural language instructions for the crawler. Instructions specify which types of pages the crawler should return.",
+          "type": "string"
+        },
+        "select_paths": {
+          "default": [],
+          "description": "Regex patterns to select only URLs with specific path patterns (e.g., /docs/.*, /api/v1.*)",
+          "items": {
+            "type": "string"
+          },
+          "type": "array"
+        },
+        "select_domains": {
+          "default": [],
+          "description": "Regex patterns to restrict crawling to specific domains or subdomains (e.g., ^docs\\.example\\.com$)",
+          "items": {
+            "type": "string"
+          },
+          "type": "array"
+        },
+        "allow_external": {
+          "default": true,
+          "description": "Whether to return external links in the final response",
+          "type": "boolean"
+        },
+        "extract_depth": {
+          "default": "basic",
+          "description": "Advanced extraction retrieves more data, including tables and embedded content, with higher success but may increase latency",
+          "enum": [
+            "basic",
+            "advanced"
+          ],
+          "type": "string"
+        },
+        "format": {
+          "default": "markdown",
+          "description": "The format of the extracted web page content. markdown returns content in markdown format. text returns plain text and may increase latency.",
+          "enum": [
+            "markdown",
+            "text"
+          ],
+          "type": "string"
+        },
+        "include_favicon": {
+          "default": false,
+          "description": "Whether to include the favicon URL for each result",
+          "type": "boolean"
+        }
+      },
+      "required": [
+        "url"
+      ],
+      "additionalProperties": false
+    }
+  },
+  {
+    "server": "tavily",
+    "name": "mcp__tavily__tavily_map",
+    "calls": "tavily_map",
+    "description": "Map a website's structure. Returns a list of URLs found starting from the base URL.",
+    "inputSchema": {
+      "type": "object",
+      "properties": {
+        "url": {
+          "description": "The root URL to begin the mapping",
+          "type": "string"
+        },
+        "max_depth": {
+          "default": 1,
+          "description": "Max depth of the mapping. Defines how far from the base URL the crawler can explore",
+          "minimum": 1,
+          "type": "integer"
+        },
+        "max_breadth": {
+          "default": 20,
+          "description": "Max number of links to follow per level of the tree (i.e., per page)",
+          "minimum": 1,
+          "type": "integer"
+        },
+        "limit": {
+          "default": 50,
+          "description": "Total number of links the crawler will process before stopping",
+          "minimum": 1,
+          "type": "integer"
+        },
+        "instructions": {
+          "default": "",
+          "description": "Natural language instructions for the crawler",
+          "type": "string"
+        },
+        "select_paths": {
+          "default": [],
+          "description": "Regex patterns to select only URLs with specific path patterns (e.g., /docs/.*, /api/v1.*)",
+          "items": {
+            "type": "string"
+          },
+          "type": "array"
+        },
+        "select_domains": {
+          "default": [],
+          "description": "Regex patterns to restrict crawling to specific domains or subdomains (e.g., ^docs\\.example\\.com$)",
+          "items": {
+            "type": "string"
+          },
+          "type": "array"
+        },
+        "allow_external": {
+          "default": true,
+          "description": "Whether to return external links in the final response",
+          "type": "boolean"
+        }
+      },
+      "required": [
+        "url"
+      ],
+      "additionalProperties": false
+    }
+  },
+  {
+    "server": "tavily",
+    "name": "mcp__tavily__tavily_research",
+    "calls": "tavily_research",
+    "description": "Perform comprehensive research on a given topic or question. Use this tool when you need to gather information from multiple sources, including web pages, documents, and other resources, to answer a question or complete a task. Returns a detailed response based on the research findings. Rate limit: 20 requests per minute.",
+    "inputSchema": {
+      "type": "object",
+      "properties": {
+        "input": {
+          "description": "A comprehensive description of the research task",
+          "type": "string"
+        },
+        "model": {
+          "default": "auto",
+          "description": "Defines the degree of depth of the research. 'mini' is good for narrow tasks with few subtopics. 'pro' is good for broad tasks with many subtopics",
+          "enum": [
+            "mini",
+            "pro",
+            "auto"
+          ],
+          "type": "string"
+        }
+      },
+      "required": [
+        "input"
+      ],
+      "additionalProperties": false
+    }
+  },
+  {
+    "server": "context7",
+    "name": "mcp__context7__resolve-library-id",
+    "calls": "resolve-library-id",
+    "description": "Resolves a package/product name to a Context7-compatible library ID and returns matching libraries.\n\nYou MUST call this function before 'Query Documentation' tool to obtain a valid Context7-compatible library ID UNLESS the user explicitly provides a library ID in the format '/org/project' or '/org/project/version' in their query.\n\nEach result includes:\n- Library ID: Context7-compatible identifier (format: /org/project)\n- Name: Library or package name\n- Description: Short summary\n- Code Snippets: Number of available code examples\n- Source Reputation: Authority indicator (High, Medium, Low, or Unknown)\n- Benchmark Score: Quality indicator (100 is the highest score)\n- Versions: List of versions if available. Use one of those versions if the user provides a version in their query. The format of the version is /org/project/version.\n\nFor best results, select libraries based on name match, source reputation, snippet coverage, benchmark score, and relevance to your use case.\n\nSelection Process:\n1. Analyze the query to understand what library/package the user is looking for\n2. Return the most relevant match based on:\n- Name similarity to the query (exact matches prioritized)\n- Description relevance to the query's intent\n- Documentation coverage (prioritize libraries with higher Code Snippet counts)\n- Source reputation (consider libraries with High or Medium reputation more authoritative)\n- Benchmark Score: Quality indicator (100 is the highest score)\n\nResponse Format:\n- Return the selected library ID in a clearly marked section\n- Provide a brief explanation for why this library was chosen\n- If multiple good matches exist, acknowledge this but proceed with the most relevant one\n- If no good matches exist, clearly state this and suggest query refinements\n\nFor ambiguous queries, request clarification before proceeding with a best-guess match.\n\nIMPORTANT: Do not call this tool more than 3 times per question. If you cannot find what you need after 3 calls, use the best result you have.",
+    "inputSchema": {
+      "type": "object",
+      "properties": {
+        "query": {
+          "type": "string",
+          "description": "What to look up in the library's documentation. This is used to rank library results by relevance to what the user is trying to accomplish. The query is sent to the Context7 API for processing. Do not include any sensitive or confidential information such as API keys, passwords, credentials, personal data, or proprietary code in your query."
+        },
+        "libraryName": {
+          "type": "string",
+          "description": "Library name to search for and retrieve a Context7-compatible library ID. Use the official library name with proper punctuation — e.g., 'Next.js' instead of 'nextjs', 'Customer.io' instead of 'customerio', 'Three.js' instead of 'threejs'."
+        }
+      },
+      "required": [
+        "query",
+        "libraryName"
+      ],
+      "$schema": "https://json-schema.org/draft/2020-12/schema"
+    }
+  },
+  {
+    "server": "context7",
+    "name": "mcp__context7__query-docs",
+    "calls": "query-docs",
+    "description": "Retrieves and queries up-to-date documentation and code examples from Context7 for any programming library or framework.\n\nYou must call 'Resolve Context7 Library ID' tool first to obtain the exact Context7-compatible library ID required to use this tool, UNLESS the user explicitly provides a library ID in the format '/org/project' or '/org/project/version' in their query.\n\nDo not call this tool more than 3 times per question.",
+    "inputSchema": {
+      "type": "object",
+      "properties": {
+        "libraryId": {
+          "type": "string",
+          "description": "Exact Context7-compatible library ID (e.g., '/mongodb/docs', '/vercel/next.js', '/supabase/supabase', '/vercel/next.js/v14.3.0-canary.87') retrieved from 'resolve-library-id' or directly from user query in the format '/org/project' or '/org/project/version'."
+        },
+        "query": {
+          "type": "string",
+          "description": "What to look up in the library's documentation, scoped to a single concept. Be specific and include relevant details, but keep each query to one topic — if the user's question spans multiple distinct concepts, make a separate call per concept instead of combining them, unless the question is about how the concepts interact. Good: 'How to set up authentication with JWT in Express.js' or 'React useEffect cleanup function examples'. Bad (too vague): 'auth' or 'hooks'. Bad (too broad): 'routing and auth and caching in Next.js'. The query is sent to the Context7 API for processing. Do not include any sensitive or confidential information such as API keys, passwords, credentials, personal data, or proprietary code in your query."
+        }
+      },
+      "required": [
+        "libraryId",
+        "query"
+      ],
+      "$schema": "https://json-schema.org/draft/2020-12/schema"
+    }
+  },
+  {
+    "server": "zotero",
+    "name": "mcp__zotero__zotero_get_annotations",
+    "calls": "zotero_get_annotations",
+    "description": "Get annotations (highlights and attached notes on PDF/EPUB attachments) for a specific item or across the active Zotero library. item_key: pass the parent item key OR an attachment key — both work; attachment-to-parent resolution is automatic. ALWAYS pass item_key when you know which item you want; calling without it returns every annotation in the library (potentially thousands). use_pdf_extraction=True falls back to direct PDF parsing when the Zotero API has no stored annotation record — useful for annotations made outside Zotero desktop. limit: cap on annotations returned; None (default) returns all. format='markdown' (default) returns a readable list; format='json' returns normalized records with stable keys for downstream scripts and other MCP tools. Uses Better BibTeX when Zotero desktop is running locally, otherwise the Zotero web API. Example: zotero_get_annotations(item_key='ABC12345') → every highlight/note on that paper.",
+    "inputSchema": {
+      "type": "object",
+      "properties": {
+        "item_key": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "Optional Zotero item key/ID to filter annotations by parent item"
+        },
+        "use_pdf_extraction": {
+          "default": false,
+          "type": "boolean",
+          "description": "Whether to attempt direct PDF extraction as a fallback"
+        },
+        "limit": {
+          "anyOf": [
+            {
+              "type": "integer"
+            },
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "Maximum number of annotations to return"
+        },
+        "format": {
+          "default": "markdown",
+          "enum": [
+            "markdown",
+            "json"
+          ],
+          "type": "string",
+          "description": "``markdown`` for human-readable output or ``json`` for\nnormalized structured records."
+        }
+      },
+      "additionalProperties": false
+    }
+  },
+  {
+    "server": "zotero",
+    "name": "mcp__zotero__zotero_get_notes",
+    "calls": "zotero_get_notes",
+    "description": "Read notes from the active Zotero library. Omit query to LIST notes: with item_key, that item's child notes; without it, notes library-wide (capped by limit). Pass query to SEARCH note and annotation text instead — case-insensitive substring over the stripped-text body, library-wide, so query and item_key cannot be combined. limit: max results (default 20). truncate=True (default) shortens long bodies for display; pass False for complete content (list mode only). raw_html=True returns a note's original HTML instead of stripped text — use it when you intend to edit and round-trip via zotero_manage_note(action='update'). Scope: active library only (zotero_switch_library to change). Example: zotero_get_notes(item_key='ABC12345', raw_html=True); zotero_get_notes(query='mindfulness').",
+    "inputSchema": {
+      "type": "object",
+      "properties": {
+        "item_key": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        },
+        "query": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        },
+        "limit": {
+          "anyOf": [
+            {
+              "type": "integer"
+            },
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": 20
+        },
+        "truncate": {
+          "default": true,
+          "type": "boolean"
+        },
+        "raw_html": {
+          "default": false,
+          "type": "boolean"
+        }
+      },
+      "additionalProperties": false
+    }
+  },
+  {
+    "server": "zotero",
+    "name": "mcp__zotero__zotero_manage_note",
+    "calls": "zotero_manage_note",
+    "description": "Create, update, or trash a Zotero note. item_key: the PARENT item's key for action='create', the NOTE's own key for 'update' and 'delete' (zotero_get_notes finds it). create: needs note_text — plain text, or simple HTML (p, strong, em, ul/li, a, code), which is preserved; note_title becomes a heading; tags optional. update: needs note_text. append=False (default) REPLACES the whole body, append=True concatenates. To keep formatting, fetch with zotero_get_notes(raw_html=True), edit that HTML, and pass it back whole. delete: moves the note to the Trash — recoverable; emptying the Trash is manual in Zotero. Notes only, not items/collections/attachments. Requires a writable library (web API key or hybrid mode). Example: (action='create', item_key='ABC12345', note_title='Reading notes', note_text='<p>Key claim ...</p>').",
+    "inputSchema": {
+      "type": "object",
+      "properties": {
+        "action": {
+          "enum": [
+            "create",
+            "update",
+            "delete"
+          ],
+          "type": "string"
+        },
+        "item_key": {
+          "type": "string"
+        },
+        "note_text": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        },
+        "note_title": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        },
+        "tags": {
+          "anyOf": [
+            {
+              "items": {
+                "type": "string"
+              },
+              "type": "array"
+            },
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        },
+        "append": {
+          "default": false,
+          "type": "boolean"
+        }
+      },
+      "required": [
+        "action",
+        "item_key"
+      ],
+      "additionalProperties": false
+    }
+  },
+  {
+    "server": "zotero",
+    "name": "mcp__zotero__zotero_create_annotation",
+    "calls": "zotero_create_annotation",
+    "description": "Create an annotation on a PDF attachment (EPUB: highlights only). Exactly one of two modes per call: text= HIGHLIGHTS selectable text; rect= draws an AREA box over a figure, table, or other non-text region (PDF only). Passing both or neither is an error. attachment_key: the PDF/EPUB attachment key, NOT the parent item key (zotero_get_item_children finds it). page: 1-indexed page (EPUB: 1-indexed chapter). text: exact text to highlight, matched against the text layer — scanned/image-only PDFs will not match. rect: [x, y, width, height] normalized to [0, 1], with (0, 0) at the page's top-left; width/height are page-relative and the box must fit the page. Call zotero_get_page_layout first and reuse a detected region's bbox instead of guessing coordinates. comment, color (hex, default '#ffd400'), tags: optional. Requires PyMuPDF (the [pdf] extra) and a writable library (web API key or hybrid mode). Examples: (attachment_key='NHZFE5A7', page=4, text='working memory'); (attachment_key='NHZFE5A7', page=7, rect=[0.15, 0.22, 0.6, 0.35], comment='Figure 3').",
+    "inputSchema": {
+      "type": "object",
+      "properties": {
+        "attachment_key": {
+          "type": "string"
+        },
+        "page": {
+          "type": "integer"
+        },
+        "text": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        },
+        "rect": {
+          "anyOf": [
+            {
+              "items": {
+                "type": "number"
+              },
+              "type": "array"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        },
+        "comment": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        },
+        "color": {
+          "default": "#ffd400",
+          "type": "string"
+        },
+        "tags": {
+          "anyOf": [
+            {
+              "items": {
+                "type": "string"
+              },
+              "type": "array"
+            },
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        }
+      },
+      "required": [
+        "attachment_key",
+        "page"
+      ],
+      "additionalProperties": false
+    }
+  },
+  {
+    "server": "zotero",
+    "name": "mcp__zotero__zotero_get_page_layout",
+    "calls": "zotero_get_page_layout",
+    "description": "Detect candidate figure/table regions on a PDF page and return their normalized bounding boxes, so area annotations can be placed on detected content instead of guessed positions. ALWAYS call this before zotero_create_annotation's area mode unless exact coordinates are already known. Returns each region's bounding box (x, y, width, height in [0, 1]), source (image/drawing/table/merged), associated caption (e.g. 'Figure 3: ...'), confidence level, and a ready-to-paste zotero_create_annotation call. Note: detection is geometric — boxes cover the graphical core of a figure/table; text labels inside figures or unruled table headers may fall outside the box. Confidence reflects caption matching, not box completeness. attachment_key: PDF attachment key — NOT the parent item key (use zotero_get_item_children to find attachments). page: 1-indexed page number (page 1 is the first page). Scope: PDFs only — EPUB attachments are NOT supported. Read-only: works in both local and web API modes. Example: zotero_get_page_layout(attachment_key='NHZFE5A7', page=7).",
+    "inputSchema": {
+      "type": "object",
+      "properties": {
+        "attachment_key": {
+          "type": "string",
+          "description": "PDF attachment key (e.g., \"NHZFE5A7\")"
+        },
+        "page": {
+          "type": "integer",
+          "description": "1-indexed PDF page number"
+        }
+      },
+      "required": [
+        "attachment_key",
+        "page"
+      ],
+      "additionalProperties": false
+    }
+  },
+  {
+    "server": "zotero",
+    "name": "mcp__zotero__zotero_update_annotation",
+    "calls": "zotero_update_annotation",
+    "description": "Update an existing Zotero annotation. Editable fields: text (highlight text), comment, color (hex like '#ffd400'), and tags. Tags can be replaced wholesale via `tags`, or edited incrementally via `add_tags`/`remove_tags` (mutually exclusive with `tags`). Position/page/sortIndex are anchored to the PDF/EPUB geometry and are not editable.",
+    "inputSchema": {
+      "type": "object",
+      "properties": {
+        "annotation_key": {
+          "type": "string"
+        },
+        "text": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        },
+        "comment": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        },
+        "color": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        },
+        "tags": {
+          "anyOf": [
+            {
+              "items": {
+                "type": "string"
+              },
+              "type": "array"
+            },
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        },
+        "add_tags": {
+          "anyOf": [
+            {
+              "items": {
+                "type": "string"
+              },
+              "type": "array"
+            },
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        },
+        "remove_tags": {
+          "anyOf": [
+            {
+              "items": {
+                "type": "string"
+              },
+              "type": "array"
+            },
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        }
+      },
+      "required": [
+        "annotation_key"
+      ],
+      "additionalProperties": false
+    }
+  },
+  {
+    "server": "zotero",
+    "name": "mcp__zotero__zotero_delete_annotation",
+    "calls": "zotero_delete_annotation",
+    "description": "Move a Zotero annotation to the Trash. Trashed annotations are recoverable from Zotero's Trash — empty the Trash in the Zotero UI for permanent deletion.",
+    "inputSchema": {
+      "type": "object",
+      "properties": {
+        "annotation_key": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "annotation_key"
+      ],
+      "additionalProperties": false
+    }
+  },
+  {
+    "server": "zotero",
+    "name": "mcp__zotero__zotero_get_item_metadata",
+    "calls": "zotero_get_item_metadata",
+    "description": "Fetch detailed metadata (title, creators, date, DOI, publisher, tags, abstract, URL, etc.) for ONE Zotero item by key. If the metadata and abstract don't contain what you need, call zotero_get_item_fulltext to read the paper — but that is resource-intensive (10K+ tokens) and should NEVER be used for searching; use zotero_search_items or zotero_semantic_search instead. item_key: the 8-character Zotero item key (NOT a DOI or title). include_abstract=True (default) includes the abstractNote in markdown output; pass False to trim tokens when you don't need it. (Ignored in bibtex/json formats.) format='markdown' (default) returns a human-readable block; format='json' returns the complete raw Zotero item record; format='bibtex' returns a BibTeX citation string suitable for .bib files. Scope: active library only (switch with zotero_switch_library). Unlike list endpoints, this returns items EVEN IF THEY ARE IN THE TRASH — a Status: In Trash line is surfaced when the item is trashed (recoverable via the Zotero UI). Collection membership is shown as keys rather than a bare count so the caller can verify entries against zotero_search_collections (the Zotero API does not cascade collection-delete to items, so dangling references can linger). Example: zotero_get_item_metadata(item_key='RTKZQI8E', format='bibtex').",
+    "inputSchema": {
+      "type": "object",
+      "properties": {
+        "item_key": {
+          "type": "string",
+          "description": "Zotero item key/ID"
+        },
+        "include_abstract": {
+          "default": true,
+          "type": "boolean",
+          "description": "Whether to include the abstract in the output (markdown format only)"
+        },
+        "format": {
+          "default": "markdown",
+          "enum": [
+            "markdown",
+            "bibtex",
+            "json"
+          ],
+          "type": "string",
+          "description": "Output format - 'markdown' for a readable summary, 'json' for\nthe complete raw Zotero item, or 'bibtex' for BibTeX citation"
+        }
+      },
+      "required": [
+        "item_key"
+      ],
+      "additionalProperties": false
+    }
+  },
+  {
+    "server": "zotero",
+    "name": "mcp__zotero__zotero_get_item_fulltext",
+    "calls": "zotero_get_item_fulltext",
+    "description": "Return the full extracted text of a Zotero item's primary attachment (PDF or EPUB). WARNING: returns the entire paper (often 10K+ tokens). Use ONLY when the user explicitly wants to READ the paper — not for searching or browsing. For topic search use zotero_semantic_search; for metadata only use zotero_get_item_metadata. Avoid calling this on multiple papers in one conversation unless the user specifically asked to read several. item_key: 8-character Zotero item key. Normally the parent item — the tool locates the attached PDF/EPUB itself, preferring PDF unless attachment_priority says otherwise. Passing an attachment's own key instead reads exactly that file and skips the priority order, which is how you read one specific attachment of an item that has several (find keys via zotero_get_item_children). Scope: active library only. Extraction path (in order): local Zotero storage via SQLite when running in local mode (fastest, respects pdf_max_pages config); Zotero's server-side fulltext index; direct download and parsing as a last resort. Image-only scanned PDFs without OCR may return little or no text. Example: zotero_get_item_fulltext(item_key='RTKZQI8E').",
+    "inputSchema": {
+      "type": "object",
+      "properties": {
+        "item_key": {
+          "type": "string",
+          "description": "Zotero item key/ID. Normally the parent item, whose best\nattachment is chosen by ``attachment_priority``. Passing an\n*attachment's* own key is also supported and reads exactly that\nfile, bypassing the priority order — pair it with\n``zotero_get_item_children`` to read one specific attachment of\nan item that has several (#378)."
+        }
+      },
+      "required": [
+        "item_key"
+      ],
+      "additionalProperties": false
+    }
+  },
+  {
+    "server": "zotero",
+    "name": "mcp__zotero__zotero_get_attachment_path",
+    "calls": "zotero_get_attachment_path",
+    "description": "Return the local filesystem path(s) of a Zotero item's attachments. Local mode only. Useful when you want to read a large PDF directly (e.g., a book) instead of going through zotero_get_item_fulltext, which is page-limited.",
+    "inputSchema": {
+      "type": "object",
+      "properties": {
+        "item_key": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "item_key"
+      ],
+      "additionalProperties": false
+    }
+  },
+  {
+    "server": "zotero",
+    "name": "mcp__zotero__zotero_get_collections",
+    "calls": "zotero_get_collections",
+    "description": "List all collections in the currently active Zotero library as a hierarchical tree (parents and nested subcollections, each with its 8-character key). Use this when the user wants to see the full library structure. If you already know a name and just need the key, prefer zotero_search_collections — it returns only matches. Scope is limited to the active library — switch libraries with zotero_switch_library before listing. Deep hierarchies render inline without truncation, so very deep trees can be long. limit: cap on collections returned; pass None (default) to use 100, or raise to 5000 for libraries with thousands of collections. include_trashed: when True, also show collections in the Zotero Trash (annotated as such). Default False, matching Zotero desktop's default view. Example output:\n  - **Orals** (Key: MT53KB66)\n    - **Early America** (Key: 3249BZKE)\n      - **I. Historiography & Methodology** (Key: XFN79DUT)",
+    "inputSchema": {
+      "type": "object",
+      "properties": {
+        "limit": {
+          "anyOf": [
+            {
+              "type": "integer"
+            },
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "Maximum number of collections to return"
+        },
+        "include_trashed": {
+          "default": false,
+          "type": "boolean",
+          "description": "if True, merge collections currently in Zotero's\nTrash into the listing, annotated with ``[trashed]``. Default\nFalse matches the Zotero desktop default and the prior\nbehavior of this tool. Trashed collections are normally\ninvisible to automated clients (#233) — turn this on when you\nneed to know they exist."
+        }
+      },
+      "additionalProperties": false
+    }
+  },
+  {
+    "server": "zotero",
+    "name": "mcp__zotero__zotero_get_collection_items",
+    "calls": "zotero_get_collection_items",
+    "description": "Get all items in a specific Zotero collection. Supports detail='keys_only' (minimal), 'summary' (default, no abstracts), or 'full' (with abstracts). Includes PDF/notes indicators. TIP: To find papers on a specific topic, use zotero_semantic_search instead — it's faster and returns only relevant results.",
+    "inputSchema": {
+      "type": "object",
+      "properties": {
+        "collection_key": {
+          "type": "string",
+          "description": "The collection key/ID"
+        },
+        "detail": {
+          "default": "summary",
+          "enum": [
+            "keys_only",
+            "summary",
+            "full"
+          ],
+          "type": "string"
+        },
+        "limit": {
+          "anyOf": [
+            {
+              "type": "integer"
+            },
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": 50,
+          "description": "Maximum number of items to return"
+        }
+      },
+      "required": [
+        "collection_key"
+      ],
+      "additionalProperties": false
+    }
+  },
+  {
+    "server": "zotero",
+    "name": "mcp__zotero__zotero_get_item_children",
+    "calls": "zotero_get_item_children",
+    "description": "List the child items (attachments, notes, annotations under an attachment) of one OR MANY parent Zotero items. Use it to find an item's PDF/EPUB attachment key before zotero_create_annotation or zotero_get_pdf_outline — those take an attachment key, NOT the parent item key. item_key: one 8-character parent key, or an ARRAY of keys (a JSON-encoded list string also works). Pass every key you have in ONE call: a batch is one API round trip instead of N, and a bad key is reported in its own section instead of aborting. Returns markdown — one key: attachments (content type, filename) and notes in full under the parent title; several keys: one compact line per child, grouped under each parent. Scope: active library only. Examples: zotero_get_item_children(item_key='RTKZQI8E'); zotero_get_item_children(item_key=['RTKZQI8E', '9UZR8GXT']).",
+    "inputSchema": {
+      "type": "object",
+      "properties": {
+        "item_key": {
+          "anyOf": [
+            {
+              "items": {
+                "type": "string"
+              },
+              "type": "array"
+            },
+            {
+              "type": "string"
+            }
+          ],
+          "description": "One item key, a list of keys, or a JSON/comma-separated\nstring of keys"
+        }
+      },
+      "required": [
+        "item_key"
+      ],
+      "additionalProperties": false
+    }
+  },
+  {
+    "server": "zotero",
+    "name": "mcp__zotero__zotero_get_tags",
+    "calls": "zotero_get_tags",
+    "description": "List all tags used in the currently active Zotero library, as a flat markdown list (one tag per line). Use this for tag discovery before filtering with zotero_search_by_tag or batch-editing with zotero_batch_update. Scope is the active library only — switch with zotero_switch_library before listing. The list is flat: tags have no parent/child structure in Zotero, only a colon convention (\"area/subtag\") that this tool preserves verbatim. limit: cap on tags returned; None (default) returns all. Example output:\n  - to-read\n  - methods/qualitative\n  - AI agents",
+    "inputSchema": {
+      "type": "object",
+      "properties": {
+        "limit": {
+          "anyOf": [
+            {
+              "type": "integer"
+            },
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "Maximum number of tags to return"
+        }
+      },
+      "additionalProperties": false
+    }
+  },
+  {
+    "server": "zotero",
+    "name": "mcp__zotero__zotero_list_libraries",
+    "calls": "zotero_list_libraries",
+    "description": "List every Zotero library this MCP can address: the user's personal library (libraryID=1 conventionally), all group libraries the user is a member of (with groupID), and (in local mode) RSS feed libraries. Each entry shows the library/group ID, display name, and item count. Use this to discover a library ID before calling zotero_switch_library — the two form a read-then-switch workflow. If the user only wants to see Zotero collections inside the CURRENT library, use zotero_get_collections instead. No parameters. In local mode: reads the local Zotero SQLite DB (fast, includes RSS feeds). In web mode: queries /groups via the Zotero web API (no feeds). Read-only; no side effects. The active library isn't flagged in the output — track it yourself from the last successful zotero_switch_library call (or the ZOTERO_LIBRARY_ID env var if none). Example: zotero_list_libraries().",
+    "inputSchema": {
+      "type": "object",
+      "properties": {},
+      "additionalProperties": false
+    }
+  },
+  {
+    "server": "zotero",
+    "name": "mcp__zotero__zotero_switch_library",
+    "calls": "zotero_switch_library",
+    "description": "Switch the active library context. EVERY subsequent read/write tool call (collections, items, annotations, search — all of them) operates on the library set here. Changes persist for the rest of the session or until the next switch. Discover valid library IDs/types via zotero_list_libraries first; don't guess. library_id: library ID string as returned by zotero_list_libraries (numeric for user/group, numeric for feeds). library_type: 'user' — the personal library; 'group' (default) — a group library; 'feeds' — a local RSS feed library; 'default' — RESET to whatever the ZOTERO_LIBRARY_ID / ZOTERO_LIBRARY_TYPE env vars configure (library_id is ignored in this mode). Fails fast if the library_id isn't accessible under the current credentials. Example: zotero_switch_library(library_id='5294983', library_type='group') or zotero_switch_library(library_id='', library_type='default').",
+    "inputSchema": {
+      "type": "object",
+      "properties": {
+        "library_id": {
+          "type": "string",
+          "description": "The library/group ID to switch to.\nFor user library: \"0\" (local mode) or your user ID (web mode).\nFor group libraries: the groupID (e.g. \"6069773\")."
+        },
+        "library_type": {
+          "default": "group",
+          "type": "string",
+          "description": "\"user\", \"group\", or \"default\" to reset to env var defaults."
+        }
+      },
+      "required": [
+        "library_id"
+      ],
+      "additionalProperties": false
+    }
+  },
+  {
+    "server": "zotero",
+    "name": "mcp__zotero__zotero_get_recent",
+    "calls": "zotero_get_recent",
+    "description": "List the most recently ADDED items (by dateAdded) in the active library, optionally scoped to a single collection. Use this for 'what did I add recently?' questions — NOT for general topic search (use zotero_semantic_search) or for a collection's full contents (use zotero_get_collection_items). limit: how many recent items to return (default 10). collection_key: optional 8-character collection key to restrict results to that collection; when omitted, returns the N most recent items across the whole library. Ordering is dateAdded DESC. All item types are returned, INCLUDING standalone notes and attachments — so results can mix papers, notes, and loose PDFs. If you only want parent items, filter client-side by itemType in the output. Scope: active library only (switch with zotero_switch_library). Example: zotero_get_recent(limit=20) or zotero_get_recent(collection_key='MT53KB66', limit=5).",
+    "inputSchema": {
+      "type": "object",
+      "properties": {
+        "limit": {
+          "anyOf": [
+            {
+              "type": "integer"
+            },
+            {
+              "type": "string"
+            }
+          ],
+          "default": 10,
+          "description": "Number of items to return"
+        },
+        "collection_key": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "Optional collection key to scope results to a specific collection"
+        }
+      },
+      "additionalProperties": false
+    }
+  },
+  {
+    "server": "zotero",
+    "name": "mcp__zotero__zotero_read_pdf_pages",
+    "calls": "zotero_read_pdf_pages",
+    "description": "Read specific page range(s) from a PDF attachment of a Zotero item. Use this when you know which pages to read — for example after getting the PDF outline via zotero_get_pdf_outline. Pages are 1-indexed. Returns Markdown with the page's heading structure preserved.",
+    "inputSchema": {
+      "type": "object",
+      "properties": {
+        "item_key": {
+          "type": "string",
+          "description": "Zotero item key/ID of the paper or its PDF attachment."
+        },
+        "start_page": {
+          "type": "integer",
+          "description": "First page to read (1-indexed)."
+        },
+        "end_page": {
+          "anyOf": [
+            {
+              "type": "integer"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "Last page to read (1-indexed). If omitted, reads only start_page."
+        }
+      },
+      "required": [
+        "item_key",
+        "start_page"
+      ],
+      "additionalProperties": false
+    }
+  },
+  {
+    "server": "zotero",
+    "name": "mcp__zotero__zotero_search_items",
+    "calls": "zotero_search_items",
+    "description": "Search Zotero items by substring match against metadata (title, creators, year, and — in 'everything' mode — abstract). Returns metadata + abstracts as markdown. IMPORTANT: keep queries SHORT and SIMPLE — 'Author Year' (e.g. 'Brewer 2011') or just an author name ('Cladder-Micus'). This is substring matching, not web search: each extra word NARROWS the match, so adding topic words usually returns fewer results, not more. For topic discovery, use zotero_semantic_search instead; for tag filtering use zotero_search_by_tag. If a query finds nothing, this tool automatically falls back to simplified queries and then semantic search. query: required substring. qmode: 'titleCreatorYear' (default) matches only title/authors/year; 'everything' also searches abstract. item_type: '-attachment' (default) excludes attachments; pass 'journalArticle', 'book', etc. to filter. tag: optional list of tag conditions (ANDed). limit: max results (default 10). collection_key: 8-char key to restrict to a collection (bypasses the fallback cascade). Example: zotero_search_items(query='Cladder-Micus') or zotero_search_items(query='Brewer 2011', limit=5).",
+    "inputSchema": {
+      "type": "object",
+      "properties": {
+        "query": {
+          "type": "string",
+          "description": "Search query string"
+        },
+        "qmode": {
+          "default": "titleCreatorYear",
+          "enum": [
+            "titleCreatorYear",
+            "everything"
+          ],
+          "type": "string",
+          "description": "Query mode (titleCreatorYear or everything)"
+        },
+        "item_type": {
+          "default": "-attachment",
+          "type": "string",
+          "description": "Type of items to search for. Use \"-attachment\" to exclude attachments."
+        },
+        "limit": {
+          "anyOf": [
+            {
+              "type": "integer"
+            },
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": 10,
+          "description": "Maximum number of results to return"
+        },
+        "tag": {
+          "anyOf": [
+            {
+              "items": {
+                "type": "string"
+              },
+              "type": "array"
+            },
+            {
+              "items": {
+                "additionalProperties": true,
+                "type": "object"
+              },
+              "type": "array"
+            },
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "Tag filter. Accepts [\"tagA\", \"tagB\"] (preferred), a bare string\n\"tagA\", a JSON-string list '[\"tagA\", \"tagB\"]', or the dict-shape\n[{\"tag\": \"tagA\"}] sometimes emitted by clients that confuse the\nfilter form with Zotero's stored-tag form. All are normalized\ninternally to the list[str] form pyzotero expects."
+        },
+        "collection_key": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "Optional collection key to scope the search to a specific collection.\nWhen provided, bypasses the fallback cascade and searches the collection directly."
+        }
+      },
+      "required": [
+        "query"
+      ],
+      "additionalProperties": false
+    }
+  },
+  {
+    "server": "zotero",
+    "name": "mcp__zotero__zotero_search_by_tag",
+    "calls": "zotero_search_by_tag",
+    "description": "Find items carrying one or more tags, with boolean syntax support. tag: list of tag strings; each entry is a condition ANDed with the others, and within an entry you can use ' OR ' for disjunction and a leading '-' for exclusion. Example: tag=['methods OR methodology', '-draft'] matches items tagged 'methods' OR 'methodology' AND NOT tagged 'draft'. item_type: '-attachment' (default) excludes attachments; pass 'journalArticle', 'book', etc. to filter. limit: max results (default 10). collection_key: optional 8-char key to scope to a collection. Use zotero_get_tags to discover available tag names first. For free-text content search, use zotero_search_items or zotero_semantic_search instead. Example: zotero_search_by_tag(tag=['to-read'], limit=20).",
+    "inputSchema": {
+      "type": "object",
+      "properties": {
+        "tag": {
+          "anyOf": [
+            {
+              "items": {
+                "type": "string"
+              },
+              "type": "array"
+            },
+            {
+              "items": {
+                "additionalProperties": true,
+                "type": "object"
+              },
+              "type": "array"
+            },
+            {
+              "type": "string"
+            }
+          ],
+          "description": "List of tag conditions. Items are returned only if they satisfy\nALL conditions in the list. Each tag condition can be expressed\nin two ways:\n    As alternatives: tag1 OR tag2 (matches items with either tag1 OR tag2)\n    As exclusions: -tag (matches items that do NOT have this tag)\nFor example, a tag field with [\"research OR important\", \"-draft\"] would\nreturn items that:\n    Have either \"research\" OR \"important\" tags, AND\n    Do NOT have the \"draft\" tag"
+        },
+        "item_type": {
+          "default": "-attachment",
+          "type": "string",
+          "description": "Type of items to search for. Use \"-attachment\" to exclude attachments."
+        },
+        "limit": {
+          "anyOf": [
+            {
+              "type": "integer"
+            },
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": 10,
+          "description": "Maximum number of results to return"
+        },
+        "collection_key": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "Optional collection key to scope the search to a specific collection"
+        }
+      },
+      "required": [
+        "tag"
+      ],
+      "additionalProperties": false
+    }
+  },
+  {
+    "server": "zotero",
+    "name": "mcp__zotero__zotero_search_by_citation_key",
+    "calls": "zotero_search_by_citation_key",
+    "description": "Look up a single Zotero item by its BetterBibTeX citation key (e.g. 'Smith2024' or 'cladderMicus2018'). Returns that one item's metadata, or a not-found message if no item has that key. citekey: the citation key exactly as assigned by BetterBibTeX (case-sensitive). In local mode: queries the running Better BibTeX plugin via its HTTP API (Zotero desktop must be running and have BBT installed). In web mode: scans the 'Extra' field of items for 'Citation Key:' lines — slower, and may miss items whose keys aren't persisted to Extra. Requires the Better BibTeX plugin in the user's Zotero install. For partial-key or free-text lookup, use zotero_search_items. Example: zotero_search_by_citation_key(citekey='hasan2026mcp') → metadata for that single item.",
+    "inputSchema": {
+      "type": "object",
+      "properties": {
+        "citekey": {
+          "type": "string",
+          "description": "The BetterBibTeX citation key to search for (e.g., 'Smith2024')"
+        }
+      },
+      "required": [
+        "citekey"
+      ],
+      "additionalProperties": false
+    }
+  },
+  {
+    "server": "zotero",
+    "name": "mcp__zotero__zotero_advanced_search",
+    "calls": "zotero_advanced_search",
+    "description": "Advanced item search with multiple structured-field conditions joined by AND or OR. Use this when you need to filter by fields that zotero_search_items and zotero_search_by_tag can't express (date ranges, specific itemTypes, etc.). For plain text use zotero_search_items; for tags use zotero_search_by_tag; for topic discovery use zotero_semantic_search. conditions: list of {field, operation, value} dicts (also accepts a JSON string).   Common fields: title, creator, date, dateAdded, dateModified, tag, itemType, publicationTitle, abstractNote, collection.   Supported operations (exhaustive): is, isNot, contains, doesNotContain, beginsWith, endsWith, isGreaterThan, isLessThan, isBefore, isAfter. For 'added in the last N days', use field='dateAdded' with operation='isAfter' and an ISO date value (e.g. '2026-03-22'). join_mode: 'all' (AND, default) or 'any' (OR). sort_by: dateAdded, dateModified, title, creator, etc. sort_direction: 'asc' (default) or 'desc'. limit: max results (default 50, max 500). Example: zotero_advanced_search(conditions=[{'field': 'itemType', 'operation': 'is', 'value': 'preprint'}, {'field': 'dateAdded', 'operation': 'isAfter', 'value': '2026-03-22'}], join_mode='all').",
+    "inputSchema": {
+      "type": "object",
+      "properties": {
+        "conditions": {
+          "items": {
+            "additionalProperties": {
+              "type": "string"
+            },
+            "type": "object"
+          },
+          "type": "array",
+          "description": "List of search condition dictionaries, each containing:\n       - field: The field to search (title, creator, date, tag, etc.)\n       - operation: The operation to perform (is, isNot, contains, etc.)\n       - value: The value to search for"
+        },
+        "join_mode": {
+          "default": "all",
+          "enum": [
+            "all",
+            "any"
+          ],
+          "type": "string",
+          "description": "Whether all conditions must match (\"all\") or any condition can match (\"any\")"
+        },
+        "sort_by": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "Field to sort by (dateAdded, dateModified, title, creator, etc.)"
+        },
+        "sort_direction": {
+          "default": "asc",
+          "enum": [
+            "asc",
+            "desc"
+          ],
+          "type": "string",
+          "description": "Direction to sort (asc or desc)"
+        },
+        "limit": {
+          "anyOf": [
+            {
+              "type": "integer"
+            },
+            {
+              "type": "string"
+            }
+          ],
+          "default": 50,
+          "description": "Maximum number of results to return"
+        }
+      },
+      "required": [
+        "conditions"
+      ],
+      "additionalProperties": false
+    }
+  },
+  {
+    "server": "zotero",
+    "name": "mcp__zotero__zotero_semantic_search",
+    "calls": "zotero_semantic_search",
+    "description": "Prioritized topic-search tool. Find papers by semantic similarity to a query using AI embeddings — the BEST tool for finding papers on a topic (e.g. 'papers about mindfulness-based therapy'), far more efficient than scanning collection items or reading abstracts. Searches across every indexed library by default (your personal library plus any group libraries that have been synced); use library_id to scope to one. query: the topic or concept; natural-language phrases work well. limit: max results (default 10). filters: optional metadata filters as a dict (e.g. {'itemType': 'journalArticle', 'year': '2023'}); also accepts a JSON string. library_id: optional — restrict results to one library. 0 or 'user' for your personal library, or a group's numeric groupID (see zotero_list_libraries). Omit to search all indexed libraries. Requires the semantic search database to be POPULATED — run zotero_update_search_database first if you just installed the server or added new items; check readiness with zotero_get_search_database_status. Available only when the [semantic] optional dependency is installed. Example: zotero_semantic_search(query='mindfulness-based cognitive therapy for depression', limit=5).",
+    "inputSchema": {
+      "type": "object",
+      "properties": {
+        "query": {
+          "type": "string",
+          "description": "Search query text - can be concepts, topics, or natural language descriptions"
+        },
+        "limit": {
+          "default": 10,
+          "type": "integer",
+          "description": "Maximum number of results to return (default: 10)"
+        },
+        "filters": {
+          "anyOf": [
+            {
+              "additionalProperties": {
+                "type": "string"
+              },
+              "type": "object"
+            },
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "Optional metadata filters as dict or JSON string. Example: {\"item_type\": \"note\"}"
+        },
+        "library_id": {
+          "anyOf": [
+            {
+              "type": "integer"
+            },
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "Optional library scope — 0/\"user\" for the personal library, a\ngroupID for a group library, or None (default) to search every\nindexed library."
+        }
+      },
+      "required": [
+        "query"
+      ],
+      "additionalProperties": false
+    }
+  },
+  {
+    "server": "zotero",
+    "name": "mcp__zotero__zotero_update_search_database",
+    "calls": "zotero_update_search_database",
+    "description": "Build or refresh the semantic search embedding database from Zotero items. Run this: (a) after first install, (b) after adding items via zotero_add_item, or (c) when the user has added items directly in Zotero desktop since the last update. By default the update is INCREMENTAL — only new or changed items are re-embedded, so repeated calls are cheap. force_rebuild=True re-embeds ALL items from scratch (slow; use when changing the embedding model or recovering from corruption). limit: optional cap on items processed (useful for smoke-testing). Progress is reported via the MCP context; on large libraries an incremental update is seconds, a full rebuild can take minutes. Requires the [semantic] optional dependency and a configured embedding provider (see config.json). Check status with zotero_get_search_database_status. Example: zotero_update_search_database() after adding a batch of papers.",
+    "inputSchema": {
+      "type": "object",
+      "properties": {
+        "force_rebuild": {
+          "default": false,
+          "type": "boolean",
+          "description": "Whether to rebuild the entire database from scratch"
+        },
+        "limit": {
+          "anyOf": [
+            {
+              "type": "integer"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "Limit number of items to process (useful for testing)"
+        }
+      },
+      "additionalProperties": false
+    }
+  },
+  {
+    "server": "zotero",
+    "name": "mcp__zotero__zotero_get_search_database_status",
+    "calls": "zotero_get_search_database_status",
+    "description": "Report the semantic search database's readiness and stats: item count, last update time, embedding provider / model, and whether the [semantic] optional dependency is installed. Use this to decide whether zotero_semantic_search will return useful results, or whether the user should run zotero_update_search_database first. Takes no parameters; no side effects. Returns a human-readable status block. If the [semantic] extras are not installed, returns an install hint instead of stats. Example: zotero_get_search_database_status() → count, last sync, provider summary.",
+    "inputSchema": {
+      "type": "object",
+      "properties": {},
+      "additionalProperties": false
+    }
+  },
+  {
+    "server": "zotero",
+    "name": "mcp__zotero__zotero_synthesize_annotations",
+    "calls": "zotero_synthesize_annotations",
+    "description": "Collect every highlight, annotation comment, and child note across a scope and organize them into a structured, per-paper digest that YOU (the agent) can then synthesize into a literature summary. This tool does NOT call an LLM — it only gathers and groups the raw material, so the synthesis step is yours. collection_key: optional 8-character collection key; when given, only annotations/notes whose resolved paper is a member of that collection are included. When omitted, the whole active library is scanned (capped by limit). tag: optional tag or list of tags to filter items by (accepts a string, a JSON list, or a list). limit: cap on annotations/notes scanned (default 200) to keep the call tractable. format='markdown' (default) groups the digest by paper; format='json' returns the same highlights and notes as structured records for downstream processing. Markdown output has each paper heading followed by its highlights (with attached comments) and any note excerpts — plus a top summary line counting papers, highlights, and notes. Use this before writing a thematic review so you can spot themes and contradictions across sources. Example: zotero_synthesize_annotations(collection_key='MT53KB66').",
+    "inputSchema": {
+      "type": "object",
+      "properties": {
+        "collection_key": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "Optional collection to restrict the digest to."
+        },
+        "tag": {
+          "anyOf": [
+            {
+              "items": {
+                "type": "string"
+              },
+              "type": "array"
+            },
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "Optional tag filter (string, JSON list, or list)."
+        },
+        "limit": {
+          "anyOf": [
+            {
+              "type": "integer"
+            },
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": 200,
+          "description": "Maximum annotations/notes to scan."
+        },
+        "format": {
+          "default": "markdown",
+          "enum": [
+            "markdown",
+            "json"
+          ],
+          "type": "string",
+          "description": "``markdown`` for a readable digest or ``json`` for structured\nper-paper annotation and note records."
+        }
+      },
+      "additionalProperties": false
+    }
+  },
+  {
+    "server": "zotero",
+    "name": "mcp__zotero__zotero_export_bibliography",
+    "calls": "zotero_export_bibliography",
+    "description": "Render a formatted bibliography or in-text citations for a set of Zotero items using Zotero's own CSL citation engine, so you can drop references straight into a manuscript. item_keys: optional list of 8-character item keys (also accepts a JSON list string); takes precedence over collection_key. collection_key: optional collection to export instead; if neither is given, the active library is exported (capped). style: CSL style short name (default 'apa'); e.g. 'modern-language-association', 'chicago-note-bibliography', 'ieee'. Ignored for bibtex. export_format: 'bib' (formatted reference-list entries, default), 'citation' (in-text citation strings), or 'bibtex' (raw BibTeX for .bib files). Output: markdown naming the style/format, then the rendered entries (a fenced block for bibtex, a numbered list otherwise). Rendering uses Zotero's own CSL engine and works in local mode with no API credentials, as well as over the web API. Capped at 100 items per call; scope with item_keys or collection_key for anything larger. Example: zotero_export_bibliography(item_keys=['RTKZQI8E'], style='apa', export_format='bib').",
+    "inputSchema": {
+      "type": "object",
+      "properties": {
+        "item_keys": {
+          "anyOf": [
+            {
+              "items": {
+                "type": "string"
+              },
+              "type": "array"
+            },
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "Optional list of item keys (or JSON/comma string)."
+        },
+        "collection_key": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "Optional collection to export."
+        },
+        "style": {
+          "default": "apa",
+          "type": "string",
+          "description": "CSL style short name (default \"apa\")."
+        },
+        "export_format": {
+          "default": "bib",
+          "enum": [
+            "bib",
+            "citation",
+            "bibtex"
+          ],
+          "type": "string",
+          "description": "\"bib\", \"citation\", or \"bibtex\"."
+        }
+      },
+      "additionalProperties": false
+    }
+  },
+  {
+    "server": "zotero",
+    "name": "mcp__zotero__zotero_batch_update",
+    "calls": "zotero_batch_update",
+    "description": "Edit metadata across many items in one call: add/remove tags and upsert/remove `Key: value` lines in Extra (Better BibTeX keys, tex.* fields). Select items by item_keys, and/or a free-text query, and/or an existing tag (query and tag are ANDed; tag may be a list to OR); item_keys wins. At least one selector AND one action are required. add_tags/remove_tags keep the item's other tags — not a replace-all. set_keys upserts Extra lines, matching a line case-insensitively by its `key:` prefix and replacing it in place, else appending; remove_keys deletes those lines; lines without a colon are preserved. limit: max items for query/tag selection (default 50). Attachments and items needing no change are skipped and counted. Requires a writable library. Example: zotero_batch_update(tag='to-read', add_tags=['reviewed'], remove_tags=['to-read']).",
+    "inputSchema": {
+      "type": "object",
+      "properties": {
+        "item_keys": {
+          "anyOf": [
+            {
+              "items": {
+                "type": "string"
+              },
+              "type": "array"
+            },
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        },
+        "query": {
+          "default": "",
+          "type": "string"
+        },
+        "tag": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "items": {
+                "type": "string"
+              },
+              "type": "array"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        },
+        "add_tags": {
+          "anyOf": [
+            {
+              "items": {
+                "type": "string"
+              },
+              "type": "array"
+            },
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        },
+        "remove_tags": {
+          "anyOf": [
+            {
+              "items": {
+                "type": "string"
+              },
+              "type": "array"
+            },
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        },
+        "set_keys": {
+          "anyOf": [
+            {
+              "additionalProperties": {
+                "type": "string"
+              },
+              "type": "object"
+            },
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        },
+        "remove_keys": {
+          "anyOf": [
+            {
+              "items": {
+                "type": "string"
+              },
+              "type": "array"
+            },
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        },
+        "limit": {
+          "anyOf": [
+            {
+              "type": "integer"
+            },
+            {
+              "type": "string"
+            }
+          ],
+          "default": 50
+        }
+      },
+      "additionalProperties": false
+    }
+  },
+  {
+    "server": "zotero",
+    "name": "mcp__zotero__zotero_create_collection",
+    "calls": "zotero_create_collection",
+    "description": "Create a new collection (project/folder) in your Zotero library. To create a subcollection, pass parent_collection (not parent_key) as either a collection key (8-character string like 'KMMQDFQ4') or a collection name. Use zotero_search_collections to find collection keys.",
+    "inputSchema": {
+      "type": "object",
+      "properties": {
+        "name": {
+          "type": "string"
+        },
+        "parent_collection": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        }
+      },
+      "required": [
+        "name"
+      ],
+      "additionalProperties": false
+    }
+  },
+  {
+    "server": "zotero",
+    "name": "mcp__zotero__zotero_delete_collection",
+    "calls": "zotero_delete_collection",
+    "description": "Delete a collection (folder) from your Zotero library by its 8-character key. Items inside the collection are NOT deleted — they remain in the library (and in any other collections they belong to). Subcollections ARE deleted along with the parent. This is a hard delete — Zotero's API does not trash collections, so the operation cannot be undone via the API. Use zotero_search_collections to find the key first. Example: zotero_delete_collection(collection_key=\"KMMQDFQ4\").",
+    "inputSchema": {
+      "type": "object",
+      "properties": {
+        "collection_key": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "collection_key"
+      ],
+      "additionalProperties": false
+    }
+  },
+  {
+    "server": "zotero",
+    "name": "mcp__zotero__zotero_search_collections",
+    "calls": "zotero_search_collections",
+    "description": "Search collections by name in the active library and return their 8-character keys. Matching is case-insensitive substring and applies ONLY to the collection's own name — not to parent names, descriptions, or items inside the collection. Multi-word queries are ANDed across words (NOT OR-ed): query 'reading list' matches only collections whose name contains both 'reading' AND 'list'. To match either word, issue two separate searches. Leading/trailing whitespace is ignored and empty words are dropped. Returns the collection's key plus its parent (if any). include_trashed: when True, also match collections currently in the Zotero Trash (results annotated as such). Default False — trashed collections are otherwise invisible to automated clients. Performance: scans all collections in the active library (O(n)); for very large libraries expect a full-list pagination under the hood. Example: zotero_search_collections(query=\"orals\") → keys for every collection with \"orals\" in its name.",
+    "inputSchema": {
+      "type": "object",
+      "properties": {
+        "query": {
+          "type": "string"
+        },
+        "include_trashed": {
+          "default": false,
+          "type": "boolean"
+        }
+      },
+      "required": [
+        "query"
+      ],
+      "additionalProperties": false
+    }
+  },
+  {
+    "server": "zotero",
+    "name": "mcp__zotero__zotero_set_item_collections",
+    "calls": "zotero_set_item_collections",
+    "description": "Change which collections existing items belong to — an incremental add/remove of item membership, NOT collection creation (use zotero_create_collection / zotero_delete_collection for that). item_keys must be an ARRAY of item keys, e.g. [\"KEY1\", \"KEY2\"] — not a single string. add_to and remove_from accept arrays of collection keys, names, or '/'-separated paths (resolved and validated automatically; unknown, trashed, or ambiguous specs fail before anything is changed). Existing memberships not named in remove_from are left alone; to replace an item's memberships wholesale use zotero_update_item. Use zotero_search_items to find item keys and zotero_search_collections to find collection keys.",
+    "inputSchema": {
+      "type": "object",
+      "properties": {
+        "item_keys": {
+          "anyOf": [
+            {
+              "items": {
+                "type": "string"
+              },
+              "type": "array"
+            },
+            {
+              "type": "string"
+            }
+          ]
+        },
+        "add_to": {
+          "anyOf": [
+            {
+              "items": {
+                "type": "string"
+              },
+              "type": "array"
+            },
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        },
+        "remove_from": {
+          "anyOf": [
+            {
+              "items": {
+                "type": "string"
+              },
+              "type": "array"
+            },
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        }
+      },
+      "required": [
+        "item_keys"
+      ],
+      "additionalProperties": false
+    }
+  },
+  {
+    "server": "zotero",
+    "name": "mcp__zotero__zotero_update_item",
+    "calls": "zotero_update_item",
+    "description": "Update metadata on an existing Zotero item by key. Only what you pass is changed. fields: {name: value} of metadata to set (a JSON object string is accepted). Names may be snake_case (title, date, doi, url, abstract, publication_title, access_date, short_title, book_title, citation_key, item_type, place, extra, volume, issue, pages, publisher, issn, isbn, edition, language) or any raw Zotero API field name. An unknown name fails the call and lists the valid ones; a name that is not valid for this item's type is reported as skipped. item_type migrates the item (overlapping fields kept, type-specific ones dropped). TAG SEMANTICS (easy to get wrong): tags REPLACES the whole tag list; add_tags/remove_tags are incremental and preferred. They are mutually exclusive with tags. collections (keys) and collection_names likewise REPLACE membership — pass collections=[] to clear it; for incremental moves use zotero_set_item_collections. creators: full replacement list of {creatorType, firstName, lastName} objects. Requires a writable library (fails in local-only mode). To edit notes use zotero_manage_note. Example: zotero_update_item(item_key='RTKZQI8E', fields={'doi': '10.1145/3708319'}, add_tags=['reviewed']).",
+    "inputSchema": {
+      "type": "object",
+      "properties": {
+        "item_key": {
+          "type": "string",
+          "description": "8-character Zotero item key of the item to update."
+        },
+        "fields": {
+          "anyOf": [
+            {
+              "additionalProperties": true,
+              "type": "object"
+            },
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "mapping (or JSON object string) of field name -> value.\nNames may be snake_case aliases (``publication_title``,\n``short_title``, ``citation_key``) or raw Zotero API keys\n(``publicationTitle``). ``place`` is the publication city\n(e.g. ``\"New York\"``) and is valid on book, bookSection,\nthesis, manuscript, report and conferencePaper.\n``citation_key`` writes Zotero's native ``data.citationKey``\n(the BetterBibTeX citation key); BBT auto-pins from metadata\non creation and provides no programmatic refresh path in 9.x,\nso a direct write here is the only programmatic remediation\nfor malformed pinned keys. ``item_type`` migrates the item\nacross types: overlapping fields are preserved and\ntype-specific fields that do not map are dropped."
+        },
+        "creators": {
+          "anyOf": [
+            {
+              "items": {
+                "additionalProperties": true,
+                "type": "object"
+              },
+              "type": "array"
+            },
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "full replacement creators list (also accepted as\n``fields['creators']``)."
+        },
+        "tags": {
+          "anyOf": [
+            {
+              "items": {
+                "type": "string"
+              },
+              "type": "array"
+            },
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        },
+        "add_tags": {
+          "anyOf": [
+            {
+              "items": {
+                "type": "string"
+              },
+              "type": "array"
+            },
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        },
+        "remove_tags": {
+          "anyOf": [
+            {
+              "items": {
+                "type": "string"
+              },
+              "type": "array"
+            },
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        },
+        "collections": {
+          "anyOf": [
+            {
+              "items": {
+                "type": "string"
+              },
+              "type": "array"
+            },
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        },
+        "collection_names": {
+          "anyOf": [
+            {
+              "items": {
+                "type": "string"
+              },
+              "type": "array"
+            },
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        }
+      },
+      "required": [
+        "item_key"
+      ],
+      "additionalProperties": false
+    }
+  },
+  {
+    "server": "zotero",
+    "name": "mcp__zotero__zotero_delete_item",
+    "calls": "zotero_delete_item",
+    "description": "Move a Zotero item to the Trash. Works for any item type (book, journalArticle, webpage, attachment, etc.). For notes, use zotero_delete_note — identical mechanism, constrained to notes for safety. Trashed items are recoverable from Zotero's Trash — empty the Trash in the Zotero UI for permanent deletion. By default refuses to trash notes; set allow_note=True to override.",
+    "inputSchema": {
+      "type": "object",
+      "properties": {
+        "item_key": {
+          "type": "string",
+          "description": "Zotero item key/ID to trash"
+        },
+        "allow_note": {
+          "default": false,
+          "type": "boolean",
+          "description": "If True, permits trashing note items. Default False\ndirects callers to zotero_delete_note for notes (which has the\nsame mechanism but is explicit about what it affects)."
+        }
+      },
+      "required": [
+        "item_key"
+      ],
+      "additionalProperties": false
+    }
+  },
+  {
+    "server": "zotero",
+    "name": "mcp__zotero__zotero_get_pdf_outline",
+    "calls": "zotero_get_pdf_outline",
+    "description": "Extract the table of contents (outline/bookmarks) from a PDF attachment, returned as a hierarchical markdown list with each entry's page number. Use this to orient in a paper before calling zotero_get_item_fulltext — the outline is typically < 200 tokens versus 10K+ for the full text. If the PDF has no embedded outline, returns a short 'no outline' message rather than failing. item_key: the PDF ATTACHMENT key OR the parent item key — both are accepted; attachment-to-parent resolution is automatic. Find the right key with zotero_get_item_children if unsure. Scope: PDFs only (EPUBs have no outline extraction here). Requires PyMuPDF (the [pdf] extra). Read-only; works in local or web mode. Example: zotero_get_pdf_outline(item_key='RTKZQI8E').",
+    "inputSchema": {
+      "type": "object",
+      "properties": {
+        "item_key": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "item_key"
+      ],
+      "additionalProperties": false
+    }
+  },
+  {
+    "server": "zotero",
+    "name": "mcp__zotero__zotero_attach_file",
+    "calls": "zotero_attach_file",
+    "description": "Attach a file to an EXISTING Zotero item as an imported child attachment (uploads the file bytes). Use when the item is already in the library and you have its key — e.g. attaching a PDF you found for a reference. To create a NEW item from a file, use zotero_add_from_file instead. item_key: key of the existing REGULAR item. Passing an attachment/note key fails with a hint to use its parent. file_path: ABSOLUTE local path (.pdf, .epub, .djvu, .doc, .docx, .odt, .rtf). url: direct http(s) link, downloaded server-side — PDF-only; for other formats download locally and use file_path. Exactly one of file_path/url must be given. filename: optional stored-filename override; defaults to the file's basename or the URL's last path segment (falling back to <item_key>.pdf); a missing extension is appended automatically. Returns the created attachment's key. Idempotent: if the item already has an attachment with the same filename or identical content (MD5), nothing is re-uploaded. Requires a writable library (fails in local-only mode). Uploads count against the Zotero cloud storage quota unless WebDAV sync is configured. Run zotero_update_search_database afterwards to index the new file for semantic search. Example: zotero_attach_file(item_key='ABCD2345', file_path='/Users/me/smith-2020.pdf').",
+    "inputSchema": {
+      "type": "object",
+      "properties": {
+        "item_key": {
+          "type": "string"
+        },
+        "file_path": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        },
+        "url": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        },
+        "filename": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        }
+      },
+      "required": [
+        "item_key"
+      ],
+      "additionalProperties": false
+    }
+  },
+  {
+    "server": "zotero",
+    "name": "mcp__zotero__zotero_add_item",
+    "calls": "zotero_add_item",
+    "description": "Add item(s) to Zotero from any source: DOI, URL, ISBN, BibTeX, CSL JSON, or a local file. Use for every 'add this to Zotero' request. source: the identifier, URL, citation text, or ABSOLUTE file path. BibTeX/CSL JSON may be inline (many entries per call) or a path to .bib/.bibtex/.json/.csljson; documents are .pdf, .epub, .docx and similar. source_type: 'auto' (default) detects it; override a wrong guess. Routing: doi → CrossRef (best metadata — prefer a DOI when you have one); url → doi.org/arxiv.org get full metadata, anything else becomes a bare 'webpage' item that is often not citable, so resolve to a DOI first; isbn → Open Library then Google Books (noisy — verify after); bibtex/csl_json → one item per entry, citation key kept in Extra; file → extracts the PDF's DOI and enriches via CrossRef, else guesses from filename/text, then attaches the file. collections: keys, names, or '/'-paths ('_project/topic'), validated before anything is created — an unknown or ambiguous spec fails the call rather than leaving an unfiled item; create_missing_collections=True creates them instead. if_exists: 'duplicate' (default) always creates; 'file' is idempotent — reuses the item matching the DOI/ISBN/URL, adding missing collections/tags, never removing; 'skip' leaves a match untouched. attach_mode: 'auto' (default) attaches an open-access PDF when available, 'none' skips, 'required' fails without one. title: file sources only, when extraction misses. Requires a writable library (fails in local-only mode). Run zotero_update_search_database afterwards for semantic search. Example: zotero_add_item(source='10.1145/3708319', collections=['9SU943GB'], if_exists='file').",
+    "inputSchema": {
+      "type": "object",
+      "properties": {
+        "source": {
+          "type": "string"
+        },
+        "source_type": {
+          "default": "auto",
+          "enum": [
+            "auto",
+            "doi",
+            "url",
+            "isbn",
+            "bibtex",
+            "csl_json",
+            "file"
+          ],
+          "type": "string"
+        },
+        "collections": {
+          "anyOf": [
+            {
+              "items": {
+                "type": "string"
+              },
+              "type": "array"
+            },
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        },
+        "tags": {
+          "anyOf": [
+            {
+              "items": {
+                "type": "string"
+              },
+              "type": "array"
+            },
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        },
+        "attach_mode": {
+          "default": "auto",
+          "type": "string"
+        },
+        "if_exists": {
+          "default": "duplicate",
+          "enum": [
+            "duplicate",
+            "file",
+            "skip"
+          ],
+          "type": "string"
+        },
+        "create_missing_collections": {
+          "default": false,
+          "type": "boolean"
+        },
+        "title": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        }
+      },
+      "required": [
+        "source"
+      ],
+      "additionalProperties": false
+    }
+  }
+]

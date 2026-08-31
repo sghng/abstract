@@ -15,7 +15,7 @@ export const SCORE = {
   orchestrator: ["motif", "orchestrator"],
   engineer: ["motif", "engineer"],
   librarian: ["motif", "librarian"],
-  writer: ["motif", "writer"],
+  writer: ["motif", "authoring", "writer"],
   reviewer: ["motif", "reviewer"],
 } as const;
 
