@@ -15,8 +15,8 @@ export const SCORE = {
   orchestrator: ["motif", "orchestrator"],
   engineer: ["motif", "engineer"],
   librarian: ["motif", "librarian"],
-  writer: ["motif", "authoring", "writer"],
-  reviewer: ["motif", "reviewer"],
+  writer: ["motif", "tuning", "authoring", "writer"],
+  reviewer: ["motif", "tuning", "reviewer"],
 } as const;
 
 export type Role = keyof typeof SCORE;
