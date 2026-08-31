@@ -8,10 +8,10 @@ The shared invariants of the lab agents live in `movement/motif.md`, not here.
 ## Repository Layout
 
 - `movement/` -- the prompt movements (Markdown, one file each): `motif.md`
-  (invariants injected into every lab agent session), one file per lab role,
-  and shared doctrine. Referenced by stem from the score
-- `src/score.ts` -- the score: which movements each role's prompt assembles,
-  in order (general --> specific). Always-on content lives here; on-demand
+  (invariants injected into every lab agent session), one file per lab role, and
+  shared doctrine. Referenced by stem from the score
+- `src/score.ts` -- the score: which movements each role's prompt assembles, in
+  order (general --> specific). Always-on content lives here; on-demand
   procedures stay in skills
 - `src/cli.ts` -- the `abstract` SDK harness CLI (Bun, linked via `package.json`
   bin). Creates/reattaches the tmux ensemble (two windows, session
@@ -39,9 +39,9 @@ The shared invariants of the lab agents live in `movement/motif.md`, not here.
 
 - **Naming follows a musical theme** (`motif`, `movement`, `score`,
   orchestrator, ...). Prefer music-inspired names for new harness components.
-- **`motif` holds invariants only.** Membership test: if the lab agents
-  forgot it, would the failure be silent and costly? Procedures and templates
-  belong in skills.
+- **`motif` holds invariants only.** Membership test: if the lab agents forgot
+  it, would the failure be silent and costly? Procedures and templates belong in
+  skills.
 - **Skills**: pi frontmatter (`name`, trigger-style `description`), one
   directory per skill, self-contained (re-enterable cold after compaction).
 - **Commits**: conventional commits. Record architectural decisions in
@@ -49,21 +49,21 @@ The shared invariants of the lab agents live in `movement/motif.md`, not here.
 
 ## Instructions for Writing Prompts
 
-- ASCII only. No emoji, no non-ASCII punctuation: write em-dashes as `--`,
-  arrows as `-->`.
-- **Economy**: instruct only where the prior is wrong; delete if deletion
-  breaks nothing.
-- **Density**: one token should carry a framework. Pick the word most unique
-  in embedding space whose meaning is exact -- "obviate", not "make
-  unnecessary"; "Hemingway", not "short declarative sentences without
-  ornament". Where no such word exists, coin one ("nodding reader") and
-  reuse it. Coin only for concepts that recur.
-- **State once**: the context is assembled; give each fact one home, chosen
-  by audience. A shared layer exists so peers know what an agent can do for
-  them and what they can ask of it (the roster in motif.md). Implementation
-  details belong only in that agent's own prompt -- peers never need them.
-- **Positive imperatives**: state what to do; cut hedges; prefer a positive
-  rule over a negated one.
+- ASCII only. No emoji, no non-ASCII punctuation; arrows as `-->`.
+- **No em-dashes**: an em dash in prompt prose is a smell, in any form, even
+  `--`.
+- **Economy**: instruct only where the prior is wrong; delete if deletion breaks
+  nothing.
+- **Density**: one token should carry a framework. Pick the word most unique in
+  embedding space whose meaning is exact -- "obviate", not "make unnecessary";
+  "Hemingway", not "short declarative sentences without ornament". Where no such
+  word exists, coin one ("nodding reader") and reuse it. Coin only for concepts
+  that recur.
+- **State once**: the context is assembled; give each fact one home, chosen by
+  audience. A shared layer exists so peers know what an agent can do for them
+  and what they can ask of it (the roster in motif.md). Implementation details
+  belong only in that agent's own prompt -- peers never need them.
+- **Positive imperatives**: state what to do; cut hedges; prefer a positive rule
+  over a negated one.
 - **Recursion**: prompt writing is iterative. A line is finished not when
-  nothing can be added, but when nothing can be deleted and no word made
-  denser.
+  nothing can be added, but when nothing can be deleted and no word made denser.
