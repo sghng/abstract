@@ -243,16 +243,23 @@ Until the harness exists, the `bin/` launchers + file-mediated consult relay
   paths" matters because artifacts are the lab's memory. Motif and role
   description are NOT baked into SYSTEM.md.
 - **Per-role assembly as file paths, not strings**: the CLI passes
-  `appendSystemPrompt: [<abs path to motif.md>, <abs path to
-  agents/<role>.md>]`. `DefaultResourceLoader.resolvePromptInput` reads a
+  `appendSystemPrompt` the role's movements from the score (`src/score.ts`
+  --> `movement/<stem>.md`). `DefaultResourceLoader.resolvePromptInput` reads a
   source from disk when it is an existing path, and `reload()` re-resolves
-  on every `/reload` -- so edits to `SYSTEM.md`, `motif.md`, or
-  `agents/<role>.md` take effect on `/reload` with zero custom code. (New
+  on every `/reload` -- so edits to `SYSTEM.md` or any movement take effect
+  on `/reload` with zero custom code. (New
   prompt applies from the next turn; history keeps what it was sent with,
   same as vanilla pi.) This is why we do NOT need a custom `ResourceLoader`
   subclass for v1 -- the vanilla mechanism already gives us the reload
   semantics; revisit only when per-role skills or dynamic assembly become
   concrete.
+- **Score and movements**: prompt assembly is data, not code --
+  `src/score.ts` maps each role to an ordered list of movement stems; each
+  movement is a Markdown file in `movement/`, general --> specific (motif,
+  doctrine, role). A movement is always-on iff needed in most turns of the
+  role or forgetting is silent and costly; everything else stays an
+  on-demand skill. Graduating a skill to always-on means extracting its body
+  into a movement (no frontmatter) and listing its stem in the score.
 - **Skills block unchanged**: pi renders the `<available_skills>` listing
   from the harness `skills/` dir exactly as before.
 - **Communication unchanged**: brokerless cue file inbox under

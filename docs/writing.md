@@ -2,8 +2,8 @@
 
 How the lab produces publishable artifacts -- grants, proposals, manuscripts,
 and similar deliverables. This doc is dev-facing; invariants live in
-`motif.md` and role behavior lives in `agents/writer.md` and
-`agents/reviewer.md`.
+`movement/motif.md` and role behavior lives in `movement/writer.md` and
+`movement/reviewer.md`.
 
 ## Roles
 
