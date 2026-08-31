@@ -55,8 +55,10 @@ The shared invariants of the lab agents live in `motif.md`, not here.
   unnecessary"; "Hemingway", not "short declarative sentences without
   ornament". Where no such word exists, coin one ("nodding reader") and
   reuse it. Coin only for concepts that recur.
-- **State once**: facts live in the highest shared layer (SYSTEM.md,
-  motif.md); role prompts reference, never restate.
+- **State once**: the context is assembled; give each fact one home, chosen
+  by audience. A shared layer exists so peers know what an agent can do for
+  them and what they can ask of it (the roster in motif.md). Implementation
+  details belong only in that agent's own prompt -- peers never need them.
 - **Positive imperatives**: state what to do; cut hedges; prefer a positive
   rule over a negated one.
 - **Recursion**: prompt writing is iterative. A line is finished not when
