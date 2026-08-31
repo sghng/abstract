@@ -15,8 +15,9 @@
  *   - agentDir pinned to this repository (SYSTEM.md, extensions/, skills/,
  *     settings.json are discovered natively)
  *   - a persistent per-role session at <project>/.pi/sessions/<role>.jsonl
- *   - motif.md + agents/<role>.md appended to the system prompt as file
- *     paths (DefaultResourceLoader re-reads them on every /reload)
+ *   - movements from the score (src/score.ts) appended to the system
+ *     prompt as file paths (DefaultResourceLoader re-reads them on every
+ *     /reload)
  *   - HARNESS_ROLE set so extensions/cue self-configures
  *   - no context files (no ambient AGENTS.md/CLAUDE.md)
  *
@@ -37,19 +38,14 @@ import {
   SessionManager,
   SettingsManager,
 } from "@earendil-works/pi-coding-agent";
-
-const ROLES = [
-  "orchestrator",
-  "engineer",
-  "librarian",
-  "writer",
-  "reviewer",
-] as const;
-type Role = (typeof ROLES)[number];
+import { ROLES, type Role, SCORE } from "./score.ts";
 
 const CLI_PATH = realpathSync(fileURLToPath(import.meta.url));
 const HARNESS_DIR = dirname(CLI_PATH).replace(/\/src$/, "");
 const PI_AGENT_DIR = join(homedir(), ".pi", "agent");
+
+/** Resolve a movement stem to its Markdown file. */
+const movement = (stem: string) => join(HARNESS_DIR, "movement", `${stem}.md`);
 
 function fail(message: string): never {
   console.error(`abstract: ${message}`);
@@ -174,12 +170,9 @@ async function runRole(role: Role): Promise<void> {
       resourceLoaderOptions: {
         noContextFiles: true,
         // File paths, not strings: DefaultResourceLoader reads them from
-        // disk and re-resolves on every /reload, so edits to SYSTEM.md,
-        // motif.md, or agents/<role>.md take effect without code changes.
-        appendSystemPrompt: [
-          join(HARNESS_DIR, "motif.md"),
-          join(HARNESS_DIR, "agents", `${role}.md`),
-        ],
+        // disk and re-resolves on every /reload, so edits to any movement
+        // take effect without code changes.
+        appendSystemPrompt: SCORE[role].map(movement),
         additionalPromptTemplatePaths: existsSync(globalPrompts) ? [globalPrompts] : [],
         additionalThemePaths: existsSync(globalThemes) ? [globalThemes] : [],
       },

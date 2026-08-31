@@ -3,18 +3,21 @@
 This repository is a pi agent directory: it defines a small academic research
 lab made of long-running pi agents (orchestrator, engineer, librarian) that
 communicate through files. This file is for agents developing this repository.
-The shared invariants of the lab agents live in `motif.md`, not here.
+The shared invariants of the lab agents live in `movement/motif.md`, not here.
 
 ## Repository Layout
 
-- `motif.md` -- invariants injected into every lab agent session: project
-  layout, naming rules, team roster, protocol summary
-- `agents/` -- role system prompts, one per lab role, consumed by the CLI
+- `movement/` -- the prompt movements (Markdown, one file each): `motif.md`
+  (invariants injected into every lab agent session), one file per lab role,
+  and shared doctrine. Referenced by stem from the score
+- `src/score.ts` -- the score: which movements each role's prompt assembles,
+  in order (general --> specific). Always-on content lives here; on-demand
+  procedures stay in skills
 - `src/cli.ts` -- the `abstract` SDK harness CLI (Bun, linked via `package.json`
-  bin). Creates/reattaches the tmux ensemble (three panes, session
+  bin). Creates/reattaches the tmux ensemble (two windows, session
   `abs-<project-basename>`) and runs each role as a peer pi SDK process:
   agentDir = this repo, session pinned at `<project>/.pi/sessions/<role>.jsonl`,
-  `HARNESS_ROLE` set, `motif.md` plus the role prompt appended as file paths,
+  `HARNESS_ROLE` set, the role's score movements appended as file paths,
   `noContextFiles: true`.
 - `SYSTEM.md` -- replaces pi's default system prompt for lab agents (discovered
   natively from the agent dir)
@@ -34,9 +37,9 @@ The shared invariants of the lab agents live in `motif.md`, not here.
 
 ## Working Conventions
 
-- **Naming follows a musical theme** (`motif.md`, orchestrator, ...). Prefer
-  music-inspired names for new harness components.
-- **`motif.md` holds invariants only.** Membership test: if the lab agents
+- **Naming follows a musical theme** (`motif`, `movement`, `score`,
+  orchestrator, ...). Prefer music-inspired names for new harness components.
+- **`motif` holds invariants only.** Membership test: if the lab agents
   forgot it, would the failure be silent and costly? Procedures and templates
   belong in skills.
 - **Skills**: pi frontmatter (`name`, trigger-style `description`), one

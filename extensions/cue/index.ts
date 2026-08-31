@@ -20,15 +20,7 @@ import {
   scanInbox,
   sendCue,
 } from "./core.ts";
-
-const ROLES = [
-  "orchestrator",
-  "engineer",
-  "librarian",
-  "writer",
-  "reviewer",
-] as const;
-type Role = (typeof ROLES)[number];
+import { ROLES, type Role } from "../../src/score.ts";
 
 export default function(pi: ExtensionAPI) {
   const roleRaw = process.env.HARNESS_ROLE;
