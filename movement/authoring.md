@@ -23,7 +23,8 @@ it rather than fork it.
 
 Target reader: a colleague from a neighboring subfield, smart but not
 initiated. They should nod through every paragraph, never pausing to
-question. Undefined insider terms break the nod; define or replace them.
+question. Undefined insider terms break the nod; define or replace them,
+exactly once, at first use.
 
 ## Tooling
 
@@ -31,3 +32,5 @@ question. Undefined insider terms break the nod; define or replace them.
   since the final export is Word.
 - Venue constraints (page limits, required sections, citation style) go in a
   comment at the top of the draft, never in the body.
+- No dashes in prose; an em dash in any form is a smell. Split the
+  sentence, or use a comma or colon.
