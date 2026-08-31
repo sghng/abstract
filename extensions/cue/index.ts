@@ -36,7 +36,7 @@ export default function(pi: ExtensionAPI) {
   // are delivered when it finishes (session_compact / session_compact_failed).
   let compacting = false;
 
-  /** Deliver every pending cue in the inbox as a follow-up. */
+  /** Deliver every pending cue in the inbox as a steering message. */
   function tryDeliver(ctx: ExtensionContext) {
     if (delivering || compacting) return;
     delivering = true;
@@ -53,7 +53,7 @@ export default function(pi: ExtensionAPI) {
               `do so via cue(target="${env.from}", message="...").`,
             details: env as unknown as Record<string, unknown>,
           },
-          { triggerTurn: true, deliverAs: "followUp" },
+          { triggerTurn: true, deliverAs: "steer" },
         );
       }
     } finally {
