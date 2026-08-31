@@ -62,4 +62,5 @@ The shared invariants of the lab agents live in `motif.md`, not here.
 - **Positive imperatives**: state what to do; cut hedges; prefer a positive
   rule over a negated one.
 - **Recursion**: prompt writing is iterative. A line is finished not when
-  nothing can be added, but when nothing can be deleted or said better.
+  nothing can be added, but when nothing can be deleted and no word made
+  denser.
