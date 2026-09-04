@@ -5,6 +5,9 @@ description: Academic presentations -- content curation, storytelling strategy, 
 
 # Preparing a Presentation
 
+A presentation is a paper distilled to its emotional arc. Every slide should
+make the audience lean forward, not lean back.
+
 This skill helps you prepare for an academic presentation. It involves how to
 curate content, design story telling strategies, and create visually appealing
 slides.

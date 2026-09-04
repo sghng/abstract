@@ -14,12 +14,12 @@ Before preparing presentation content:
 - Understand the audience and occasion
 - Clarify the key message (usually 1-3 take-home points)
 
-**Read `../story-keeping.md` for the standard story.md format.**
+**Read `notes/story.md` itself; its format is owned by the orchestrator.**
 
 ## The Story Document
 
-Use `story.md` or a presentation-specific story file. The content should
-follow the standard format defined in `../story-keeping.md`:
+Use `story.md` or a presentation-specific story file, following the shape of
+the project's `notes/story.md`:
 
 - **One-Line Summary**: What this talk is about
 - **Three-Act Narrative**: Hook, approach, discovery
