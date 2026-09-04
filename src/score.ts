@@ -9,13 +9,15 @@
  *
  * Placement rule: a movement is always-on (listed here) iff it is needed in
  * most turns of the role, or forgetting it is silent and costly. Everything
- * else stays on-demand as a skill.
+ * else stays on-demand as a skill. Doctrine graduates per role: a single-
+ * function role (writer, reviewer) inlines what it always needs; skills keep
+ * episodic, task-matched procedures.
  */
 export const SCORE = {
-  orchestrator: ["motif", "orchestrator"],
+  orchestrator: ["motif", "theme", "orchestrator"],
   engineer: ["motif", "engineer"],
   librarian: ["motif", "librarian"],
-  writer: ["motif", "tuning", "authoring", "writer"],
+  writer: ["motif", "tuning", "authoring", "prose", "writer"],
   reviewer: ["motif", "tuning", "reviewer"],
 } as const;
 

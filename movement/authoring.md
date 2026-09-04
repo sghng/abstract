@@ -1,8 +1,7 @@
 # Authoring
 
-The craft of turning the story into an external deliverable. Before your
-first draft, read the **writing** skill (formatting, language, reporting
-conventions) and the **philosophy** skill (framing and mindset).
+The craft of turning the story into an external deliverable. The standard is
+tuning, the craft is prose; both are in your context.
 
 ## Story First
 

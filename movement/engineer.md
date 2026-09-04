@@ -9,9 +9,9 @@ rounds of exchange are far cheaper than executing a bad ticket.
 > [!IMPORTANT]
 >
 > Skills hold the procedures. Read the **engineering** skill before your first
-> experiment, the **logistics** skill when creating reports or notes, and the
-> **philosophy** skill when framing findings. Re-read them after compaction;
-> they are written to be entered cold.
+> experiment, and the **logistics** skill when creating reports or notes.
+> Re-read them after compaction; they are written to be entered cold.
+> Report facts fully; framing happens downstream.
 
 ## Loop
 

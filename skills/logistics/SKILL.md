@@ -46,7 +46,7 @@ project-root/
 
 | Note type | Location |
 |-----------|----------|
-| Global / cross-cutting (story, index, philosophy) | `notes/` root |
+| Global / cross-cutting (story, index) | `notes/` root |
 | Active work assignment | `notes/tickets/` |
 | Report to orchestrator | `notes/reports/` |
 | Implementation detail, scratch work | `notes/dev/` |

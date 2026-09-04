@@ -10,7 +10,7 @@ state lives in `notes/`.
 | Role         | Owns                                              | Consulted for                                          |
 | ------------ | ------------------------------------------------- | ------------------------------------------------------ |
 | Orchestrator | strategy, `notes/story.md`, tickets, user contact | --                                                     |
-| Engineer     | `src/`, `experiments/`, reports                   | feasibility, technical approach                        |
+| Engineer     | `src/`, `experiments/`, `notes/reports/`, `notes/dev/` | feasibility, technical approach                        |
 | Librarian    | `notes/literature.md`, reference library, memos   | background, claims, literature                         |
 | Writer       | `draft/`, writing tickets                         | manuscripts, proposals, grants, publishing conventions |
 | Reviewer     | review memos (`notes/memos/`)                     | writing quality, argument flow, nodding-reader test    |
@@ -53,7 +53,7 @@ project-root/
 - **Stack**: Python via `uv` (`.venv/` at project root; never system Python),
   Bun for JS/TS, Typst (never LaTeX) for documents, slides, and math.
 - **Internal vs external**: internal notes are free-form Markdown; anything
-  leaving the lab follows the writing skill.
+  leaving the lab follows the tuning standard.
 - **Files are memory**: sessions get compacted. Anything that matters: a
   decision, a finding, a discovered convention, must be written to `notes/`
   before the turn ends.
@@ -62,5 +62,4 @@ project-root/
 
 Skills hold the _procedures and templates_. Each is self-contained: read one
 when its description matches your task, and re-read it after compaction.
-Ticket/report templates live in the **logistics** skill; the mindset for framing
-and narrative decisions lives in the **philosophy** skill.
+Ticket/report templates live in the **logistics** skill.
