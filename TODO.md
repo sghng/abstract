@@ -127,16 +127,17 @@ Until the harness exists, the `bin/` launchers + file-mediated consult relay
 - **Prompt hierarchy (2026-09-04, see `docs/prompt-hierarchy.md`)**: three
   layers -- shared movements (the all-hands meeting), role movements (the
   one-on-one), skills (reference manuals). Doctrine lives with the role that
-  owns the artifact it governs: story doctrine in `theme` (orchestrator,
-  owner of story.md), prose craft in `prose` (writer, owner of draft/), the
-  shared standard in `tuning` (writer + reviewer), shared narrative doctrine
-  in `story` (orchestrator maintains, writer instantiates). Never duplicate within one
-  agent's context; duplication across agents is acceptable at audience-chosen
-  grain (reviewer gets a checklist, not the writer's rationale). The
-  `writing`, `philosophy`, and `story-keeping` skills graduated into
-  movements and were deleted; `typst` stays a skill (typesetting medium is
-  not the writer's constant concern and may change). The deprecated
-  "When Supervising" section (dual-session PhD/supervisor era) is gone.
+  owns the artifact it governs: story keeping in `story-keeping` (orchestrator,
+  owner of story.md), writing craft in `writing-craft` (writer, owner of
+  draft/), the shared prose standard in `prose-standard` (writer + reviewer),
+  shared narrative doctrine in `story-doctrine` (orchestrator maintains, writer
+  instantiates). Never duplicate within one agent's context; duplication across
+  agents is acceptable at audience-chosen grain (reviewer gets a checklist, not
+  the writer's rationale). The `writing`, `philosophy`, and `story-keeping`
+  skills graduated into movements and were deleted; `typst` stays a skill
+  (typesetting medium is not the writer's constant concern and may change). The
+  deprecated "When Supervising" section (dual-session PhD/supervisor era) is
+  gone.
 - `notes/story.md` is the story location (per the later logistics refinement;
   older docs said project root -- consolidated in the restructure).
 - Experiment dirs: `experiments/NN-name/` (not `exp-NNN-`).
@@ -267,9 +268,9 @@ Until the harness exists, the `bin/` launchers + file-mediated consult relay
   only proven failures. First applications: writer.md dropped its cue-routing
   paragraph (the roster implies who to ask for what), and
   skills/manuscript/authoring.md graduated to `movement/authoring.md` (the
-  writer's sole function is authoring); the writer's score is now `["motif",
-  "authoring", "writer"]`. The manuscript skill keeps review and format
-  tooling.
+  writer's sole function is authoring); the writer's score is now
+  `["motif", "authoring", "writer"]`. The manuscript skill keeps review and
+  format tooling.
 - **Skills block unchanged**: pi renders the `<available_skills>` listing from
   the harness `skills/` dir exactly as before.
 - **Communication unchanged**: brokerless cue file inbox under

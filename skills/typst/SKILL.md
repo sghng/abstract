@@ -1,6 +1,8 @@
 ---
 name: typst
-description: Typst syntax guidance, common mistakes, and math typesetting. Use whenever writing or reviewing Typst source or mathematical notation.
+description:
+  Typst syntax guidance, common mistakes, and math typesetting. Use whenever
+  writing or reviewing Typst source or mathematical notation.
 ---
 
 # Typst
@@ -22,8 +24,8 @@ or review Typst source.
 - In Typst, commands and functions usually start with `#`.
 - Use `[]` content blocks and Typst functions, not LaTeX environments like
   `\begin{}` and `\end{}`.
-- Math is written in `$...$`, but inner syntax still follows Typst style.
-  Do not assume LaTeX macros exist.
+- Math is written in `$...$`, but inner syntax still follows Typst style. Do not
+  assume LaTeX macros exist.
 - If you are unsure about syntax, check Typst docs and package docs before
   proceeding.
 
@@ -31,7 +33,7 @@ or review Typst source.
 
 - We always use the latest package versions.
 - We only use featured packages from Typst Universe:
-  https://typst.app/universe/search/?kind=packages&featured
+  <https://typst.app/universe/search/?kind=packages&featured>
 - You are encouraged to use packages when they are helpful. However, always
   communicate with user before adopting a package, and keep a clear mind on what
   problem you are solving.

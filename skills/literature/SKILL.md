@@ -1,6 +1,9 @@
 ---
 name: literature
-description: Literature search, validation, and management -- Perplexity-first search, Zotero records, claim verification with supporting passages. Use for literature searches, citation checks, or maintaining notes/literature.md.
+description:
+  Literature search, validation, and management -- Perplexity-first search,
+  Zotero records, claim verification with supporting passages. Use for
+  literature searches, citation checks, or maintaining notes/literature.md.
 ---
 
 # Literature
@@ -43,17 +46,17 @@ Every report to the user (both the Perplexity prompt output and the
 post-validation refined table) uses this format:
 
 ```markdown
-| # | Title | Year | Authors | Venue | URL/DOI | One-sentence relevance |
-|---|-------|------|---------|-------|---------|------------------------|
-| 1 | ...   | 2025 | ...     | ...   | ...     | What it supports ...  |
+| #   | Title | Year | Authors | Venue | URL/DOI | One-sentence relevance |
+| --- | ----- | ---- | ------- | ----- | ------- | ---------------------- |
+| 1   | ...   | 2025 | ...     | ...   | ...     | What it supports ...   |
 ```
 
 The refined table after Zotero validation adds a status column:
 
 ```markdown
-| # | Title | Year | Authors | Venue | URL/DOI | Relevance | Status |
-|---|-------|------|---------|-------|---------|-----------|--------|
-| 1 | ...   | 2025 | ...     | ...   | ...     | ...       | in collection / in library / needs adding |
+| #   | Title | Year | Authors | Venue | URL/DOI | Relevance | Status                                    |
+| --- | ----- | ---- | ------- | ----- | ------- | --------- | ----------------------------------------- |
+| 1   | ...   | 2025 | ...     | ...   | ...     | ...       | in collection / in library / needs adding |
 ```
 
 ## Zotero Workflow
@@ -98,12 +101,13 @@ yourself -- the browser extension produces better results.
 
 ### Adding Papers (User Does This)
 
-The MCP tools (`add_by_doi`, `add_by_url`) produce unreliable results:
-incorrect item types (webpage instead of conferencePaper), missing PDFs, bare
-URLs as titles, and incomplete author metadata. The Zotero browser extension
-with institutional login is the correct import path.
+The MCP tools (`add_by_doi`, `add_by_url`) produce unreliable results: incorrect
+item types (webpage instead of conferencePaper), missing PDFs, bare URLs as
+titles, and incomplete author metadata. The Zotero browser extension with
+institutional login is the correct import path.
 
 **Workflow:**
+
 1. Agent searches Zotero + web, triages candidates by reading abstracts
 2. Agent reports promising papers to the user: title, authors, venue, URL
 3. User imports via browser extension (clean metadata, institutional PDF access)
@@ -142,8 +146,8 @@ before a paper enters the citation plan, the agent extracts the supporting
 passage for the specific claim it supports. For each candidate paper:
 
 1. **Locate the exact sentence(s).** Use `read_pdf_pages` to target the relevant
-   section (e.g., theorem statement, results paragraph). Do not cite from
-   memory or from the abstract alone when making a specific factual claim.
+   section (e.g., theorem statement, results paragraph). Do not cite from memory
+   or from the abstract alone when making a specific factual claim.
 
 2. **Record the passage as a block quote.** Include the verbatim text, the page
    number, and the section/theorem number. Store this either in the internal
@@ -156,18 +160,18 @@ passage for the specific claim it supports. For each candidate paper:
    (e.g., "Euler's formula is V - E + F = 2") does not.
 
 4. **If the passage is ambiguous or missing.** Flag it. A paper whose abstract
-   seems to support a claim may state something different in the body. Better
-   to discover this during verification than during review.
+   seems to support a claim may state something different in the body. Better to
+   discover this during verification than during review.
 
 Format example:
 
 > "Any triangulation of a set P of n points in the plane -- not all collinear,
-> and with k points on the convex hull -- has 2n - 2 - k triangles and 3n - 3 - k
-> edges." -- de Berg et al. (2008), Theorem 9.1, p. 193
+> and with k points on the convex hull -- has 2n - 2 - k triangles and 3n - 3 -
+> k edges." -- de Berg et al. (2008), Theorem 9.1, p. 193
 
-This step is not optional for quantitative claims. It is the only mechanism
-that builds confidence when neither author nor reviewer can re-derive the
-result independently.
+This step is not optional for quantitative claims. It is the only mechanism that
+builds confidence when neither author nor reviewer can re-derive the result
+independently.
 
 ### Citation Analysis
 
@@ -206,4 +210,4 @@ Not every paper goes in the note -- only those relevant to your narrative.
 - **Perplexity summaries can be misleading**: Always verify the paper's actual
   conclusion, not just the excerpts Perplexity highlights. Chan et al. (2025)
   was summarized as documenting errors but actually concludes CoT prompting
-  *solves* quality problems.
+  _solves_ quality problems.

@@ -1,19 +1,18 @@
-# Motif
+# Invariants
 
-This file is the lab's motif: the shared invariants loaded into every agent
-session, which survive compaction. It contains **only invariants**: the rules
-that must never be forgotten. Procedures and templates live in skills; project
-state lives in `notes/`.
+The shared invariants loaded into every agent session, which survive compaction.
+It contains **only invariants**: the rules that must never be forgotten.
+Procedures and templates live in skills; project state lives in `notes/`.
 
 ## The Team
 
-| Role         | Owns                                              | Consulted for                                          |
-| ------------ | ------------------------------------------------- | ------------------------------------------------------ |
-| Orchestrator | strategy, `notes/story.md`, tickets, user contact | --                                                     |
+| Role         | Owns                                                   | Consulted for                                          |
+| ------------ | ------------------------------------------------------ | ------------------------------------------------------ |
+| Orchestrator | strategy, `notes/story.md`, tickets, user contact      | --                                                     |
 | Engineer     | `src/`, `experiments/`, `notes/reports/`, `notes/dev/` | feasibility, technical approach                        |
-| Librarian    | `notes/literature.md`, reference library, memos   | background, claims, literature                         |
-| Writer       | `draft/`, writing tickets                         | manuscripts, proposals, grants, publishing conventions |
-| Reviewer     | review memos (`notes/memos/`)                     | writing quality, argument flow, nodding-reader test    |
+| Librarian    | `notes/literature.md`, reference library, memos        | background, claims, literature                         |
+| Writer       | `draft/`, writing tickets                              | manuscripts, proposals, grants, publishing conventions |
+| Reviewer     | review memos (`notes/memos/`)                          | writing quality, argument flow, nodding-reader test    |
 
 Protocol rhythm: **converge --> compile --> execute --> synthesize**. Tickets
 are co-designed through consultation, executed in isolation, then synthesized
@@ -25,7 +24,7 @@ a lasting fact, it must land in `notes/` (a memo, a ticket's "Because", or
 
 ## Project Layout (Invariant)
 
-```
+```text
 project-root/
 +-- notes/                  # Research notes (usually a symlink to the Obsidian vault; use find -L)
 |   +-- index.md            # Note on notes, entry point
@@ -53,7 +52,7 @@ project-root/
 - **Stack**: Python via `uv` (`.venv/` at project root; never system Python),
   Bun for JS/TS, Typst (never LaTeX) for documents, slides, and math.
 - **Internal vs external**: internal notes are free-form Markdown; anything
-  leaving the lab follows the tuning standard.
+  leaving the lab follows the prose standard.
 - **Files are memory**: sessions get compacted. Anything that matters: a
   decision, a finding, a discovered convention, must be written to `notes/`
   before the turn ends.

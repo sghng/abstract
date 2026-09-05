@@ -3,13 +3,17 @@
 This repository is a pi agent directory: it defines a small academic research
 lab made of long-running pi agents (orchestrator, engineer, librarian) that
 communicate through files. This file is for agents developing this repository.
-The shared invariants of the lab agents live in `movement/motif.md`, not here.
+The shared invariants of the lab agents live in `movement/invariants.md`, not
+here.
 
 ## Repository Layout
 
-- `movement/` -- the prompt movements (Markdown, one file each): `motif.md`
-  (invariants injected into every lab agent session), one file per lab role, and
-  shared doctrine. Referenced by stem from the score
+- `movement/` -- the prompt movements (Markdown, one file each, descriptive
+  names): `invariants.md` for all roles, shared doctrine (`prose-standard.md`,
+  `story-doctrine.md`), role doctrine (`story-keeping.md`, `writing-craft.md`),
+  and one file per lab role. Referenced by stem from the score. Only file
+  contents enter the context, so names are dev-facing and descriptive rather
+  than musical
 - `src/score.ts` -- the score: which movements each role's prompt assembles, in
   order (general --> specific). Always-on content lives here; on-demand
   procedures stay in skills
@@ -37,11 +41,12 @@ The shared invariants of the lab agents live in `movement/motif.md`, not here.
 
 ## Working Conventions
 
-- **Naming follows a musical theme** (`motif`, `movement`, `score`,
-  orchestrator, ...). Prefer music-inspired names for new harness components.
-- **`motif` holds invariants only.** Membership test: if the lab agents forgot
-  it, would the failure be silent and costly? Procedures and templates belong in
-  skills.
+- **Naming**: harness components keep musical names (`movement`, `score`, `cue`,
+  orchestrator); prompt files get descriptive names, since only their contents
+  enter the agents' context.
+- **`invariants.md` holds invariants only.** Membership test: if the lab agents
+  forgot it, would the failure be silent and costly? Procedures and templates
+  belong in skills.
 - **Skills**: pi frontmatter (`name`, trigger-style `description`), one
   directory per skill, self-contained (re-enterable cold after compaction).
 - **Commits**: conventional commits. Record architectural decisions in
@@ -66,8 +71,8 @@ The shared invariants of the lab agents live in `movement/motif.md`, not here.
   that recur.
 - **State once**: the context is assembled; give each fact one home, chosen by
   audience. A shared layer exists so peers know what an agent can do for them
-  and what they can ask of it (the roster in motif.md). Implementation details
-  belong only in that agent's own prompt -- peers never need them.
+  and what they can ask of it (the roster in invariants.md). Implementation
+  details belong only in that agent's own prompt -- peers never need them.
 - **Positive imperatives**: state what to do; cut hedges; prefer a positive rule
   over a negated one.
 - **Recursion**: prompt writing is iterative. A line is finished not when

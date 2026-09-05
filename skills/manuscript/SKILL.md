@@ -1,6 +1,9 @@
 ---
 name: manuscript
-description: Manuscript authoring and review workflows for educational assessment/psychometrics journals. Use when drafting, revising, reviewing, or submitting a paper.
+description:
+  Manuscript authoring and review workflows for educational
+  assessment/psychometrics journals. Use when drafting, revising, reviewing, or
+  submitting a paper.
 ---
 
 # Manuscript
@@ -28,5 +31,5 @@ and format tooling.
 - A `story.md` file is used to keep track of the story telling strategy. All
   drafting and reviewing should closely follow the story and do not go astray.
 - For writing conventions (formatting, language, reporting rules), see the
-  tuning and prose movements; these are the single source of truth.
-
+  prose-standard and writing-craft movements; these are the single source of
+  truth.

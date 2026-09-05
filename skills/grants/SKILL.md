@@ -1,6 +1,8 @@
 ---
 name: grants
-description: Grant and fellowship proposal writing (work in progress). Use when writing funding applications or proposals.
+description:
+  Grant and fellowship proposal writing (work in progress). Use when writing
+  funding applications or proposals.
 ---
 
 # Grants and Fellowship (Work in Progress)

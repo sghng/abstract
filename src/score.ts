@@ -3,7 +3,7 @@
  *
  * A movement is a Markdown file in `movement/` (referenced here by stem, no
  * extension). The score lists them general --> specific: lab invariants
- * (motif) first, shared doctrine next, role-specific deviation last. The CLI
+ * (invariants) first, shared doctrine next, role-specific deviation last. The CLI
  * maps the score to file paths for `appendSystemPrompt`, re-read from disk
  * on every /reload.
  *
@@ -14,11 +14,11 @@
  * episodic, task-matched procedures.
  */
 export const SCORE = {
-  orchestrator: ["motif", "story", "theme", "orchestrator"],
-  engineer: ["motif", "engineer"],
-  librarian: ["motif", "librarian"],
-  writer: ["motif", "tuning", "story", "authoring", "prose", "writer"],
-  reviewer: ["motif", "tuning", "reviewer"],
+  orchestrator: ["invariants", "story-doctrine", "story-keeping", "orchestrator"],
+  engineer: ["invariants", "engineer"],
+  librarian: ["invariants", "librarian"],
+  writer: ["invariants", "prose-standard", "story-doctrine", "writing-craft", "writer"],
+  reviewer: ["invariants", "prose-standard", "reviewer"],
 } as const;
 
 export type Role = keyof typeof SCORE;
