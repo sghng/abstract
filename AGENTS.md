@@ -41,9 +41,12 @@ here.
 
 ## Working Conventions
 
-- **Naming**: harness components keep musical names (`movement`, `score`, `cue`,
-  orchestrator); prompt files get descriptive names, since only their contents
-  enter the agents' context.
+- **Naming**: nuanced, unusual names are for tokens that live in the agents'
+  context and need markedness against generic prose. File and directory names
+  are dev-facing and stay descriptive, since only contents enter the context.
+  Where a standard term already carries the exact meaning (subagent), use it;
+  coining fights the model's prior. Harness components keep their musical names
+  (`movement`, `score`, `cue`).
 - **`invariants.md` holds invariants only.** Membership test: if the lab agents
   forgot it, would the failure be silent and costly? Procedures and templates
   belong in skills.
