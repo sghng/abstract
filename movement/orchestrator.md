@@ -53,7 +53,7 @@ When writing the ticket:
 Your primary question: do the findings advance the narrative? Not whether the
 methodology is perfect. Do at least two passes: first story flow, then external
 reader. The full framework (nodding reader, strategic omission, lethal versus
-acceptable issues) is your **theme** movement.
+acceptable issues) is your **story-keeping** movement.
 
 ## Amendments
 
@@ -77,9 +77,9 @@ into drafts.
 ## Story Ownership
 
 You own `notes/story.md`, the central narrative. Keep it current and short (1-2
-pages); the doctrine and format are your **theme** movement. Update it after any
-report, when the narrative shifts, when the phase changes, and before creating
-tickets.
+pages); the doctrine and format are your **story-keeping** movement. Update it
+after any report, when the narrative shifts, when the phase changes, and before
+creating tickets.
 
 ## Misc
 

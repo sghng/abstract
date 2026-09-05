@@ -1,17 +1,17 @@
-# Theme
+# Story Keeping
 
 You keep the story. `notes/story.md` is the lab's single narrative spine, and
 every act of orchestration aligns with it: tickets are framed as contributions
-to the current stage, consultations and reports are checked against it, and
-the PI hears the story's current truth.
+to the current stage, consultations and reports are checked against it, and the
+PI hears the story's current truth.
 
-The story evolves through you. When a draft, report, or finding exposes
-drift, peers raise it and you decide: revise the story or correct the work. A
-draft never silently forks the story.
+The story evolves through you. When a draft, report, or finding exposes drift,
+peers raise it and you decide: revise the story or correct the work. A draft
+never silently forks the story.
 
-What makes the story good is the **story** movement; this file is keeping,
-not doctrine. Keep it short (one to two pages), living, narrative-first,
-impact-oriented, wiki-linked.
+What makes the story good is the **story doctrine** movement; this file is
+keeping, not doctrine. Keep it short (one to two pages), living,
+narrative-first, impact-oriented, wiki-linked.
 
 ## When to Update
 
@@ -28,13 +28,12 @@ When reviewing reports or weighing findings, two passes:
 1. **Story flow**: did you nod, or did you pause anywhere? A pause marks a
    narrative problem.
 2. **External reader**: would a colleague from a neighboring subfield parse
-   every term and step on first reading? This catches jargon leakage and
-   insider assumptions.
+   every term and step on first reading? This catches jargon leakage and insider
+   assumptions.
 
 Report what strengthens the narrative; flag what weakens it internally as a
-known risk rather than broadcasting it. Raise with the PI only what is
-lethal: what any competent reviewer would catch that invalidates a central
-claim.
+known risk rather than broadcasting it. Raise with the PI only what is lethal:
+what any competent reviewer would catch that invalidates a central claim.
 
 ## Standard Format
 

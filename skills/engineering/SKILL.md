@@ -1,16 +1,19 @@
 ---
 name: engineering
-description: Research engineering procedures -- experiments, code and data conventions, data analysis, figures. Use when writing or running code, creating experiments, analyzing data, or producing figures.
+description:
+  Research engineering procedures -- experiments, code and data conventions,
+  data analysis, figures. Use when writing or running code, creating
+  experiments, analyzing data, or producing figures.
 ---
 
 # Engineering
 
-This skill covers the engineering *procedures* of academic research: how to run
+This skill covers the engineering _procedures_ of academic research: how to run
 experiments, organize code and data, analyze data, and produce figures.
 
-The invariant project layout, file naming, and wiki-link conventions are
-defined in the team kernel (`AGENTS.md`, always loaded). Templates for tickets
-and reports live in the logistics skill.
+The invariant project layout, file naming, and wiki-link conventions are defined
+in the team kernel (`AGENTS.md`, always loaded). Templates for tickets and
+reports live in the logistics skill.
 
 ## Experiment Convention
 
@@ -20,6 +23,7 @@ and reports live in the logistics skill.
 - Almost all experiments produce a report to `notes/reports/`
 
 **Experiment contents typically include:**
+
 - Analysis scripts (Python, R, etc.)
 - Generated figures and tables
 - `results.md`: Detailed log of actions and data (for internal use)
@@ -65,8 +69,8 @@ Keep extensive inline documentation:
 
 ### Data Quality Rules
 
-1. **Filter before counting**: Most review/analysis cells will be empty.
-   Always filter empty/NaN values before calculating statistics.
+1. **Filter before counting**: Most review/analysis cells will be empty. Always
+   filter empty/NaN values before calculating statistics.
 
 2. **Count completed observations**: Count actual valid ratings/measurements,
    not rows in the spreadsheet.
@@ -93,6 +97,7 @@ Keep extensive inline documentation:
 **Explore Before Confirming**
 
 Always begin with exploratory analysis before testing hypotheses:
+
 - Load data and visualize distributions first
 - Look for patterns, outliers, and unexpected structures
 - Document initial observations before formal analysis
@@ -115,6 +120,7 @@ Always begin with exploratory analysis before testing hypotheses:
 **Prefer Positive Framing**
 
 When analyzing and reporting results:
+
 - "Higher success rate under condition X" rather than "Lower failure rate"
 - "Items showed quality retention" rather than "Minimal degradation"
 - Frame findings around what works, not just what doesn't
@@ -159,6 +165,7 @@ reports.
 remain valid regardless of when they are read.
 
 **Use instead**:
+
 - GOOD: Sequence: "Complete Task 1 before Task 2"
 - GOOD: Priorities: "Task A is critical; Task B is secondary"
 - GOOD: Dependencies: "Requires completion of experiment 01"
@@ -168,6 +175,7 @@ remain valid regardless of when they are read.
 ### Atomic Artifacts
 
 Each artifact should stand alone:
+
 - Self-contained context and instructions
 - Valid regardless of when read
 - Cross-references via wiki links, not temporal references
@@ -190,6 +198,7 @@ When delegating engineering tasks:
 ### Pre-Work Checklist
 
 The engineer verifies before starting:
+
 - [ ] Read the ticket completely
 - [ ] Read `notes/story.md` for narrative context
 - [ ] Check existing code in `src/` and previous experiments
@@ -209,6 +218,7 @@ The engineer verifies before starting:
 ### Discovery Zone
 
 When executing tasks, document unexpected findings:
+
 - Results that contradict expectations
 - Patterns suggesting new hypotheses
 - Opportunities for additional insights

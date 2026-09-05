@@ -1,11 +1,16 @@
 ---
 name: logistics
-description: Project organization standards -- repository layout, ticket and report templates, file naming, wiki-links, workflow. Use when creating tickets, reports, or notes, or when unsure where a file belongs.
+description:
+  Project organization standards -- repository layout, ticket and report
+  templates, file naming, wiki-links, workflow. Use when creating tickets,
+  reports, or notes, or when unsure where a file belongs.
 ---
 
 # Logistics
 
-How research projects are organized, structured, and executed. This module covers file naming, repository structure, ticket conventions, wiki-links, and the workflow from story to deliverables.
+How research projects are organized, structured, and executed. This module
+covers file naming, repository structure, ticket conventions, wiki-links, and
+the workflow from story to deliverables.
 
 ---
 
@@ -33,7 +38,8 @@ project-root/
 
 ### Key Conventions
 
-- **notes/** is typically a symlink to an Obsidian vault. Use `-L` with `find` to follow symlinks.
+- **notes/** is typically a symlink to an Obsidian vault. Use `-L` with `find`
+  to follow symlinks.
 - **story.md** lives at `notes/story.md` -- inside notes, at the vault root
 - **index.md** lives at `notes/index.md` -- the "note on notes", entry point
 - **tickets/**, **reports/**, **dev/** are the only required subdirectories
@@ -44,14 +50,14 @@ project-root/
 
 ### Where Do Notes Go?
 
-| Note type | Location |
-|-----------|----------|
-| Global / cross-cutting (story, index) | `notes/` root |
-| Active work assignment | `notes/tickets/` |
-| Report to orchestrator | `notes/reports/` |
-| Implementation detail, scratch work | `notes/dev/` |
-| Themed content (literature, methods) | Optional subdir, create when needed |
-| Random working notes | `notes/` root |
+| Note type                             | Location                            |
+| ------------------------------------- | ----------------------------------- |
+| Global / cross-cutting (story, index) | `notes/` root                       |
+| Active work assignment                | `notes/tickets/`                    |
+| Report to orchestrator                | `notes/reports/`                    |
+| Implementation detail, scratch work   | `notes/dev/`                        |
+| Themed content (literature, methods)  | Optional subdir, create when needed |
+| Random working notes                  | `notes/` root                       |
 
 If a note doesn't clearly belong to a themed directory, keep it at the notes
 root. Don't force categorization -- let patterns emerge and create directories
@@ -61,8 +67,8 @@ retroactively when a clear theme appears.
 
 ## Notes Index (index.md)
 
-Every notes vault should have an `index.md` at its root -- a "note on notes" that
-serves as the entry point for both humans and agents.
+Every notes vault should have an `index.md` at its root -- a "note on notes"
+that serves as the entry point for both humans and agents.
 
 ### Purpose
 
@@ -114,6 +120,7 @@ BAD: proposal_v2.md
 ### Ticket Naming
 
 Tickets use the format:
+
 ```
 ticket-NNN-short-descriptive-name.md
 ```
@@ -124,6 +131,7 @@ ticket-NNN-short-descriptive-name.md
 - Tickets are atomic static artifacts
 
 Examples:
+
 - `ticket-001-data-analysis.md`
 - `ticket-002-proposal-prep.md`
 - `ticket-003-story-reframe.md`
@@ -131,11 +139,13 @@ Examples:
 ### Report Naming
 
 Reports use the format:
+
 ```
 report-NNN-short-descriptive-name.md
 ```
 
 Examples:
+
 - `report-001-data-analysis.md`
 - `report-002-proposal-draft.md`
 
@@ -146,9 +156,8 @@ Examples:
 Use wiki-links to cross-reference documents without paths or extensions:
 
 ```markdown
-See [[story]] for the research narrative.
-Refer to [[ticket-001-data-analysis]] for details.
-Check [[report-001-data-analysis]] for results.
+See [[story]] for the research narrative. Refer to [[ticket-001-data-analysis]]
+for details. Check [[report-001-data-analysis]] for results.
 ```
 
 ### Resolution Rules
@@ -173,7 +182,8 @@ Check [[report-001-data-analysis]] for results.
 
 ## Ticket Structure
 
-Tickets are the primary work assignment format. They should be **concise**, **actionable**, and **narrative-driven**.
+Tickets are the primary work assignment format. They should be **concise**,
+**actionable**, and **narrative-driven**.
 
 ### Standard Ticket Format
 
@@ -201,12 +211,14 @@ The central question this ticket addresses.
 ## Todos
 
 ### Task 1: Task Name
+
 - [ ] Specific action
 - [ ] Another action
 
 **Because**: Why this task matters to the narrative.
 
 ### Task 2: Task Name
+
 - [ ] Specific action
 
 **Because**: Narrative rationale.
@@ -216,13 +228,17 @@ The central question this ticket addresses.
 ## Deliverables
 
 ### For You: `results.md`
+
 Location: `experiments/NNN-name/results.md`
+
 - Raw analysis output
 - Code and parameters
 - Intermediate calculations
 
 ### For Me: `report-NNN-*.md`
+
 Location: `notes/reports/report-NNN-name.md`
+
 - Executive summary
 - Key findings
 - Narrative implications
@@ -240,8 +256,8 @@ Location: `notes/reports/report-NNN-name.md`
 ## Amendments
 
 ### Amendment 1: Description
-**Date**: YYYY-MM-DD
-**Based on**: [[report-XXX]] review
+
+**Date**: YYYY-MM-DD **Based on**: [[report-XXX]] review
 
 What changed and why.
 ```
@@ -252,19 +268,22 @@ Amendments apply **only after** a ticket has been finalized and delegated to
 execution. They capture corrections discovered during execution (e.g., a report
 reveals gaps or unexpected clarifications) without touching the ticket body.
 
-**During the drafting phase** (before delegation), do NOT use amendments.
-Just redraft the ticket directly -- edit the body freely. A ticket is not
-finalized until it's delegated; anything before that is draft, and drafts are
-redrafted, not amended.
+**During the drafting phase** (before delegation), do NOT use amendments. Just
+redraft the ticket directly -- edit the body freely. A ticket is not finalized
+until it's delegated; anything before that is draft, and drafts are redrafted,
+not amended.
 
 Lifecycle:
+
 1. **Drafting**: Edit the body freely. No amendments.
-2. **Delegated**: Ticket body is frozen. Discovered issues --> append amendments.
+2. **Delegated**: Ticket body is frozen. Discovered issues --> append
+   amendments.
 3. **Superseded**: New ticket (or full redraft) replaces it.
 
 ### Key Principles
 
-1. **Every task needs a "Because"**: Explain how the task contributes to the narrative
+1. **Every task needs a "Because"**: Explain how the task contributes to the
+   narrative
 2. **Quick Links at top**: Easy navigation to related documents
 3. **Deliverables section**: Clear output expectations
 4. **Questions section**: Blockers and clarifications
@@ -282,10 +301,11 @@ split it:
 - **Parent ticket**: Overview, blocking decisions, domain summary. Links to
   sub-tickets via wiki links. Remains stable; sub-tickets carry the detail.
 - **Sub-tickets**: One per domain. `ticket-NNN-short-name.md` each. Each is a
-  self-contained execution unit with its own Quick Links, Background, Todos,
-  and Deliverables. Link back to the parent and to each other where dependent.
+  self-contained execution unit with its own Quick Links, Background, Todos, and
+  Deliverables. Link back to the parent and to each other where dependent.
 
 Example:
+
 ```
 ticket-002-psychometrika-revision.md      (parent)
 +-- ticket-003-literature-review.md       (sub)
@@ -321,8 +341,7 @@ Reports are **executive summaries** for the orchestrator, not raw logs.
 ```markdown
 # Report NNN - Short Title
 
-**Date**: YYYY-MM-DD
-**Based on**: [[ticket-XXX]], [[story]]
+**Date**: YYYY-MM-DD **Based on**: [[ticket-XXX]], [[story]]
 
 ---
 
@@ -368,8 +387,9 @@ What could go wrong? What are the limitations?
 ## Visualizations
 
 ### Figure 1: Name
-![Figure 1](experiments/NNN/figures/name.png)
-**Caption**: Description of what the figure shows.
+
+![Figure 1](experiments/NNN/figures/name.png) **Caption**: Description of what
+the figure shows.
 
 ---
 
@@ -455,30 +475,26 @@ story.md --> tickets --> experiments --> reports --> deliverables
 ### From Tickets
 
 ```markdown
-See [[story]] for current narrative.
-Based on [[report-001-data-analysis]].
+See [[story]] for current narrative. Based on [[report-001-data-analysis]].
 Related: [[ticket-002-proposal-prep]].
 ```
 
 ### From Reports
 
 ```markdown
-Based on [[ticket-001-data-analysis]].
-See [[story]] for narrative context.
+Based on [[ticket-001-data-analysis]]. See [[story]] for narrative context.
 ```
 
 ### From Story
 
 ```markdown
-See [[ticket-001]] for data analysis.
-See [[report-001]] for results.
+See [[ticket-001]] for data analysis. See [[report-001]] for results.
 ```
 
 ### From Deliverables
 
 ```markdown
-See [[story]] for research narrative.
-Results detailed in [[report-001]].
+See [[story]] for research narrative. Results detailed in [[report-001]].
 ```
 
 ---
@@ -586,4 +602,6 @@ Check project conventions before adding indicators.
 
 ---
 
-*This logistics module defines how research work is organized and executed. See content-specific skills (manuscript, presentation, etc.) for domain conventions.*
+_This logistics module defines how research work is organized and executed. See
+content-specific skills (manuscript, presentation, etc.) for domain
+conventions._

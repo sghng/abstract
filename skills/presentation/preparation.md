@@ -10,6 +10,7 @@ explore task using a subagent to get relevant info in the working dir.
 ## Prerequisites
 
 Before preparing presentation content:
+
 - Review `story.md` in `notes/narrative/`
 - Understand the audience and occasion
 - Clarify the key message (usually 1-3 take-home points)
@@ -18,8 +19,8 @@ Before preparing presentation content:
 
 ## The Story Document
 
-Use `story.md` or a presentation-specific story file, following the shape of
-the project's `notes/story.md`:
+Use `story.md` or a presentation-specific story file, following the shape of the
+project's `notes/story.md`:
 
 - **One-Line Summary**: What this talk is about
 - **Three-Act Narrative**: Hook, approach, discovery
@@ -29,20 +30,21 @@ the project's `notes/story.md`:
 
 ## Mapping Story to Presentation
 
-| Story Section | Presentation Element | Purpose |
-|:--------------|:---------------------|:--------|
-| Act 1 (Hook) | Opening slide(s) | Grab attention, establish why this matters |
-| Research Question | Agenda/Overview slide | Preview what you will cover |
-| Act 2 (Approach) | Methods slides | How you tackled the problem |
-| Act 3 (Discovery) | Results slides | What you found |
-| Key Facts | Key Takeaway slides | What the audience should remember |
-| Open Questions | Future Work slide | What's next |
+| Story Section     | Presentation Element  | Purpose                                    |
+| :---------------- | :-------------------- | :----------------------------------------- |
+| Act 1 (Hook)      | Opening slide(s)      | Grab attention, establish why this matters |
+| Research Question | Agenda/Overview slide | Preview what you will cover                |
+| Act 2 (Approach)  | Methods slides        | How you tackled the problem                |
+| Act 3 (Discovery) | Results slides        | What you found                             |
+| Key Facts         | Key Takeaway slides   | What the audience should remember          |
+| Open Questions    | Future Work slide     | What's next                                |
 
 ## Principles
 
 ### Know Your Audience
 
-**The goal of a presentation is to please our audience, make them feel informed.**
+**The goal of a presentation is to please our audience, make them feel
+informed.**
 
 - Conference talk: Emphasize novelty and contribution
 - Group meeting: Focus on methods and challenges
@@ -57,6 +59,7 @@ the project's `notes/story.md`:
 ### The Rule of Three
 
 Structure around three main points:
+
 - Three acts of the story
 - Three key findings
 - Three takeaways
@@ -79,6 +82,7 @@ doubt, consult the user.
 ## Deliverables
 
 When content preparation is complete, you should have:
+
 - [ ] Clear one-line summary
 - [ ] Defined audience and occasion
 - [ ] Three-act narrative documented

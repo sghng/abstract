@@ -2,7 +2,7 @@
 
 How the lab produces publishable artifacts -- grants, proposals, manuscripts,
 and similar deliverables. This doc is dev-facing; invariants live in
-`movement/motif.md` and role behavior lives in `movement/writer.md` and
+`movement/invariants.md` and role behavior lives in `movement/writer.md` and
 `movement/reviewer.md`.
 
 ## Roles
@@ -75,15 +75,15 @@ orchestrator when the work is complete.
 ## File Conventions
 
 `draft/` holds working drafts and externally-edited feedback files. The lab
-keeps one current working file per artifact. Internal reviewer-agent rounds
-edit that file in place; external feedback is what drives version increments.
+keeps one current working file per artifact. Internal reviewer-agent rounds edit
+that file in place; external feedback is what drives version increments.
 
-| File | Meaning |
-|------|---------|
-| `draft/artifact-v0.md` | current working draft; all internal editing happens here |
-| `draft/artifact-v0-advisor-edited.md` | external feedback on v0 from advisor |
-| `draft/artifact-v0-pi-edited.md` | external feedback on v0 from PI |
-| `draft/artifact-v1.md` | next working draft after v0 feedback is incorporated |
+| File                                  | Meaning                                                  |
+| ------------------------------------- | -------------------------------------------------------- |
+| `draft/artifact-v0.md`                | current working draft; all internal editing happens here |
+| `draft/artifact-v0-advisor-edited.md` | external feedback on v0 from advisor                     |
+| `draft/artifact-v0-pi-edited.md`      | external feedback on v0 from PI                          |
+| `draft/artifact-v1.md`                | next working draft after v0 feedback is incorporated     |
 
 Rules:
 
@@ -107,9 +107,8 @@ flow, jargon leakage, and disproportionate paragraphs. The target venue is
 NSF IIS with a 15-page limit.
 ```
 
-The reviewer returns a memo at `notes/memos/memo-NNN-review-proposal-v0.md`.
-The memo follows the standard memo template (see the logistics skill) and
-includes:
+The reviewer returns a memo at `notes/memos/memo-NNN-review-proposal-v0.md`. The
+memo follows the standard memo template (see the logistics skill) and includes:
 
 - summary of the draft's current state;
 - concrete issues with file paths, line references, or wiki links where
@@ -121,21 +120,20 @@ The writer reads the memo, revises `draft/proposal-v0.md` in place, and either
 asks for another review round or reports completion to the orchestrator.
 
 The reviewer does not edit `draft/` files. The reviewer is a consultant, not a
-co-author or a gate. If the writer repeatedly ignores serious reviewer
-concerns, that is a conversation for the orchestrator, not a harness-level
-block.
+co-author or a gate. If the writer repeatedly ignores serious reviewer concerns,
+that is a conversation for the orchestrator, not a harness-level block.
 
 ## Externalization
 
-Only the orchestrator approves whether a draft leaves the lab. When the
-writer reports completion, the orchestrator either:
+Only the orchestrator approves whether a draft leaves the lab. When the writer
+reports completion, the orchestrator either:
 
 - approves, and the current working draft is sent out; or
 - requests amendments and creates a new ticket or cues the writer with
   high-level feedback.
 
-The version that is sent out is the current working version. If the working
-file is `draft/proposal-v1.md`, then `v1` is what leaves the lab.
+The version that is sent out is the current working version. If the working file
+is `draft/proposal-v1.md`, then `v1` is what leaves the lab.
 
 ## Example: From Story to Grant Proposal
 
@@ -151,11 +149,10 @@ file is `draft/proposal-v1.md`, then `v1` is what leaves the lab.
 6. Writer revises `draft/nsf-iis-proposal-v0.md` and repeats review until
    satisfied.
 7. Writer cues orchestrator: proposal ready for externalization.
-8. Orchestrator approves; the user sends `draft/nsf-iis-proposal-v0.md` to
-   the NSF.
+8. Orchestrator approves; the user sends `draft/nsf-iis-proposal-v0.md` to the
+   NSF.
 9. External feedback returns as `draft/nsf-iis-proposal-v0-po-comments.md`.
-10. Writer incorporates comments and advances to
-    `draft/nsf-iis-proposal-v1.md`.
+10. Writer incorporates comments and advances to `draft/nsf-iis-proposal-v1.md`.
 
 ## Relationship to Other Roles
 
@@ -163,8 +160,7 @@ file is `draft/proposal-v1.md`, then `v1` is what leaves the lab.
   does not rewrite them. If a report contains prose that belongs in the final
   artifact, the writer adapts it in `draft/` and cites the report via wiki link.
 - **Librarian** -- writer can cue the librarian for citations, claim
-  verification, and background. The librarian returns memos in
-  `notes/memos/`.
+  verification, and background. The librarian returns memos in `notes/memos/`.
 - **Orchestrator** -- the writer can always ask the orchestrator questions,
   especially about conceptual integrity between `notes/story.md` and the draft.
   The orchestrator may relay the question or point the writer to the right
@@ -175,11 +171,11 @@ file is `draft/proposal-v1.md`, then `v1` is what leaves the lab.
 
 ## Open Questions
 
-- The writing conventions live in the **tuning** and **prose** movements
-  (shared standard, then writer craft); venue-specific modules stay skills
-  (**grants**, **manuscript**).
+- The writing conventions live in the **prose-standard** and **writing-craft**
+  movements (shared standard, then writer craft); venue-specific modules stay
+  skills (**grants**, **manuscript**).
 - Should the reviewer ever be engaged for non-draft artifacts (e.g., polishing
-  an engineer report)? The harness does not forbid it, but the convention is that
-  the reviewer is the writer's right-hand.
+  an engineer report)? The harness does not forbid it, but the convention is
+  that the reviewer is the writer's right-hand.
 - How many review rounds are normal before externalization? The writer decides
   for now; if the number grows, add a convention or lightweight checklist.

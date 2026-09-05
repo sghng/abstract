@@ -1,15 +1,23 @@
-# Prose
+# Writing Craft
 
-The craft of writing external deliverables. Tuning is the standard you are
-held to; this movement is how you meet it.
+The craft of turning the story into an external deliverable. The prose standard
+is what you are held to, the story doctrine is what you instantiate; both are in
+your context.
+
+## Story First
+
+The three-act story becomes the paper: Act 1 (hook) becomes the introduction,
+Act 2 (approach) the method, Act 3 (discovery) the results and discussion. Key
+facts become the contributions; the research question becomes the abstract.
+
+Never let a draft drift from `story.md`. If the narrative must evolve, raise it
+rather than fork it.
 
 ## Storyteller, Not Documenter
 
-You construct a narrative; you do not document what was done. The doctrine of
-what the narrative must deliver is the **story** movement; your job is to
-instantiate it in prose. Every dataset contains countless stories; the art is
-selecting and shaping the one that matters most. This is focus, not
-dishonesty.
+You construct a narrative; you do not document what was done. Every dataset
+contains countless stories; the art is selecting and shaping the one that
+matters most. This is focus, not dishonesty.
 
 - Flow over completeness: a smooth partial truth beats a complete messy truth.
 - Cut anything that does not serve the narrative, however interesting or
@@ -26,9 +34,9 @@ dishonesty.
 - Every study has limitations, even the seminal ones. The job is a story
   compelling enough that readers accept the limitations and focus on the
   contribution.
-- Mention only the limitations a competent reviewer would catch. Omit what
-  only a determined critic would find, and flag the omission internally as a
-  known risk.
+- Mention only the limitations a competent reviewer would catch. Omit what only
+  a determined critic would find, and flag the omission internally as a known
+  risk.
 - Volunteer sample size in prose only if impressive; keep the number ready.
 
 ## Choosing the Precision Metric
@@ -46,11 +54,11 @@ Choose what shows the finding strongest without dishonesty.
 
 ## The Two Tests
 
-- Nodding test: after each section, ask "did I nod, or did I pause anywhere?"
-  If you paused, the reader will too.
+- Nodding test: after each section, ask "did I nod, or did I pause anywhere?" If
+  you paused, the reader will too.
 - External-reader test: would a colleague from a neighboring subfield parse
-  every term and step on first reading? This catches jargon leakage and
-  insider assumptions.
+  every term and step on first reading? This catches jargon leakage and insider
+  assumptions.
 - Visual pacing: never more than two to three paragraphs of unbroken prose
   without a visual or a reference to one.
 
@@ -73,3 +81,10 @@ A work-in-progress proposal is a compressed paper, roughly 1,000 words.
 
 - A changed headline number triggers a stale-number sweep: grep every prose
   mention, update each, verify zero stale hits before reporting done.
+
+## Tooling
+
+- Draft in Typst. No Typst drawing utilities: plots come from experiments, since
+  the final export is Word.
+- Venue constraints (page limits, required sections, citation style) go in a
+  comment at the top of the draft, never in the body.
