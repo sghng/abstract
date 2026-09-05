@@ -64,7 +64,7 @@ reference the relevant skill conventions so the _why_ is understood.
 ## Writing Workflow
 
 You initiate writing tickets and assign them to the writer. The writer drafts in
-`draft/` and runs review rounds with the reviewer. When the writer reports
+`draft/` and runs review rounds with the editor. When the writer reports
 completion, only you decide whether the draft leaves the lab:
 
 - **Approve externalization**: the current working draft goes out.

@@ -6,7 +6,7 @@
  *
  *   abstract              create or reattach the tmux ensemble (core window:
  *                         orchestrator | engineer | librarian; writing window:
- *                         writer | reviewer) anchored at the current project dir
+ *                         writer | editor) anchored at the current project dir
  *   abstract __run <role> internal: run one role's pi session in this
  *                         terminal (spawned into tmux panes by `abstract`)
  *
@@ -25,7 +25,14 @@
  * running; if the tmux server died, panes resume the same session files.
  */
 import { execFileSync } from "node:child_process";
-import { existsSync, lstatSync, mkdirSync, realpathSync, symlinkSync, unlinkSync } from "node:fs";
+import {
+  existsSync,
+  lstatSync,
+  mkdirSync,
+  realpathSync,
+  symlinkSync,
+  unlinkSync,
+} from "node:fs";
 import { homedir } from "node:os";
 import { basename, dirname, join, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
@@ -90,7 +97,13 @@ function launch(): void {
   };
 
   if (has) {
-    const windows = tmux(["list-windows", "-t", session, "-F", "#{window_name} #{window_panes}"])
+    const windows = tmux([
+      "list-windows",
+      "-t",
+      session,
+      "-F",
+      "#{window_name} #{window_panes}",
+    ])
       .trim()
       .split("\n")
       .filter(Boolean)
@@ -102,17 +115,62 @@ function launch(): void {
       tmux(["attach-session", "-t", `${session}:core`], true);
       return;
     }
-    console.error(`abstract: recreating session ${session} (layout stale; agent memory preserved in .pi/sessions/)`);
+    console.error(
+      `abstract: recreating session ${session} (layout stale; agent memory preserved in .pi/sessions/)`,
+    );
     tmux(["kill-session", "-t", session]);
   }
 
-  tmux(["new-session", "-d", "-s", session, "-n", "core", "-c", cwd, run("orchestrator")]);
-  tmux(["split-window", "-h", "-t", `${session}:core`, "-c", cwd, run("engineer")]);
-  tmux(["split-window", "-h", "-t", `${session}:core.1`, "-c", cwd, run("librarian")]);
+  tmux([
+    "new-session",
+    "-d",
+    "-s",
+    session,
+    "-n",
+    "core",
+    "-c",
+    cwd,
+    run("orchestrator"),
+  ]);
+  tmux([
+    "split-window",
+    "-h",
+    "-t",
+    `${session}:core`,
+    "-c",
+    cwd,
+    run("engineer"),
+  ]);
+  tmux([
+    "split-window",
+    "-h",
+    "-t",
+    `${session}:core.1`,
+    "-c",
+    cwd,
+    run("librarian"),
+  ]);
   tmux(["select-layout", "-t", `${session}:core`, "even-horizontal"]);
 
-  tmux(["new-window", "-t", `${session}:1`, "-n", "writing", "-c", cwd, run("writer")]);
-  tmux(["split-window", "-h", "-t", `${session}:writing`, "-c", cwd, run("reviewer")]);
+  tmux([
+    "new-window",
+    "-t",
+    `${session}:1`,
+    "-n",
+    "writing",
+    "-c",
+    cwd,
+    run("writer"),
+  ]);
+  tmux([
+    "split-window",
+    "-h",
+    "-t",
+    `${session}:writing`,
+    "-c",
+    cwd,
+    run("editor"),
+  ]);
   tmux(["select-layout", "-t", `${session}:writing`, "even-horizontal"]);
 
   tmux(["attach-session", "-t", `${session}:core`], true);
@@ -123,11 +181,16 @@ function linkGlobalConfig(name: string, required: boolean): void {
   const source = join(PI_AGENT_DIR, name);
   const target = join(HARNESS_DIR, name);
   if (!existsSync(source)) {
-    if (required) fail(`${source} not found -- run pi once to set up credentials`);
+    if (required)
+      fail(`${source} not found -- run pi once to set up credentials`);
     return;
   }
   try {
-    if (lstatSync(target).isSymbolicLink() && realpathSync(target) === realpathSync(source)) return;
+    if (
+      lstatSync(target).isSymbolicLink() &&
+      realpathSync(target) === realpathSync(source)
+    )
+      return;
     unlinkSync(target);
   } catch {
     // missing or not removable as link; fall through to symlinkSync
@@ -147,7 +210,9 @@ async function runRole(role: Role): Promise<void> {
 
   const cwd = process.cwd();
   mkdirSync(join(cwd, ".pi", "sessions"), { recursive: true });
-  const sessionManager = SessionManager.open(join(cwd, ".pi", "sessions", `${role}.jsonl`));
+  const sessionManager = SessionManager.open(
+    join(cwd, ".pi", "sessions", `${role}.jsonl`),
+  );
   sessionManager.appendSessionInfo(role);
 
   const globalPrompts = join(PI_AGENT_DIR, "prompts");
@@ -173,7 +238,9 @@ async function runRole(role: Role): Promise<void> {
         // disk and re-resolves on every /reload, so edits to any movement
         // take effect without code changes.
         appendSystemPrompt: SCORE[role].map(movement),
-        additionalPromptTemplatePaths: existsSync(globalPrompts) ? [globalPrompts] : [],
+        additionalPromptTemplatePaths: existsSync(globalPrompts)
+          ? [globalPrompts]
+          : [],
         additionalThemePaths: existsSync(globalThemes) ? [globalThemes] : [],
       },
     });
@@ -184,10 +251,12 @@ async function runRole(role: Role): Promise<void> {
     });
     const diagnostics = [
       ...services.diagnostics,
-      ...services.resourceLoader.getExtensions().errors.map(({ path, error }) => ({
-        type: "error" as const,
-        message: `Failed to load extension "${path}": ${error}`,
-      })),
+      ...services.resourceLoader
+        .getExtensions()
+        .errors.map(({ path, error }) => ({
+          type: "error" as const,
+          message: `Failed to load extension "${path}": ${error}`,
+        })),
     ];
     return { ...created, services, diagnostics };
   };
@@ -200,7 +269,8 @@ async function runRole(role: Role): Promise<void> {
 
   const errors = runtime.diagnostics.filter((d) => d.type === "error");
   if (errors.length > 0) {
-    for (const d of runtime.diagnostics) console.error(`${d.type}: ${d.message}`);
+    for (const d of runtime.diagnostics)
+      console.error(`${d.type}: ${d.message}`);
     process.exit(1);
   }
 
@@ -215,13 +285,18 @@ async function main(): Promise<void> {
   const [arg, ...rest] = process.argv.slice(2);
   if (arg === "__run") {
     const role = rest[0] as Role | undefined;
-    if (!role || !ROLES.includes(role)) fail(`__run requires a role: ${ROLES.join("|")}`);
+    if (!role || !ROLES.includes(role))
+      fail(`__run requires a role: ${ROLES.join("|")}`);
     await runRole(role);
     return;
   }
   if (arg === "--help" || arg === "-h") {
-    console.log("usage: abstract          create/reattach the tmux ensemble (core: orchestrator|engineer|librarian; writing: writer|reviewer)");
-    console.log("       abstract __run r  internal: run role r in this terminal");
+    console.log(
+      "usage: abstract          create/reattach the tmux ensemble (core: orchestrator|engineer|librarian; writing: writer|editor)",
+    );
+    console.log(
+      "       abstract __run r  internal: run role r in this terminal",
+    );
     return;
   }
   if (arg !== undefined) fail(`unknown argument: ${arg} (try --help)`);

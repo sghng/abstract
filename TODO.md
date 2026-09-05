@@ -124,15 +124,28 @@ Until the harness exists, the `bin/` launchers + file-mediated consult relay
 
 ## Canonical Decisions Log
 
+- **Subagents; reviewer becomes the editor (2026-09-05, issue #27)**: disposable
+  in-process child sessions (`extensions/subagents/`, telemetry in
+  `.pi/subagents.jsonl`), voluntary by agent judgment and mandatory for known
+  failure modes. Bundled over ad-hoc: tool-call arguments persist verbatim in
+  the parent's context until compaction, so per-spawn system prompts are a
+  recurring tax; bundled subagents (`subagents/<name>.md`) pin prompt, tier, and
+  tools, while bespoke prompts remain for inherently bespoke work, above all the
+  editor's reviewer panels. Reviewer role renamed editor: fresh-eyed reading
+  moved down into reviewer subagents (vary model family x familiarity); the
+  editor curates the panel, collates, and owns the verdict. Tiers are semantic,
+  not model SKUs (OmO's categories insight): routine (least capable suffices),
+  standard, deep (hard reasoning); mapping lives in `subagents/tiers.json`;
+  escape-hatch overrides are logged for observation.
 - **Prompt hierarchy (2026-09-04, see `docs/prompt-hierarchy.md`)**: three
   layers -- shared movements (the all-hands meeting), role movements (the
   one-on-one), skills (reference manuals). Doctrine lives with the role that
   owns the artifact it governs: story keeping in `story-keeping` (orchestrator,
   owner of story.md), writing craft in `writing-craft` (writer, owner of
-  draft/), the shared prose standard in `prose-standard` (writer + reviewer),
+  draft/), the shared prose standard in `prose-standard` (writer + editor),
   shared narrative doctrine in `story-doctrine` (orchestrator maintains, writer
   instantiates). Never duplicate within one agent's context; duplication across
-  agents is acceptable at audience-chosen grain (reviewer gets a checklist, not
+  agents is acceptable at audience-chosen grain (editor gets a checklist, not
   the writer's rationale). The `writing`, `philosophy`, and `story-keeping`
   skills graduated into movements and were deleted; `typst` stays a skill
   (typesetting medium is not the writer's constant concern and may change). The

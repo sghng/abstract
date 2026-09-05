@@ -13,7 +13,7 @@ lives. Think of it as onboarding employees.
 
 2. **The one-on-one (role movements).** Specific expectations for one role,
    always-on in that role's context: doctrine, craft, workflow. Single- function
-   roles (writer, reviewer) inline everything they always need; a probabilistic
+   roles (writer, editor) inline everything they always need; a probabilistic
    gate on content with a near-certain invocation rate is pure overhead and pure
    risk.
 
@@ -34,19 +34,19 @@ lives. Think of it as onboarding employees.
   owns the artifact the doctrine governs: story keeping in `story-keeping`
   (orchestrator, owner of `notes/story.md`), writing craft in `writing-craft`
   (writer, owner of `draft/`). When two roles must reason about the same
-  doctrine, it becomes a shared movement: `prose-standard` (writer + reviewer),
+  doctrine, it becomes a shared movement: `prose-standard` (writer + editor),
   `story-doctrine` (orchestrator maintains the story, the writer instantiates
   it). Consumers of an artifact read the artifact; roles that shape it share the
   doctrine.
 - **Duplication rule.** Never repeat a statement within one agent's context.
   Repetition across different agents' contexts is acceptable and sometimes
-  intended (the prose standard shared by writer and reviewer; the reviewer's
+  intended (the prose standard shared by writer and editor; the editor's
   checklist restating the writer's detail at recognition grain). When the same
   fact serves two roles, give each the grain it needs: generative detail for the
   producer, checkable items for the judge.
-- **Asymmetric detail protects independence.** The reviewer gets a checklist,
-  not the writer's full rationale; a reviewer inside the writer's frame shares
-  the writer's blind spots.
+- **Asymmetric detail protects independence.** The editor gets a checklist, not
+  the writer's full rationale; an editor inside the writer's frame shares the
+  writer's blind spots.
 - **Pointer discipline.** Movements may point to skills for episodic procedures
   ("read the logistics skill when creating reports"). Never put always-on
   doctrine behind a skill pointer: a two-hop dependency fails silently when the

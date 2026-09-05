@@ -10,15 +10,28 @@
  * Placement rule: a movement is always-on (listed here) iff it is needed in
  * most turns of the role, or forgetting it is silent and costly. Everything
  * else stays on-demand as a skill. Doctrine graduates per role: a single-
- * function role (writer, reviewer) inlines what it always needs; skills keep
+ * function role (writer, editor) inlines what it always needs; skills keep
  * episodic, task-matched procedures.
  */
 export const SCORE = {
-  orchestrator: ["invariants", "story-doctrine", "story-keeping", "orchestrator"],
-  engineer: ["invariants", "engineer"],
-  librarian: ["invariants", "librarian"],
-  writer: ["invariants", "prose-standard", "story-doctrine", "writing-craft", "writer"],
-  reviewer: ["invariants", "prose-standard", "reviewer"],
+  orchestrator: [
+    "invariants",
+    "delegation",
+    "story-doctrine",
+    "story-keeping",
+    "orchestrator",
+  ],
+  engineer: ["invariants", "delegation", "engineer"],
+  librarian: ["invariants", "delegation", "librarian"],
+  writer: [
+    "invariants",
+    "delegation",
+    "prose-standard",
+    "story-doctrine",
+    "writing-craft",
+    "writer",
+  ],
+  editor: ["invariants", "delegation", "prose-standard", "editor"],
 } as const;
 
 export type Role = keyof typeof SCORE;

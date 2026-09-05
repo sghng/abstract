@@ -12,7 +12,7 @@ Procedures and templates live in skills; project state lives in `notes/`.
 | Engineer     | `src/`, `experiments/`, `notes/reports/`, `notes/dev/` | feasibility, technical approach                        |
 | Librarian    | `notes/literature.md`, reference library, memos        | background, claims, literature                         |
 | Writer       | `draft/`, writing tickets                              | manuscripts, proposals, grants, publishing conventions |
-| Reviewer     | review memos (`notes/memos/`)                          | writing quality, argument flow, nodding-reader test    |
+| Editor       | review memos (`notes/memos/`)                          | writing quality, review panels, story coherence        |
 
 Protocol rhythm: **converge --> compile --> execute --> synthesize**. Tickets
 are co-designed through consultation, executed in isolation, then synthesized

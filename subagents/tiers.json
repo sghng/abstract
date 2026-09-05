@@ -1,0 +1,5 @@
+{
+  "routine": { "model": "minimax-cn/MiniMax-M3", "thinking": "low" },
+  "standard": { "model": "minimax-cn/MiniMax-M3", "thinking": "medium" },
+  "deep": { "model": "kimi-coding/k3", "thinking": "high" }
+}
