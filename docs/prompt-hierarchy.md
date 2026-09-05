@@ -31,10 +31,13 @@ text lives. Think of it as onboarding employees.
   role and a skill (or nothing) for another. Doctrine graduates into exactly
   the scores that always need it.
 - **Ownership places doctrine.** A line of doctrine lives with the role that
-  owns the artifact the doctrine governs: story doctrine with the
-  orchestrator (`theme`, owner of `notes/story.md`), prose craft with the
-  writer (`prose`, owner of `draft/`). Consumers of an artifact read the
-  artifact, not the doctrine.
+  owns the artifact the doctrine governs: story-keeping in `theme`
+  (orchestrator, owner of `notes/story.md`), prose craft in `prose` (writer,
+  owner of `draft/`). When two roles must reason about the same doctrine, it
+  becomes a shared movement: `tuning` (prose standard, writer + reviewer),
+  `story` (narrative doctrine: the orchestrator maintains the story, the
+  writer instantiates it). Consumers of an artifact read the artifact; roles
+  that shape it share the doctrine.
 - **Duplication rule.** Never repeat a statement within one agent's context.
   Repetition across different agents' contexts is acceptable and sometimes
   intended (tuning shared by writer and reviewer; the reviewer's checklist

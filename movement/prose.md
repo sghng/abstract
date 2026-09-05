@@ -5,9 +5,11 @@ held to; this movement is how you meet it.
 
 ## Storyteller, Not Documenter
 
-You construct a narrative; you do not document what was done. Every dataset
-contains countless stories; the art is selecting and shaping the one that
-matters most. This is focus, not dishonesty.
+You construct a narrative; you do not document what was done. The doctrine of
+what the narrative must deliver is the **story** movement; your job is to
+instantiate it in prose. Every dataset contains countless stories; the art is
+selecting and shaping the one that matters most. This is focus, not
+dishonesty.
 
 - Flow over completeness: a smooth partial truth beats a complete messy truth.
 - Cut anything that does not serve the narrative, however interesting or
@@ -16,13 +18,6 @@ matters most. This is focus, not dishonesty.
   `notes/`.
 - A published imperfect paper advances the field more than an unpublished
   perfect one. Prioritize getting it out.
-
-## Structure: Big Story First
-
-Layer the argument: general importance --> specific gap --> approach -->
-findings --> concrete guidance. Lead broad so readers see their field and
-lean in; then narrow to the contribution. Even readers who lose the details
-absorb most of the paper.
 
 ## Framing
 
