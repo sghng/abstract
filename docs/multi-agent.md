@@ -36,8 +36,8 @@ to any session's TUI live and steer it directly -- direct control of every agent
 is a permanent requirement.
 
 The `abstract` CLI opens two tmux windows: `core` (orchestrator | engineer |
-librarian) and `writing` (writer | reviewer). It attaches to the `core` window
-by default; the user switches windows with the tmux prefix + window number.
+librarian) and `writing` (writer | editor). It attaches to the `core` window by
+default; the user switches windows with the tmux prefix + window number.
 
 All five processes load the same harness extension (from the agent dir) and
 self-configure from `HARNESS_ROLE` (set by the launcher). Cues cross process

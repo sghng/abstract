@@ -3,12 +3,13 @@
 How the lab produces publishable artifacts -- grants, proposals, manuscripts,
 and similar deliverables. This doc is dev-facing; invariants live in
 `movement/invariants.md` and role behavior lives in `movement/writer.md` and
-`movement/reviewer.md`.
+`movement/editor.md`.
 
 ## Roles
 
 - **Writer** -- owns `draft/` and executes writing tickets.
-- **Reviewer** -- consultant to the writer; reviews drafts and writes memos.
+- **Editor** -- consultant to the writer; convenes reviewer subagent panels and
+  writes memos.
 - **Orchestrator** -- assigns writing work, approves externalization, keeps
   drafts aligned with `notes/story.md`.
 - **Librarian** -- consulted by the writer for citations, claims, and
@@ -28,10 +29,10 @@ Writer reads story.md + reports + memos
 Writer drafts in draft/<artifact>-v0.md
               |
               v
-Writer cues Reviewer
+Writer cues Editor
               |
               v
-Reviewer writes notes/memos/memo-NNN-review-<artifact>.md
+Editor writes notes/memos/memo-NNN-review-<artifact>.md
               |
               v
 Writer revises in place (still v0)
@@ -65,7 +66,7 @@ engineering tickets, but with writing-specific fields:
   and reports.
 - **Required Sections** -- explicit structural requirements.
 - **Deliverable** -- the file path in `draft/` and the target version to reach.
-- **Review Plan** -- how many review rounds are expected and what the reviewer
+- **Review Plan** -- how many review rounds are expected and what the editor
   should focus on.
 - **Discovery Zone** -- permission to surface unexpected framing opportunities.
 
@@ -75,8 +76,8 @@ orchestrator when the work is complete.
 ## File Conventions
 
 `draft/` holds working drafts and externally-edited feedback files. The lab
-keeps one current working file per artifact. Internal reviewer-agent rounds edit
-that file in place; external feedback is what drives version increments.
+keeps one current working file per artifact. Internal editor rounds edit that
+file in place; external feedback is what drives version increments.
 
 | File                                  | Meaning                                                  |
 | ------------------------------------- | -------------------------------------------------------- |
@@ -88,26 +89,26 @@ that file in place; external feedback is what drives version increments.
 Rules:
 
 - `v0` is the first working draft.
-- Internal reviewer rounds do not change the version number.
+- Internal editor rounds do not change the version number.
 - When the artifact is sent externally, no rename or snapshot is made.
 - External feedback returns as `draft/artifact-vN-<source>-edited.md`.
 - After incorporating external feedback, advance to `draft/artifact-v(N+1).md`.
 - Internal review memos live in `notes/memos/`, not in `draft/`.
 - `notes/reviews/` is reserved for future external-review tracking; it is not
-  used by the reviewer agent.
+  used by the editor.
 
 ## Review Cycle
 
 The writer owns the review cycle. The writer decides when a draft is ready for
-review and what the reviewer should focus on. A typical cue:
+review and what the editor should focus on. A typical cue:
 
 ```txt
-[cue to reviewer] Please review draft/proposal-v0.md for "nodding reader"
+[cue to editor] Please review draft/proposal-v0.md for "nodding reader"
 flow, jargon leakage, and disproportionate paragraphs. The target venue is
 NSF IIS with a 15-page limit.
 ```
 
-The reviewer returns a memo at `notes/memos/memo-NNN-review-proposal-v0.md`. The
+The editor returns a memo at `notes/memos/memo-NNN-review-proposal-v0.md`. The
 memo follows the standard memo template (see the logistics skill) and includes:
 
 - summary of the draft's current state;
@@ -119,8 +120,8 @@ memo follows the standard memo template (see the logistics skill) and includes:
 The writer reads the memo, revises `draft/proposal-v0.md` in place, and either
 asks for another review round or reports completion to the orchestrator.
 
-The reviewer does not edit `draft/` files. The reviewer is a consultant, not a
-co-author or a gate. If the writer repeatedly ignores serious reviewer concerns,
+The editor does not edit `draft/` files. The editor is a consultant, not a
+co-author or a gate. If the writer repeatedly ignores serious editor concerns,
 that is a conversation for the orchestrator, not a harness-level block.
 
 ## Externalization
@@ -144,7 +145,7 @@ is `draft/proposal-v1.md`, then `v1` is what leaves the lab.
 3. Writer reads `notes/story.md`, relevant `notes/reports/`, and literature
    memos; cues librarian for missing citations.
 4. Writer produces `draft/nsf-iis-proposal-v0.md`.
-5. Writer cues reviewer. Reviewer writes
+5. Writer cues editor. Editor writes
    `notes/memos/memo-042-review-nsf-iis-proposal-v0.md`.
 6. Writer revises `draft/nsf-iis-proposal-v0.md` and repeats review until
    satisfied.
@@ -165,7 +166,7 @@ is `draft/proposal-v1.md`, then `v1` is what leaves the lab.
   especially about conceptual integrity between `notes/story.md` and the draft.
   The orchestrator may relay the question or point the writer to the right
   file/agent.
-- **Reviewer** -- only engaged by the writer. The orchestrator does not
+- **Editor** -- only engaged by the writer. The orchestrator does not
   micromanage review rounds, but may request a specific review angle in the
   original writing ticket.
 
@@ -174,8 +175,8 @@ is `draft/proposal-v1.md`, then `v1` is what leaves the lab.
 - The writing conventions live in the **prose-standard** and **writing-craft**
   movements (shared standard, then writer craft); venue-specific modules stay
   skills (**grants**, **manuscript**).
-- Should the reviewer ever be engaged for non-draft artifacts (e.g., polishing
-  an engineer report)? The harness does not forbid it, but the convention is
-  that the reviewer is the writer's right-hand.
+- Should the editor ever be engaged for non-draft artifacts (e.g., polishing an
+  engineer report)? The harness does not forbid it, but the convention is that
+  the editor is the writer's right-hand.
 - How many review rounds are normal before externalization? The writer decides
   for now; if the number grows, add a convention or lightweight checklist.

@@ -24,7 +24,7 @@ why.
   dir into every lab session, self-configuring from the `HARNESS_ROLE` env var
   set by the launcher.
 - **`abstract`** (the CLI): opens five roles across two tmux windows: `core`
-  (orchestrator | engineer | librarian) and `writing` (writer | reviewer). It
+  (orchestrator | engineer | librarian) and `writing` (writer | editor). It
   attaches to `core` by default (session `abs-<project-basename>`; pi has native
   tmux integration, see pi's `docs/tmux.md`).
 
@@ -155,7 +155,7 @@ the rationale.)
   `--name <role>` so pi's builtin footer labels the session.
 - `bin/lab`: tmux layout -- new session, two windows (`core` with three panes
   running `bin/orchestrator`, `bin/engineer`, `bin/librarian`; `writing` with
-  two panes running `bin/writer`, `bin/reviewer`) in the current project
+  two panes running `bin/writer`, `bin/editor`) in the current project
   directory. Re-running attaches when the session already has the right windows
   and pane counts; otherwise it recreates. No tmux pane titles: role identity
   lives in each pi footer's cwd line via `--name`.

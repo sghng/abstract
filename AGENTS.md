@@ -26,10 +26,13 @@ here.
 - `SYSTEM.md` -- replaces pi's default system prompt for lab agents (discovered
   natively from the agent dir)
 - `extensions/` -- pi extensions, one directory per extension: `cue/`
-  (brokerless message exchange, see `docs/harness.md`) and `mcp/` (internal
-  adapter: registers tools we don't implement -- the implementation hides behind
-  a server URL; the server list and per-role scoping are code in `servers.ts`,
-  not config)
+  (brokerless message exchange, see `docs/harness.md`), `subagents/` (disposable
+  delegate sessions, issue #27), and `mcp/` (internal adapter: registers tools
+  we don't implement -- the implementation hides behind a server URL; the server
+  list and per-role scoping are code in `servers.ts`, not config)
+- `subagents/` -- the bundled subagent catalog (one Markdown file per subagent,
+  frontmatter pins tier/model/tools) plus `tiers.json` (routine/standard/deep
+  model mapping)
 - `skills/` -- pi skills: procedures and standards, one directory per skill
 - `TODO.md` -- design rationale, roadmap, and decisions log; read before
   changing the architecture
