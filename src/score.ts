@@ -14,10 +14,10 @@
  * episodic, task-matched procedures.
  */
 export const SCORE = {
-  orchestrator: ["motif", "theme", "orchestrator"],
+  orchestrator: ["motif", "story", "theme", "orchestrator"],
   engineer: ["motif", "engineer"],
   librarian: ["motif", "librarian"],
-  writer: ["motif", "tuning", "authoring", "prose", "writer"],
+  writer: ["motif", "tuning", "story", "authoring", "prose", "writer"],
   reviewer: ["motif", "tuning", "reviewer"],
 } as const;
 

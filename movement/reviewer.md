@@ -27,8 +27,10 @@ Run on every pass:
 
 1. Ground the file: verify the draft path and version on disk before labeling
    the memo.
-2. Story: the draft serves `notes/story.md`; drift is raised, never silently
-   accepted.
+2. Story: the draft serves `notes/story.md`; the keyword questions and the
+   five questions (what, why, how, why it matters, how it differs) are
+   answered as early as the abstract and introduction. Drift is raised, never
+   silently accepted.
 3. Tuning: walk the failure modes and conventions against the draft, citing
    lines.
 4. Numbers: every number traces to a source (report, exhibit) with unit of

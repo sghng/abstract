@@ -129,7 +129,8 @@ Until the harness exists, the `bin/` launchers + file-mediated consult relay
   one-on-one), skills (reference manuals). Doctrine lives with the role that
   owns the artifact it governs: story doctrine in `theme` (orchestrator,
   owner of story.md), prose craft in `prose` (writer, owner of draft/), the
-  shared standard in `tuning` (writer + reviewer). Never duplicate within one
+  shared standard in `tuning` (writer + reviewer), shared narrative doctrine
+  in `story` (orchestrator maintains, writer instantiates). Never duplicate within one
   agent's context; duplication across agents is acceptable at audience-chosen
   grain (reviewer gets a checklist, not the writer's rationale). The
   `writing`, `philosophy`, and `story-keeping` skills graduated into
