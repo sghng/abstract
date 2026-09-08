@@ -29,6 +29,13 @@ import {
   type ExtensionAPI,
 } from "@earendil-works/pi-coding-agent";
 import { ROLES, type Role } from "../../src/score.ts";
+import { repertoireTool } from "../repertoire/index.ts";
+
+// Custom tools pinnable by name in subagent frontmatter. Children run with
+// noExtensions: true, so the tool objects must be passed explicitly.
+const CUSTOM_TOOLS: Record<string, typeof repertoireTool> = {
+  repertoire: repertoireTool,
+};
 
 const HARNESS_DIR = path.resolve(
   path.dirname(fileURLToPath(import.meta.url)),
@@ -179,6 +186,9 @@ export default function (pi: ExtensionAPI) {
         model,
         thinkingLevel: thinkingLevel as never,
         tools: args.tools,
+        customTools: (args.tools ?? [])
+          .filter((t: string) => CUSTOM_TOOLS[t])
+          .map((t: string) => CUSTOM_TOOLS[t]),
         sessionManager: SessionManager.inMemory(cwd),
         resourceLoader: new DefaultResourceLoader({
           cwd,

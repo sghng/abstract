@@ -294,3 +294,42 @@ Until the harness exists, the `bin/` launchers + file-mediated consult relay
   prompts/themes inheritance paths, `HARNESS_ROLE` (becomes the internal pane
   flag), session pinning, cue extension -- all ported to code in the CLI. No
   staged rollout; half a harness means running two harnesses.
+- **repertoire transcribes publisher HTML instead of converting PDF**
+  (2026-09): a docling/marker/MinerU bake-off showed every ML converter
+  introduces unfixable damage (rasterized equations, flattened tables,
+  OCR-class text errors), fatal for a prose-imitation corpus. Cambridge Core
+  serves full-text HTML for 395/395 Psychometrika 2020-2025 articles with
+  byte-perfect prose, author LaTeX in span.tex-math, and image-based tables
+  with stable CDN URLs. Pipeline: list -> fetch-html -> html2md (cheerio +
+  turndown), D1 for papers/assets metadata, Vectorize + R2 pending. Details
+  and gotchas in docs/repertoire.md.
+
+## 2026-09-08: repertoire exposed as an agent tool
+
+The corpus becomes a tool, not an MCP server: `extensions/repertoire/`
+registers `repertoire` (one noun, three verbs -- search/context/outline) via
+pi.registerTool for the writer and editor peers only (HARNESS_ROLE gate).
+search hits Voyage + Vectorize REST; context/outline read the local chunk
+cache (repertoire/.cache/chunks), no vector query needed. Subagents run with
+noExtensions, so custom tools are passed by object: extensions/subagents keeps
+a CUSTOM_TOOLS registry and subagent frontmatter `tools: [repertoire]` pins
+it. First armed prototype: style-check -- the prose analogue of a linter
+(compares draft register against the corpus; the writer writes for meaning,
+the checker checks for style). Equipment follows persona per editor.md:
+insiders get repertoire, outsiders stay blind. Corpus is Psychometrika-only
+for now: a style guide, not a venue-alignment claim; the journal metadata
+field makes multi-venue a data problem, not a redesign.
+
+## 2026-09-08: JEM joins the corpus; per-journal adapters; R2 preservation
+
+Second journal (JEM, Wiley) validated the adapter pattern: jem-list (Crossref,
+because Cloudflare walls Wiley), jem-fetch (headless Chromium passes the
+challenge; capture the raw document body, never the MathJax-mutated DOM --
+lazy mjx rendering empties assistive MathML and the live DOM loses TeX),
+jem2md (Wiley schema). Equations: 2022+ carry application/x-tex annotations
+verbatim; 2020-21 are PNG-only and get @@EQIMG placeholders for a later
+img2latex pass (asset URLs are Cloudflare-walled too, so the download goes
+through the browser session). Complex tables become caption+asset refs, never
+raw HTML (single-line 100K-char chunks broke the chunker cap). Raw corpus
+preserved in R2 buckets repertoire-html / repertoire-md; sync-r2.ts is
+checkpointed and resumable.
