@@ -27,18 +27,28 @@ here.
   natively from the agent dir)
 - `extensions/` -- pi extensions, one directory per extension: `cue/`
   (brokerless message exchange, see `docs/harness.md`), `subagents/` (disposable
-  delegate sessions, issue #27), and `mcp/` (internal adapter: registers tools
+  delegate sessions, issue #27), `repertoire/` (the corpus as a tool:
+  search/context/outline; registered for writer and editor peers, pinnable
+  on subagent prototypes via frontmatter `tools`), and `mcp/` (internal adapter: registers tools
   we don't implement -- the implementation hides behind a server URL; the server
   list and per-role scoping are code in `servers.ts`, not config)
 - `subagents/` -- the bundled subagent catalog (one Markdown file per subagent,
   frontmatter pins tier/model/tools) plus `tiers.json` (routine/standard/deep
-  model mapping)
+  model mapping). Custom tools by name (repertoire) resolve through
+  extensions/subagents' CUSTOM_TOOLS registry
 - `skills/` -- pi skills: procedures and standards, one directory per skill
 - `TODO.md` -- design rationale, roadmap, and decisions log; read before
   changing the architecture
 - `docs/` -- design documents for the harness (`multi-agent.md` for the
   message-exchange pattern, `harness.md` for the implementation plan);
-  dev-facing, not loaded by lab agents
+  dev-facing, not loaded by lab agents. Also `repertoire.md`, the design of
+  the retrieval system below
+- `repertoire/` -- the writer's convention corpus: pipeline scripts (list,
+  download, convert, embed, sync) that turn journal articles (initially
+  Psychometrika 2020-2025) into PDF/Markdown/asset stores on Cloudflare R2
+  plus a Vectorize index, with a D1 metadata table as source of truth. See
+  `docs/repertoire.md`. Musical name, and earned: it enters the writer
+  agent's context as the retrieval tool name
 - `manifesto.md` -- human-facing philosophy behind the project
 - `settings.json` -- pi settings for the agent directory
 
@@ -48,8 +58,9 @@ here.
   context and need markedness against generic prose. File and directory names
   are dev-facing and stay descriptive, since only contents enter the context.
   Where a standard term already carries the exact meaning (subagent), use it;
-  coining fights the model's prior. Harness components keep their musical names
-  (`movement`, `score`, `cue`).
+  coining fights the model's prior. Musical names (`movement`, `score`,
+  `cue`, `repertoire`) apply exactly when the token will appear in an
+  agent's context, including tool names; otherwise names stay descriptive.
 - **`invariants.md` holds invariants only.** Membership test: if the lab agents
   forgot it, would the failure be silent and costly? Procedures and templates
   belong in skills.
