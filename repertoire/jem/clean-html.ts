@@ -22,6 +22,7 @@ const arg = (name: string, dflt: string) => {
 };
 const HTML_DIR = arg("in", `${ROOT}/jem/html`);
 const OUT_DIR = arg("out", HTML_DIR);
+const PREFIX = arg("prefix", "");
 const DRY = process.argv.includes("--dry");
 
 const PAIRED = /<(script|style|svg|noscript|button|form|iframe)\b[\s\S]*?<\/\1\s*>/gi;
@@ -32,7 +33,9 @@ const LINKOUT =
   /<a\b[^>]*href="[^"]*(?:getFTRLinkout|servlet\/linkout|cdn-cgi\/l\/email-protection)[^"]*"[^>]*>[\s\S]*?<\/a\s*>/gi;
 
 const main = async () => {
-  const files = (await readdir(HTML_DIR)).filter((f) => f.endsWith(".html"));
+  const files = (await readdir(HTML_DIR)).filter(
+    (f) => f.endsWith(".html") && (!PREFIX || f.startsWith(PREFIX)),
+  );
   let before = 0;
   let after = 0;
   let changed = 0;

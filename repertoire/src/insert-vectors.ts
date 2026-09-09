@@ -5,14 +5,40 @@
  * Concatenates per-paper checkpoints into batches of 1000 vectors and calls
  * `wrangler vectorize insert`. Tracks completed batches in
  * .cache/insert-state.txt so the run is resumable.
+ *
+ * --fresh-index: delete and recreate the index first (full rebuilds; md
+ * changed, so old vectors are stale). Metadata indexes must exist before
+ * the first insert, per Vectorize rules.
  */
 import { readdir, readFile, writeFile, appendFile } from "node:fs/promises";
+import { execFile } from "node:child_process";
+import { promisify } from "node:util";
+const run = promisify(execFile);
 
 const ROOT = new URL("..", import.meta.url).pathname;
 const VEC_DIR = `${ROOT}/.cache/vectors`;
 const BATCH_DIR = `${ROOT}/.cache/batches`;
 const STATE = `${ROOT}/.cache/insert-state.txt`;
 const BATCH = 1000;
+
+if (process.argv.includes("--fresh-index")) {
+  console.log("recreating index repertoire (dimensions 1024, cosine)");
+  await run(
+    "npx",
+    ["wrangler", "vectorize", "index", "delete", "repertoire", "--force", "--yes"],
+    { cwd: ROOT },
+  ).catch((e) => console.log("delete skipped:", String(e).split("\n")[0]));
+  await run(
+    "npx",
+    [
+      "wrangler", "vectorize", "index", "create", "repertoire",
+      "--dimensions", "1024", "--metric", "cosine",
+      "--metadata-indexing", `(doi:string,journal:string,year:numeric,section:string)`,
+    ],
+    { cwd: ROOT },
+  );
+  await writeFile(STATE, "");
+}
 
 const doneBatches = new Set(
   (await Bun.file(STATE).exists() ? await readFile(STATE, "utf8") : "").split("\n").filter(Boolean),

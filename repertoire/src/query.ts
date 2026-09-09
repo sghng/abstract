@@ -34,9 +34,12 @@ const year = opt("year") ? Number(opt("year")) : undefined;
 const doiFilter = opt("doi");
 const journal = opt("journal");
 const file = opt("file");
+const SMOKE = args.includes("--smoke");
 const queryText = file
   ? await Bun.file(file).text()
-  : args.filter((a, i) => !a.startsWith("--") && args[i - 1] !== "--top-k" && args[i - 1] !== "--year" && args[i - 1] !== "--doi" && args[i - 1] !== "--journal").join(" ");
+  : SMOKE
+    ? "the reliability of the test scores was estimated using coefficient alpha"
+    : args.filter((a, i) => !a.startsWith("--") && args[i - 1] !== "--top-k" && args[i - 1] !== "--year" && args[i - 1] !== "--doi" && args[i - 1] !== "--journal").join(" ");
 if (!queryText.trim()) {
   console.error('usage: bun src/query.ts "draft text" [--top-k 8] [--distinct] [--section abstract] [--prefer discussion] [--year 2024] [--doi 10.x/...]');
   process.exit(1);
@@ -108,4 +111,14 @@ for (const [i, m] of matches.entries()) {
   console.log(`\n=== [${i + 1}] score ${m.score?.toFixed(4)} | ${title} (${meta.year})`);
   console.log(`    ${meta.doi} chunk ${meta.chunk_no}${meta.heading ? ` | ${meta.heading}` : ""}`);
   console.log(meta.text?.replace(/^/gm, "    "));
+}
+
+if (SMOKE) {
+  // pipeline-final assertion: the index answers
+  if (matches.length === 0) {
+    console.log("SMOKE FAILED: no matches");
+    process.exit(1);
+  }
+  console.log(`\nSMOKE PASSED: ${matches.length} matches`);
+  process.exit(0);
 }

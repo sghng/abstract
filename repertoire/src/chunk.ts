@@ -2,10 +2,16 @@
 /**
  * repertoire chunk: Markdown -> paragraph-aware chunks (~500 tokens).
  *
- * Rules: split on blank lines; track the current ## heading; merge blocks
- * until ~1900 chars (~475 tokens); split oversized blocks on sentences;
- * never merge across a heading. Output: .cache/chunks/{doi_id}.json
- * [{chunk_no, heading, text}].
+ * POLICY (audit record; see docs/repertoire.md):
+ *   - split on blank lines; track the current ## heading
+ *   - merge blocks until ~1900 chars (~475 tokens); split oversized
+ *     prose blocks on sentences; never merge across a heading
+ *   - GFM tables are ATOMIC: a pipe block is never sentence-split and
+ *     never merged with prose; an oversized table stands as one chunk
+ *     (table content IS embedded; a shredded table would be worse)
+ *   - asset-ref lines (captions) ride with prose like any block
+ *
+ * Output: .cache/chunks/{doi_id}.json [{chunk_no, heading, text}].
  */
 import { mkdir, readdir, writeFile } from "node:fs/promises";
 
@@ -34,6 +40,13 @@ function chunkPaper(md: string): { chunk_no: number; heading: string; text: stri
       flush();
       heading = h[1].trim();
       buf = block; // heading line starts the next chunk
+      continue;
+    }
+    if (block.startsWith("|")) {
+      // atomic GFM table: own chunk, never split, never merged
+      flush();
+      buf = block;
+      flush();
       continue;
     }
     if (block.length > MAX_CHARS) {

@@ -18,6 +18,7 @@ const arg = (name: string, dflt: string) => {
 };
 const IN_DIR = arg("in", `${ROOT}/raw`);
 const OUT_DIR = arg("out", `${ROOT}/html`);
+const PREFIX = arg("prefix", "");
 const DRY = process.argv.includes("--dry");
 
 // paired tags; script/style content can contain '<' so match lazily to the
@@ -26,7 +27,9 @@ const PAIRED = /<(script|style|svg|noscript)\b[\s\S]*?<\/\1\s*>/gi;
 const COMMENTS = /<!--[\s\S]*?-->/g;
 
 const main = async () => {
-  const files = (await readdir(IN_DIR)).filter((f) => f.endsWith(".html"));
+  const files = (await readdir(IN_DIR)).filter(
+    (f) => f.endsWith(".html") && (!PREFIX || f.startsWith(PREFIX)),
+  );
   if (!DRY) await mkdir(OUT_DIR, { recursive: true });
   let before = 0;
   let after = 0;
