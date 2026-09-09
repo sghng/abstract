@@ -8,9 +8,9 @@ set -euo pipefail
 cd "$(dirname "$0")"
 set -a; source ../.env; set +a
 
-echo "[tail] waiting for merge-tables to finish..."
-while pgrep -f "merge-tables.py" > /dev/null; do sleep 60; done
-echo "[tail] merge done at $(date)"
+echo "[tail] waiting for merge-tables and img2latex to finish..."
+while pgrep -f "merge-tables.py" > /dev/null || pgrep -f "img2latex.ts" > /dev/null; do sleep 60; done
+echo "[tail] merge + ocr done at $(date)"
 
 bun src/img2latex.ts --no-download > .cache/tail-resplice.log 2>&1 || { echo "RESPLICE FAILED"; exit 1; }
 echo "[tail] resplice done at $(date)"

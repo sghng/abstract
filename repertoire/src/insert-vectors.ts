@@ -23,20 +23,27 @@ const BATCH = 1000;
 
 if (process.argv.includes("--fresh-index")) {
   console.log("recreating index repertoire (dimensions 1024, cosine)");
+  await run("npx", ["wrangler", "vectorize", "delete", "repertoire", "--force"], { cwd: ROOT }).catch(
+    (e) => console.log("delete skipped:", String(e).split("\n")[0]),
+  );
   await run(
     "npx",
-    ["wrangler", "vectorize", "index", "delete", "repertoire", "--force", "--yes"],
-    { cwd: ROOT },
-  ).catch((e) => console.log("delete skipped:", String(e).split("\n")[0]));
-  await run(
-    "npx",
-    [
-      "wrangler", "vectorize", "index", "create", "repertoire",
-      "--dimensions", "1024", "--metric", "cosine",
-      "--metadata-indexing", `(doi:string,journal:string,year:numeric,section:string)`,
-    ],
+    ["wrangler", "vectorize", "create", "repertoire", "--dimensions", "1024", "--metric", "cosine"],
     { cwd: ROOT },
   );
+  // metadata indexes must exist before the first insert
+  for (const [prop, type] of [
+    ["doi", "string"],
+    ["journal", "string"],
+    ["year", "number"],
+    ["section", "string"],
+  ] as const) {
+    await run(
+      "npx",
+      ["wrangler", "vectorize", "create-metadata-index", "repertoire", "--propertyName", prop, "--type", type],
+      { cwd: ROOT },
+    );
+  }
   await writeFile(STATE, "");
 }
 
