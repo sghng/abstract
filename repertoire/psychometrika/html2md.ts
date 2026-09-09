@@ -6,8 +6,8 @@
  * generic markup (headings, lists, emphasis, links).
  *
  *   span.tex-math        -> its text (publisher LaTeX, $..$ already present)
- *   div.fig-ada          -> ![caption]({doi_id}-figNN)  + assets row
- *   div.table-wrap-ada   -> ![caption]({doi_id}-tabNN)  + assets row
+ *   div.fig-ada          -> ![caption](figNN)  + assets row
+ *   div.table-wrap-ada   -> ![caption](tabNN)  + assets row
  *   all other img        -> dropped (equation glyphs, badges)
  *
  * Writes md/{doi_id}.md and .cache/assets-{doi_id}.sql; use --apply to push
@@ -23,7 +23,7 @@ const MD_DIR = `${ROOT}/md`;
 const APPLY = process.argv.includes("--apply");
 
 interface Asset {
-  asset_id: string;
+  handle: string;
   doi: string;
   kind: "figure" | "table";
   url: string | null;
@@ -91,15 +91,15 @@ function convert(html: string, doi: string, doiId: string): { md: string; assets
     const isTable = $el.hasClass("table-wrap-ada");
     const no = isTable ? ++tabNo : ++figNo;
     const kind = isTable ? "table" : "figure";
-    const assetId = `${doiId}-${isTable ? "tab" : "fig"}${String(no).padStart(2, "0")}`;
+    const handle = `${isTable ? "tab" : "fig"}${String(no).padStart(2, "0")}`;
     const caption = $el
       .find("div.caption")
       .text()
       .replace(/\s+/g, " ")
       .trim();
     const url = $el.find("img[data-src]").attr("data-src") ?? null;
-    assets.push({ asset_id: assetId, doi, kind, url, caption });
-    $el.replaceWith(`<p>@@ASSET:${assetId}@@</p>`);
+    assets.push({ handle, doi, kind, url, caption });
+    $el.replaceWith(`<p>@@ASSET:${handle}@@</p>`);
   });
   // any remaining images are glyphs/badges
   body.find("img").remove();
@@ -111,7 +111,7 @@ function convert(html: string, doi: string, doiId: string): { md: string; assets
   // replace tokens with image-style references
   for (const a of assets) {
     const cap = a.caption.replace(/[[\]]/g, "");
-    md = md.replace(`@@ASSET:${a.asset_id}@@`, `![${cap}](${a.asset_id})`);
+    md = md.replace(`@@ASSET:${a.handle}@@`, `![${cap}](${a.handle})`);
   }
   // restore protected math (verbatim, no markdown escaping)
   md = md.replace(/@@MATH(\d+)@@/g, (_, i) => maths[Number(i)]);
@@ -137,8 +137,8 @@ const main = async () => {
       await writeFile(`${MD_DIR}/${doiId}.md`, md);
       for (const a of assets) {
         allSql.push(
-          `insert or replace into assets (asset_id, doi, kind, url, caption) values ` +
-            `(${esc(a.asset_id)}, ${esc(a.doi)}, ${esc(a.kind)}, ${esc(a.url)}, ${esc(a.caption)});`,
+          `insert or replace into assets (doi, handle, kind, url, caption) values ` +
+            `(${esc(a.doi)}, ${esc(a.handle)}, ${esc(a.kind)}, ${esc(a.url)}, ${esc(a.caption)});`,
         );
       }
       figTotal += assets.filter((a) => a.kind === "figure").length;
@@ -153,7 +153,7 @@ const main = async () => {
   console.log(`${figTotal} figures, ${tabTotal} tables; ${allSql.length} asset rows -> ${sqlPath}`);
   if (APPLY) {
     const proc = Bun.spawn(
-      ["wrangler", "d1", "execute", "repertoire", "--remote", "--file", sqlPath],
+      ["npx", "wrangler", "d1", "execute", "repertoire", "--remote", "--file", sqlPath],
       { stdout: "pipe", stderr: "pipe" },
     );
     console.log((await proc.exited) === 0 ? "assets pushed to D1" : "D1 push FAILED");
