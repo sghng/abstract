@@ -26,9 +26,13 @@ import { readdirSync, readFileSync, writeFileSync, openSync, closeSync, writeSyn
 import * as cheerio from "cheerio";
 
 const ROOT = new URL("..", import.meta.url).pathname;
-const XML_DIR = `${ROOT}/jem/xml`;
-const MD_DIR = `${ROOT}/jem/md`;
-const ASSETS_ND = `${ROOT}/.cache/jem-xml-assets.ndjson`;
+const arg = (name: string, dflt: string) => {
+  const i = process.argv.indexOf(`--${name}`);
+  return i > 0 ? process.argv[i + 1] : dflt;
+};
+const XML_DIR = arg("xml-dir", `${ROOT}/jem/xml`);
+const MD_DIR = arg("md-dir", `${ROOT}/jem/md`);
+const ASSETS_ND = arg("ndjson", `${ROOT}/.cache/jem-xml-assets.ndjson`);
 const ONLY = process.argv.includes("--only")
   ? process.argv[process.argv.indexOf("--only") + 1]
   : null;

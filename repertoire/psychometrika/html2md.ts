@@ -13,13 +13,18 @@
  * Writes md/{doi_id}.md and .cache/assets-{doi_id}.sql; use --apply to push
  * asset rows to D1.
  */
-import { readdir, writeFile } from "node:fs/promises";
+import { readdir, writeFile, mkdir } from "node:fs/promises";
 import * as cheerio from "cheerio";
 import TurndownService from "turndown";
 
 const ROOT = new URL("..", import.meta.url).pathname;
-const HTML_DIR = `${ROOT}/html`;
-const MD_DIR = `${ROOT}/md`;
+const arg = (name: string, dflt: string) => {
+  const i = process.argv.indexOf(`--${name}`);
+  return i > 0 ? process.argv[i + 1] : dflt;
+};
+const HTML_DIR = arg("html-dir", `${ROOT}/html`);
+const MD_DIR = arg("md-dir", `${ROOT}/md`);
+const SQL_PATH = arg("sql", `${ROOT}/.cache/assets.sql`);
 const APPLY = process.argv.includes("--apply");
 
 interface Asset {
@@ -134,6 +139,7 @@ const main = async () => {
     try {
       const html = await Bun.file(`${HTML_DIR}/${f}`).text();
       const { md, assets } = convert(html, doi, doiId);
+      await mkdir(MD_DIR, { recursive: true });
       await writeFile(`${MD_DIR}/${doiId}.md`, md);
       for (const a of assets) {
         allSql.push(
@@ -148,7 +154,7 @@ const main = async () => {
       console.log(`${doiId} FAILED: ${e.message}`);
     }
   }
-  const sqlPath = `${ROOT}/.cache/assets.sql`;
+  const sqlPath = SQL_PATH;
   await writeFile(sqlPath, allSql.join("\n") + "\n");
   console.log(`${figTotal} figures, ${tabTotal} tables; ${allSql.length} asset rows -> ${sqlPath}`);
   if (APPLY) {

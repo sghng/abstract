@@ -24,9 +24,13 @@ import TurndownService from "turndown";
 import * as fs from "node:fs";
 
 const ROOT = new URL("..", import.meta.url).pathname;
-const HTML = `${ROOT}/jem/html`;
-const MD = `${ROOT}/jem/md`;
-const ASSETS_ND = `${ROOT}/.cache/jem-assets.ndjson`;
+const arg = (name: string, dflt: string) => {
+  const i = process.argv.indexOf(`--${name}`);
+  return i > 0 ? process.argv[i + 1] : dflt;
+};
+const HTML = arg("html-dir", `${ROOT}/jem/html`);
+const MD = arg("md-dir", `${ROOT}/jem/md`);
+const ASSETS_ND = arg("ndjson", `${ROOT}/.cache/jem-assets.ndjson`);
 // XML shadows HTML: html converts only papers with no xml on disk
 const XML_IDS = new Set(
   fs.readdirSync(`${ROOT}/jem/xml`).map((f) => f.replace(/\.xml$/, "")),

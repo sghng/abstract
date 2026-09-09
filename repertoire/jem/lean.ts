@@ -7,8 +7,10 @@
  * the result (--pretty): HTML prettier is whitespace-safe (css display
  * sensitivity), unlike XML.
  *
- * Assumes jem/clean-html.ts has run. Validate by re-running jem2md and
- * diffing md/ (must be byte-identical). Usage: bun jem/lean.ts [--dry]
+ * Assumes jem/clean-html.ts has run. In-place slimming of the working dir
+ * (regenerable from raw/ for the recent era). Validate by re-running
+ * jem2md and diffing md/ (must be byte-identical).
+ * Usage: bun jem/lean.ts [--in dir] [--dry]  (default dir: jem/html)
  * Prettify separately: npx prettier --parser html --write jem/html (then
  * re-validate MD); kept out of this script to batch npx startup.
  */
@@ -16,7 +18,11 @@ import { readdir, readFile, writeFile } from "node:fs/promises";
 import * as cheerio from "cheerio";
 
 const ROOT = new URL("..", import.meta.url).pathname;
-const HTML_DIR = `${ROOT}/jem/html`;
+const arg = (name: string, dflt: string) => {
+  const i = process.argv.indexOf(`--${name}`);
+  return i > 0 ? process.argv[i + 1] : dflt;
+};
+const HTML_DIR = arg("in", `${ROOT}/jem/html`);
 const DRY = process.argv.includes("--dry");
 
 const KEEP_META = /^(citation_|dc\.|description$)/;

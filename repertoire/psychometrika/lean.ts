@@ -7,14 +7,20 @@
  * data-src, ...), which halves the bytes: publisher markup carries ~50%
  * attribute weight (data-mathjax-*, aria-*, base64 placeholder src).
  *
- * Assumes clean-html has run. Validate by re-running psy2md and diffing
- * md/ (must be byte-identical). Usage: bun psychometrika/lean.ts [--dry]
+ * Assumes clean-html has run. In-place slimming of the working dir
+ * (regenerable from raw/). Validate by re-running psy2md and diffing
+ * md/ (must be byte-identical).
+ * Usage: bun psychometrika/lean.ts [--in dir] [--dry]  (default dir: html)
  */
 import { readdir, readFile, writeFile } from "node:fs/promises";
 import * as cheerio from "cheerio";
 
 const ROOT = new URL("..", import.meta.url).pathname;
-const HTML_DIR = `${ROOT}/html`;
+const arg = (name: string, dflt: string) => {
+  const i = process.argv.indexOf(`--${name}`);
+  return i > 0 ? process.argv[i + 1] : dflt;
+};
+const HTML_DIR = arg("in", `${ROOT}/html`);
 const DRY = process.argv.includes("--dry");
 
 const KEEP_META = /^(citation_|dc\.|description$)/;

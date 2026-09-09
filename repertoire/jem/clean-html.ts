@@ -10,12 +10,18 @@
  * Content selectors (article__body, citation_* metas) are untouched.
  * Validate by re-running jem2md and diffing md/.
  *
- * Usage: bun jem/clean-html.ts [--dry]
+ * Usage: bun jem/clean-html.ts [--in dir] [--out dir] [--dry]
+ *   defaults: --in jem/html (in place)
  */
 import { readdir, readFile, writeFile } from "node:fs/promises";
 
 const ROOT = new URL("..", import.meta.url).pathname;
-const HTML_DIR = `${ROOT}/jem/html`;
+const arg = (name: string, dflt: string) => {
+  const i = process.argv.indexOf(`--${name}`);
+  return i > 0 ? process.argv[i + 1] : dflt;
+};
+const HTML_DIR = arg("in", `${ROOT}/jem/html`);
+const OUT_DIR = arg("out", HTML_DIR);
 const DRY = process.argv.includes("--dry");
 
 const PAIRED = /<(script|style|svg|noscript|button|form|iframe)\b[\s\S]*?<\/\1\s*>/gi;
@@ -31,8 +37,7 @@ const main = async () => {
   let after = 0;
   let changed = 0;
   for (const f of files) {
-    const path = `${HTML_DIR}/${f}`;
-    const html = await readFile(path, "utf8");
+    const html = await readFile(`${HTML_DIR}/${f}`, "utf8");
     const cleaned = html
       .replace(PAIRED, "")
       .replace(COMMENTS, "")
@@ -41,7 +46,9 @@ const main = async () => {
     after += cleaned.length;
     if (cleaned !== html) {
       changed++;
-      if (!DRY) await writeFile(path, cleaned);
+      if (!DRY) await writeFile(`${OUT_DIR}/${f}`, cleaned);
+    } else if (!DRY && OUT_DIR !== HTML_DIR) {
+      await writeFile(`${OUT_DIR}/${f}`, cleaned);
     }
   }
   const mb = (n: number) => (n / 1e6).toFixed(0);
