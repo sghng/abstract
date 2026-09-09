@@ -10,8 +10,13 @@
  *     never merged with prose; an oversized table stands as one chunk
  *     (table content IS embedded; a shredded table would be worse)
  *   - asset-ref lines (captions) ride with prose like any block
+ *   - embedding text transforms @@eqNNNN@@ -> [formula] (noise to the
+ *     embedder; the md keeps the real tokens for the future OCR pass)
+ *   - each chunk records its line span in the md: D1 serves pointers,
+ *     passages are read from the document itself
  *
- * Output: .cache/chunks/{doi_id}.json [{chunk_no, heading, text}].
+ * Output: .cache/chunks/{doi_id}.json
+ *   [{chunk_no, heading, section, line_start, line_end, text}]
  */
 import { mkdir, readdir, writeFile } from "node:fs/promises";
 
@@ -20,45 +25,109 @@ const MD_DIRS = [`${ROOT}/md`, `${ROOT}/jem/md`];
 const OUT_DIR = `${ROOT}/.cache/chunks`;
 const MAX_CHARS = 1900;
 
+const SECTION_MAP: [RegExp, string][] = [
+  [/^(abstract|summary)/, "abstract"],
+  [/^(method|material|procedure|measure|instrument|sample|participant|design|estimation|data)/, "methods"],
+  [/^(result|finding|simulation|application|empirical|analysis|example|illustration|numerical)/, "results"],
+  [/^(discussion|limitation|general|robustness)/, "discussion"],
+  [/^(conclusion|concluding|future|summary|final)/, "conclusion"],
+  [/^(reference|bibliograph|appendix|acknowledg|supplement)/, "backmatter"],
+];
+
+function sectionOf(heading: string): string {
+  const h = heading.replace(/^#+\s*/, "").replace(/^[\d.\s]+/, "").toLowerCase().trim();
+  for (const [re, bucket] of SECTION_MAP) if (re.test(h)) return bucket;
+  return h.split(/[\s:;,(]/)[0] ?? "";
+}
+
+type Chunk = {
+  chunk_no: number;
+  heading: string;
+  section: string;
+  line_start: number;
+  line_end: number;
+  text: string;
+};
+
 function splitSentences(text: string): string[] {
   // split after sentence-final punctuation followed by space+capital/digit/$
   return text.split(/(?<=[.!?])\s+(?=[A-Z0-9$(\\])/);
 }
 
-function chunkPaper(md: string): { chunk_no: number; heading: string; text: string }[] {
-  const blocks = md.split(/\n{2,}/).map((b) => b.trim()).filter(Boolean);
-  const chunks: { chunk_no: number; heading: string; text: string }[] = [];
+// group raw lines into blocks of consecutive non-blank lines, keeping
+// 1-based start/end line numbers so chunks can point into the md
+function toBlocks(md: string): { text: string; start: number; end: number }[] {
+  const lines = md.split("\n");
+  const blocks: { text: string; start: number; end: number }[] = [];
+  let buf: string[] = [];
+  let start = 0;
+  for (let i = 0; i <= lines.length; i++) {
+    const blank = i === lines.length || lines[i].trim() === "";
+    if (!blank) {
+      if (!buf.length) start = i + 1; // 1-based
+      buf.push(lines[i]);
+    } else if (buf.length) {
+      blocks.push({ text: buf.join("\n").trim(), start, end: i });
+      buf = [];
+    }
+  }
+  return blocks.filter((b) => b.text);
+}
+
+function chunkPaper(md: string): Chunk[] {
+  const blocks = toBlocks(md);
+  const chunks: Chunk[] = [];
   let heading = "";
   let buf = "";
+  let bStart = 0;
+  let bEnd = 0;
   const flush = () => {
-    if (buf.trim()) chunks.push({ chunk_no: chunks.length, heading, text: buf.trim() });
+    if (buf.trim())
+      chunks.push({
+        chunk_no: chunks.length,
+        heading,
+        section: sectionOf(heading),
+        line_start: bStart,
+        line_end: bEnd,
+        text: buf.trim().replace(/@@eq\d{4}@@/g, "[formula]"),
+      });
     buf = "";
   };
   for (const block of blocks) {
-    const h = block.match(/^#{2,3}\s+(.*)$/);
+    const h = block.text.match(/^#{2,3}\s+(.*)$/);
     if (h) {
       flush();
       heading = h[1].trim();
-      buf = block; // heading line starts the next chunk
+      bStart = block.start;
+      bEnd = block.end;
+      buf = block.text; // heading line starts the next chunk
       continue;
     }
-    if (block.startsWith("|")) {
+    if (block.text.startsWith("|")) {
       // atomic GFM table: own chunk, never split, never merged
       flush();
-      buf = block;
+      bStart = block.start;
+      bEnd = block.end;
+      buf = block.text;
       flush();
       continue;
     }
-    if (block.length > MAX_CHARS) {
+    if (!buf) {
+      bStart = block.start;
+    }
+    bEnd = block.end;
+    if (block.text.length > MAX_CHARS) {
       flush();
-      for (const sent of splitSentences(block)) {
+      for (const sent of splitSentences(block.text)) {
         if (buf.length + sent.length + 1 > MAX_CHARS) flush();
+        if (!buf) bStart = block.start; // sentence-split chunk starts here
         buf = buf ? buf + " " + sent : sent;
+        bEnd = block.end;
       }
       continue;
     }
-    if (buf.length + block.length + 2 > MAX_CHARS) flush();
-    buf = buf ? buf + "\n\n" + block : block;
+    if (buf.length + block.text.length + 2 > MAX_CHARS) flush();
+    buf = buf ? buf + "\n\n" + block.text : block.text;
   }
   flush();
   return chunks;

@@ -26,7 +26,6 @@ const STATE = `${ROOT}/.cache/r2-derived-state.txt`;
 const SOURCES: { dir: string; key: (f: string) => string }[] = [
   { dir: `${ROOT}/html`, key: (f) => f },
   { dir: `${ROOT}/jem/html`, key: (f) => f },
-  { dir: `${ROOT}/xml-clean`, key: (f) => f },
   { dir: `${ROOT}/md`, key: (f) => f },
   { dir: `${ROOT}/jem/md`, key: (f) => f },
   { dir: `${ROOT}/assets`, key: (f) => `assets/${f}` },

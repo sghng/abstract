@@ -140,10 +140,7 @@ const main = async () => {
               doi,
               journal: m?.journal ?? "psychometrika",
               year: m?.year ?? null,
-              chunk_no: i,
-              section: sectionOf(c.heading),
-              heading: c.heading,
-              text: c.text,
+              section: c.section ?? sectionOf(c.heading),
             },
           }),
         );
