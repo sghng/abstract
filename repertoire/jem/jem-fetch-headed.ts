@@ -8,7 +8,8 @@
  * Usage: bun jem/jem-fetch-headed.ts [--xml] [--limit N]
  *   --xml    try /doi/full-xml/ first, fall back to /doi/full/
  *   targets: JEM 2005-2019 from .cache/jem-papers-legacy.json
- * Output: xml/{doi_id}.xml or html/{doi_id}.html (checkpointed, resumable)
+ * Output: jem/xml/{doi_id}.xml or jem/html/{doi_id}.html (checkpointed,
+ * resumable)
  */
 import { chromium } from "playwright";
 import * as fs from "node:fs";

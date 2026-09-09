@@ -2,15 +2,13 @@
 /**
  * repertoire jem-clean-html: Wiley-specific in-place slimming of article
  * HTML. Self-contained (no shared pass): strips script/style/svg/noscript
- * and HTML comments (ad/tracking JS, icon sprites), plus Wiley UI chrome:
- * <button> (Open in figure viewer / PowerPoint, citation widgets), <form>
- * (search/login widgets), <iframe> (ad/widget embeds). Also strips
- * render-chrome anchors that Wiley's CMS injects at serve time (PROVEN
- * absent from the Wiley XML source of the same articles -- zero
- * information loss): Google Scholar getFTRLinkout, OpenURL/EBSCO
- * servlet/linkout (nests an <img> button), Cloudflare cdn-cgi email
- * obfuscation. Content selectors (article__body, citation_* metas) are
- * untouched. Validate by re-running jem2md and diffing md/.
+ * and HTML comments, plus Wiley UI chrome: <button> (figure viewer,
+ * citation widgets), <form> (search/login), <iframe> (ads), and
+ * render-chrome anchors Wiley injects at serve time (Google Scholar
+ * getFTRLinkout, OpenURL/EBSCO linkout, cdn-cgi email obfuscation -- all
+ * proven absent from the article XML source, so removal loses nothing).
+ * Content selectors (article__body, citation_* metas) are untouched.
+ * Validate by re-running jem2md and diffing md/.
  *
  * Usage: bun jem/clean-html.ts [--dry]
  */

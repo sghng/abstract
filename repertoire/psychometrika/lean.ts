@@ -8,7 +8,7 @@
  * attribute weight (data-mathjax-*, aria-*, base64 placeholder src).
  *
  * Assumes clean-html has run. Validate by re-running psy2md and diffing
- * md/ (must be byte-identical). Usage: bun src/psy-lean.ts [--dry]
+ * md/ (must be byte-identical). Usage: bun psychometrika/lean.ts [--dry]
  */
 import { readdir, readFile, writeFile } from "node:fs/promises";
 import * as cheerio from "cheerio";
