@@ -330,7 +330,8 @@ function convert(doi: string, doiId: string, xml: string): { md: string; assets:
 
 const main = () => {
   mkdirSync(MD_DIR, { recursive: true });
-  const files = readdirSync(XML_DIR).filter((f) => f.endsWith(".xml"));
+  // JEM converter: only Wiley DOIs, whatever dir the xml lives in
+  const files = readdirSync(XML_DIR).filter((f) => f.startsWith("10.1111") && f.endsWith(".xml"));
   const out = openSync(ASSETS_ND, "w");
   let converted = 0;
   let failures = 0;
