@@ -25,7 +25,8 @@ create table if not exists assets (
   doi text not null,
   handle text not null,
   kind text not null,
-  url text,
+  url text,            -- publisher provenance (may be dead at the CDN)
+  attachment_key text, -- durable copy in repertoire-docs, e.g. assets/<doi_id>:eq0007.png
   caption text,
   primary key (doi, handle)
 );

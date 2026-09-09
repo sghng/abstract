@@ -384,7 +384,7 @@ const main = async () => {
           const p = await imgPath(e);
           if (!(await Bun.file(p).exists())) throw new Error("image missing");
           const tex = await ocr(p);
-          state[k] = "ok";
+          state[k] = "ok\n" + tex;
           report[k] = { tex, display: e.display, url: e.url, img: p };
         } catch (e2: any) {
           state[k] = `fail:${e2.message.slice(0, 80)}`;
@@ -428,13 +428,27 @@ const main = async () => {
         }
         // re-derive display-ness from the md (token alone on its line)
         const display = new RegExp(`^\\s*@@${h}@@\\s*$`, "m").test(out);
-        // find the tex from this run's report or re-OCR (cheap: 1 call)
-        const tex = report[k]?.tex ?? (await ocr(await reimgPath(doiId, h, eqs)));
+        // inline tex from state (durable), then this run's report, then re-OCR
+        const sv = state[k] ?? "";
+        const inline = sv.startsWith("ok\n") ? sv.slice(3) : undefined;
+        let tex = inline ?? report[k]?.tex;
+        if (tex === undefined) {
+          try {
+            tex = await ocr(await reimgPath(doiId, h, eqs));
+            state[k] = "ok\n" + tex; // persist lazy re-OCR for future runs
+          } catch {
+            continue; // re-OCR failed: keep the placeholder
+          }
+        }
         out = out.replaceAll(`@@${h}@@`, display ? `$$${tex}$$` : `$${tex}$`);
         spliced++;
       }
-      await Bun.writeFile(`${MD_DIR}/${f}`, out);
+      await writeFile(`${MD_DIR}/${f}`, out);
       papers++;
+      if (papers % 20 === 0) {
+        await writeFile(STATE, JSON.stringify(state, null, 1));
+        console.log(`spliced ${papers} papers (${spliced} eq, ${kept} kept)`);
+      }
     }
     await writeFile(REPORT, JSON.stringify(report, null, 1));
     console.log(`spliced ${spliced} equations in ${papers} papers; ${kept} kept as placeholders`);
