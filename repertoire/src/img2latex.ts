@@ -43,6 +43,7 @@ const MODEL = "deepseek-v4-flash-vision-exp";
 const TOKEN_RE = /@@(eq\d+)@@/g;
 
 const DOWNLOAD_ONLY = process.argv.includes("--download-only");
+const NO_DOWNLOAD = process.argv.includes("--no-download");
 const BUILD_MAPS = process.argv.includes("--build-srcmaps");
 const dlMisses: Record<string, string> = {};
 const SRCMAP_DIR = `${ROOT}/.cache/eqsrcmap`;
@@ -189,6 +190,9 @@ async function imgPath(e: Eq): Promise<string> {
 
 async function downloadAll(ctx: any, eqs: Eq[]) {
   await mkdir(IMG_DIR, { recursive: true });
+  // persistent miss list: dead-era urls never come back
+  const missPath = `${ROOT}/.cache/eqimg-misses.json`;
+  Object.assign(dlMisses, JSON.parse((await readFile(missPath).catch(() => "{}")) as any));
   // PNG era first (bulk, live), dead/hanging GIF era last
   const png = eqs.filter((e) => e.url.endsWith(".png"));
   const gif = eqs.filter((e) => !e.url.endsWith(".png"));
@@ -204,6 +208,7 @@ async function downloadAll(ctx: any, eqs: Eq[]) {
     // clearance went stale: end the worker instead of retrying 20K times.
     const page = await ctx.newPage();
     let consecutiveFails = 0;
+    let backoffs = 0;
     while (queue.length) {
       const e = queue.shift()!;
       const ext = e.url.match(/\.(\w+)(\?|$)/)?.[1] ?? "img";
@@ -245,8 +250,9 @@ async function downloadAll(ctx: any, eqs: Eq[]) {
       } catch (e2: any) {
         const msg = String(e2.message).split("\n")[0];
         console.log(`DL FAIL ${key(e.doiId, e.handle)}: ${msg}`);
-        if (/http 40[4]|http 41[05]|Timeout/.test(msg)) {
-          // permanently gone (or hanging challenge): record and move on
+        if (/http 40[4]|http 41[05]|Timeout|no body/.test(msg)) {
+          // permanently gone / hanging / empty (dead-era assets): record
+          // and move on
           dlMisses[key(e.doiId, e.handle)] = msg;
           continue;
         }
@@ -255,8 +261,14 @@ async function downloadAll(ctx: any, eqs: Eq[]) {
           return; // clearance stale: stop this worker
         }
         if (++consecutiveFails >= 8) {
-          await page.close().catch(() => {});
-          return;
+          if (++backoffs >= 8) {
+            await page.close().catch(() => {});
+            return; // rate-limit wall not clearing: stop this worker
+          }
+          const wait = 60_000 * Math.min(backoffs, 4);
+          console.log(`backing off ${wait / 1000}s (burst of empty bodies)`);
+          await new Promise((r) => setTimeout(r, wait));
+          consecutiveFails = 0;
         }
       }
       if (n % 100 === 1) consecutiveFails = 0;
@@ -264,12 +276,21 @@ async function downloadAll(ctx: any, eqs: Eq[]) {
     }
     await page.close().catch(() => {});
   };  await Promise.all(Array.from({ length: 6 }, worker));
+  await writeFile(missPath, JSON.stringify(dlMisses, null, 1));
 }
 
 // ---- OCR --------------------------------------------------------------
 
 async function ocr(path: string): Promise<string> {
-  const b64 = Buffer.from(await readFile(path)).toString("base64");
+  const buf = Buffer.from(await readFile(path));
+  // PNG IHDR: bytes 16-20 big-endian height. Tiny renders (<20px) are
+  // single-glyph fragments where OCR is unreliable: keep the placeholder
+  // (fail-open) instead of splicing a guessed symbol.
+  if (buf.length > 24 && buf[12] === 0x49 && buf[13] === 0x48 && buf[14] === 0x44 && buf[15] === 0x52) {
+    const h = buf.readUInt32BE(16);
+    if (h < 20) throw new Error("tiny-glyph");
+  }
+  const b64 = buf.toString("base64");
   const res = await fetch("https://api.deepseek.com/chat/completions", {
     method: "POST",
     headers: {
@@ -331,7 +352,7 @@ const main = async () => {
       await ctx.close();
       return;
     }
-    await downloadAll(ctx, eqs);
+    if (!SAMPLE && !NO_DOWNLOAD) await downloadAll(ctx, eqs);
     if (DOWNLOAD_ONLY) {
       await ctx.close();
       return;
@@ -339,8 +360,13 @@ const main = async () => {
 
     let targets = eqs.filter((e) => !state[key(e.doiId, e.handle)]);
     if (SAMPLE) {
-      // random sample across eras for the eyeball gate
-      targets = [...eqs]
+      // random sample across eras for the eyeball gate; only equations
+      // whose image actually downloaded
+      const withImg: Eq[] = [];
+      for (const e of eqs) {
+        if (await Bun.file(await imgPath(e)).exists()) withImg.push(e);
+      }
+      targets = withImg
         .sort(() => Math.random() - 0.5)
         .filter((e) => state[key(e.doiId, e.handle)] === undefined)
         .slice(0, SAMPLE);
