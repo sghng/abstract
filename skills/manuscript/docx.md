@@ -11,9 +11,9 @@ module explains how to handle it.
   multiple files via heading tag.
 - You may want to use the `--track-changes` flag to include the revision notes.
   This is especially helpful when the document is a revised manuscript sent from
-  advisor or colleague. `--track-changes all` helps you see all the revisions
-  someone made; `--track-changes accept` is helpful for creating a clean
-  starting point to work on since we default to accept advisor's all revisions.
+  advisor or colleague. `--track-changes all` shows every revision someone
+  made; `--track-changes accept` yields the clean accepted version we work on
+  (accept-by-default lives in the **nlpatch** skill).
 
 ## Write
 

@@ -32,10 +32,17 @@ intent. Then:
    rejections carry the burden of proof.
 3. Bump the source and derive the response patch (below).
 
+Accept-by-default has an operational meaning: build
+`draft/<artifact>-v(N+1)` on the accepted baseline of the `_edit.docx`
+(ingress can emit it), never on vN. A rejected edit keeps the original
+wording in the source and resurfaces as a reverse hunk in the response
+patch: that hunk is how the editor sees the rejection.
+
 ## Egress: Responding to External Edits
 
 Never author in patch format: the source is the medium, the patch is a
-derived view. After the source reaches `draft/<artifact>-v(N+1)`:
+derived view. The source reaches `draft/<artifact>-v(N+1)` on the accepted
+baseline (see ingress); then:
 
 1. Crude patch: word-diff the accepted baseline against the new version's
    rendered text. The baseline regenerates mechanically: `pandoc
