@@ -62,6 +62,34 @@ Choose what shows the finding strongest without dishonesty.
 - Visual pacing: never more than two to three paragraphs of unbroken prose
   without a visual or a reference to one.
 
+## Reader Expectations
+
+Readers read meaning out of structure, not words alone. Each position in a
+sentence carries an expectation, and information lands best where the reader
+looks for it.
+
+- **Topic position**: open with old information, material the reader already
+  holds; it links backward and frames what follows. The sentence is a story
+  about whatever appears first, so choose that subject deliberately. "Pollen is
+  dispersed by bees" continues pollen's story; the passive is the tool, not the
+  failure.
+- **Subject with verb**: a grammatical subject is followed immediately by its
+  verb. Length in between reads as interruption whatever its true weight; give
+  that material its own clause or cut it.
+- **Stress position**: readers emphasize what arrives at the end, at syntactic
+  closure. Reserve it for the new information that deserves emphasis. A
+  sentence with more candidates for emphasis than closures is too long; split
+  it.
+- **Action in the verb**: the verb articulates the action; a nominalization
+  beside a weak is or has hides it. "Egg extract limits transcription", not
+  "transcription is TFIIIA-dependent".
+- **Articulate the links**: a connection obvious to the writer is a gap to the
+  reader. When restructuring cannot make the next sentence follow from the
+  last, the argument itself has a hole; raise it, do not paper over it.
+
+Violate an expectation only deliberately: a deviation registers as emphasis
+against a background of met expectations.
+
 ## Proposal
 
 A work-in-progress proposal is a compressed paper, roughly 1,000 words.
