@@ -26,10 +26,10 @@ When creating the NLPatch, you shouldn't include any HTML tags, only the plain
 text -- the NLPatch only serves as a tool to assist a human manually applying
 the changes to a Word document.
 
-Note that, eventually we accept all changes from the advisor by default. But
-preserving all tracked changes is helpful for you to understand what changes did
-the advisor make and you can revise accordingly. The final NLPatch you create
-will be based on the draft with all changes from advisor accepted.
+We accept the advisor's edits by default and work on top of the accepted
+version; the dispositions flow and the derived response patch live in the
+**nlpatch** skill. Preserving all tracked changes through ingress is what
+lets you see what the advisor changed and revise accordingly.
 
 ## Harnesses
 
