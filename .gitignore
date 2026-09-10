@@ -12,3 +12,16 @@ auth.json
 models.json
 mcp.secrets.json
 .pi/
+.env
+
+# repertoire corpus artifacts (durable copies live in D1/R2, not git)
+repertoire/html/
+repertoire/xml/
+repertoire/jem/html/
+repertoire/jem/xml/
+repertoire/jem/md/
+repertoire/md/
+repertoire/pdf/
+repertoire/assets/
+repertoire/.cache/
+repertoire/inserts.sql
