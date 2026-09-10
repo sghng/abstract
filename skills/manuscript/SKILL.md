@@ -17,13 +17,13 @@ reviewing.
 The following skill modules are included:
 
 - `review.md`: workflow of reviewing a manuscript.
-- `docx.md`: introduces tooling related to handling Microsoft Word format.
-- `nlpatch.md`: introduces the NLPatch (Natural Language Patch) format which is
-  a deliverable during paper review.
+- `docx.md`: tooling for reading Microsoft Word format.
+- `journal-review.md`: writing the response letter to journal reviewers.
 
-The authoring workflow itself graduated to the writer's prompt
-(`movement/authoring.md` and `movement/prose.md`); this skill now holds review
-and format tooling.
+Word-mediated revision (tracked-changes DOCX in, NLPatch out) lives in the
+**nlpatch** skill. The authoring workflow graduated to the writer's prompt
+(the writing-craft and prose-standard movements); this skill holds review
+tooling.
 
 ## Conventions
 

@@ -42,7 +42,9 @@ project-root/
 ## Never Forget
 
 - **Read `notes/story.md` first.** Only the orchestrator edits it.
-- **Naming**: kebab-case everywhere. `notes/tickets/ticket-NNN-name.md`,
+- **Naming**: kebab-case everywhere, for files the lab authors. An underscore
+  marks foreign provenance (e.g. `*_edit.docx` from a collaborator); never
+  rename such a file to kebab-case. `notes/tickets/ticket-NNN-name.md`,
   `notes/reports/report-NNN-name.md`, `experiments/NN-name/`.
 - **No dates or timelines** in tickets, reports, or note filenames. Use
   sequence, priority, and dependencies instead.

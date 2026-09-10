@@ -18,8 +18,9 @@ with `.docx` files.
 ## What the Output Looks Like
 
 Your output shall be a **list of revisions/comments** needed to arrive at a
-newer versions. This will be stored in a file such as `revision-v1.patch`. Read
-`nlpatch.md` to know more about it.
+newer version: an NLPatch at `draft/<artifact>-vN-<name>_edit.patch`. The
+format, and the subagent that ingresses DOCX files and refines patches, live
+in the **nlpatch** skill.
 
 When creating the NLPatch, you shouldn't include any HTML tags, only the plain
 text -- the NLPatch only serves as a tool to assist a human manually applying
@@ -41,11 +42,10 @@ will be based on the draft with all changes from advisor accepted.
 
 - You may want to read the repository (especially previous versions of drafts
   and experiment notes and regular notes) to understand what is this project
-  about. Alternatively, consult a engineer subagent for this.
-- You would need to create a `story.md`, if it doesn't exist already, to
-  describe the coherent storyline of the paper. As always, the story is the
-  center and is crucial for the paper. Read `authoring.md` to understand more
-  about `story.md`.
+  about. Alternatively, consult an engineer subagent for this.
+- The storyline lives in `notes/story.md` (orchestrator-owned); the story is
+  the center and crucial for the paper. Ask the orchestrator if it is
+  missing. The doctrine lives in the story-doctrine movement.
 
 ## Self-Review
 
