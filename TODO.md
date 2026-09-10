@@ -118,12 +118,30 @@ Until the harness exists, the `bin/` launchers + file-mediated consult relay
   role (preserve role-relevant context verbatim).
 - **Session-file locking** if headless consults ever touch a session that is
   open interactively.
-- **nlpatch agent**: currently a prompt; becomes an SDK sub-session or tool.
 - **Parallel workstreams**: multiple in-flight tickets with per-artifact
   ownership; revisit after the single-workstream protocol is solid.
 
 ## Canonical Decisions Log
 
+- **NLPatch bundled as a subagent; source-first patch derivation (2026-09-10)**:
+  `movement/nlpatch.md` was a dead movement (in no score) while the skill and
+  orchestrator prompt referenced an `nlpatch` subagent name that resolved to
+  nothing. Migrated to `subagents/nlpatch.md` with the spec inlined: children
+  are born blind, so the prompt must carry everything, and bundled prompts are
+  paid once instead of per spawn. Division of labor: the writer owns Word
+  logistics. Ingress (DOCX to patch, faithful, no interpretation) and egress
+  (refine a machine word-diff; never hand-authored hunks) both delegate to the
+  subagent; the orchestrator only routes (feedback arrives as
+  `draft/<artifact>-vN-<name>_edit.docx`, writer parses and proposes
+  dispositions, orchestrator arbitrates against the story, never opening the
+  DOCX). Egress diffs against the accepted baseline (`--track-changes=accept`),
+  not v0, and against rendered text, not raw Typst. Hand-authored patches
+  survive only for foreign manuscripts (journal review), where the lab owns no
+  source. The spec moved from the manuscript skill to a dedicated `nlpatch`
+  skill: grants and proposals round-trip through Word too. Subagents write
+  artifacts to task-given paths and report summaries only; the 32k report cap
+  would truncate a full-manuscript patch. `_edit` breaks kebab-case
+  deliberately: an underscore in `draft/` marks foreign provenance.
 - **Subagents; reviewer becomes the editor (2026-09-05, issue #27)**: disposable
   in-process child sessions (`extensions/subagents/`, telemetry in
   `.pi/subagents.jsonl`), voluntary by agent judgment and mandatory for known

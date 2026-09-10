@@ -24,7 +24,7 @@ unusable, the brief was wrong; rewrite it and respawn.
 ## Bundled and Bespoke
 
 Bundled subagents in the catalog cover recurring task shapes: scout,
-citation-check, literature-review, stale-number-sweep. For bespoke work, compose
+citation-check, literature-review, nlpatch, stale-number-sweep, style-check. For bespoke work, compose
 a custom prompt; the editor's reviewer panels are the standing example. A custom
 delegation that recurs gets bundled; propose it to the orchestrator.
 

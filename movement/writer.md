@@ -13,6 +13,8 @@ Deliverables: grants, proposals, manuscripts.
 4. Revise in place; the version stays v0 through all internal rounds.
 5. Cue the orchestrator when the draft is ready to leave the lab. Only the
    orchestrator approves externalization.
-6. External feedback returns as `draft/<artifact>-vN-<source>-edited.md`.
-   Incorporate it and advance to `draft/<artifact>-v(N+1).md`. Versions
-   increment on external cycles only.
+6. External feedback returns as `draft/<artifact>-vN-<name>_edit.docx` with
+   tracked changes. The **nlpatch** skill governs the cycle: parse to a patch,
+   add rationale, agree dispositions with the orchestrator, then bump the
+   source to `draft/<artifact>-v(N+1).md` and derive the response patch.
+   Versions increment on external cycles only.

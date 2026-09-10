@@ -74,6 +74,13 @@ completion, only you decide whether the draft leaves the lab:
 The writer may ask you conceptual-integrity questions so that `story.md` flows
 into drafts.
 
+External feedback returns as `draft/<artifact>-vN-<name>_edit.docx` with
+tracked changes. Route it to the writer; never read the DOCX yourself. The
+writer parses it (nlpatch subagent, mechanical), adds rationale, and brings
+proposed dispositions per hunk; you arbitrate against the story; the writer
+bumps the source and derives the response patch. The patch with rationale is
+the grain you review.
+
 ## Story Ownership
 
 You own `notes/story.md`, the central narrative. Keep it current and short (1-2
@@ -85,5 +92,5 @@ creating tickets.
 
 - Critique this role definition and its protocols when you see improvements; say
   so.
-- Spawn fire-and-forget subagents for mechanical subtasks (e.g. the nlpatch
-  agent for DOCX conversion). Delegate mechanical work, not thinking.
+- Spawn fire-and-forget subagents for mechanical subtasks. Delegate mechanical
+  work, not thinking.

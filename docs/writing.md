@@ -47,10 +47,15 @@ Orchestrator approves or requests amendment
 Artifact sent out as v0
               |
               v
-External feedback returns as draft/<artifact>-v0-<source>-edited.md
+External feedback returns as draft/<artifact>-v0-<name>_edit.docx
               |
               v
-Writer incorporates feedback, advances to v1
+Writer parses it to a patch (nlpatch subagent), adds rationale,
+agrees dispositions with the orchestrator
+              |
+              v
+Writer bumps the source to v1; response patch derived
+(word-diff, nlpatch subagent refines)
 ```
 
 ## Tickets
@@ -81,17 +86,20 @@ file in place; external feedback is what drives version increments.
 
 | File                                  | Meaning                                                  |
 | ------------------------------------- | -------------------------------------------------------- |
-| `draft/artifact-v0.md`                | current working draft; all internal editing happens here |
-| `draft/artifact-v0-advisor-edited.md` | external feedback on v0 from advisor                     |
-| `draft/artifact-v0-pi-edited.md`      | external feedback on v0 from PI                          |
-| `draft/artifact-v1.md`                | next working draft after v0 feedback is incorporated     |
+| `draft/artifact-v0.md`                 | current working draft; all internal editing happens here |
+| `draft/artifact-v0-advisor_edit.docx`  | external feedback on v0 from advisor (tracked changes)   |
+| `draft/artifact-v0-advisor_edit.patch` | the parsed NLPatch of that feedback                      |
+| `draft/artifact-v1.md`                 | next working draft after v0 feedback is incorporated     |
 
 Rules:
 
 - `v0` is the first working draft.
 - Internal editor rounds do not change the version number.
 - When the artifact is sent externally, no rename or snapshot is made.
-- External feedback returns as `draft/artifact-vN-<source>-edited.md`.
+- External feedback returns as `draft/artifact-vN-<name>_edit.docx`; the
+  underscore marks foreign provenance. Its parsed form is
+  `draft/artifact-vN-<name>_edit.patch`. The **nlpatch** skill governs the
+  round trip.
 - After incorporating external feedback, advance to `draft/artifact-v(N+1).md`.
 - Internal review memos live in `notes/memos/`, not in `draft/`.
 - `notes/reviews/` is reserved for future external-review tracking; it is not
@@ -152,8 +160,11 @@ is `draft/proposal-v1.md`, then `v1` is what leaves the lab.
 7. Writer cues orchestrator: proposal ready for externalization.
 8. Orchestrator approves; the user sends `draft/nsf-iis-proposal-v0.md` to the
    NSF.
-9. External feedback returns as `draft/nsf-iis-proposal-v0-po-comments.md`.
-10. Writer incorporates comments and advances to `draft/nsf-iis-proposal-v1.md`.
+9. External feedback returns as `draft/nsf-iis-proposal-v0-po_edit.docx`;
+   the writer parses it to `draft/nsf-iis-proposal-v0-po_edit.patch` and
+   agrees dispositions with the orchestrator.
+10. Writer incorporates the agreed comments and advances to
+    `draft/nsf-iis-proposal-v1.md`.
 
 ## Relationship to Other Roles
 
