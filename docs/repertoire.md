@@ -74,38 +74,47 @@ rsplit(':', 1).
 
 - **D1 `repertoire`** (metadata + pointers, no blobs):
   `papers(doi PK, doi_id, title, authors, year, journal, issue_url,
-  article_url, pdf_url, state, local_path, sha256, keywords, error,
-  updated_at)` -- `state` drives resumability per stage (listed -> fetched
-  -> ...). `assets(doi, handle, kind, url, caption)` keyed (doi, handle);
-  `url` is the publisher URL for images, or the attachment key
-  (`<doi_id>:tab03.html`) for reconstructed complex tables. Image binaries
-  are deliberately not downloaded yet (not needed for embeddings);
-  `url` makes a later batch download mechanical.
-- **R2** bucket `repertoire-docs` (bytes), one bucket:
+  article_url, pdf_url, state, local_path, sha256, error, updated_at)` --
+  `state` drives resumability per stage. `assets(doi, handle, kind, url,
+  attachment_key, caption)` keyed (doi, handle): `url` is publisher
+  provenance (may be dead at the CDN), `attachment_key` points at our
+  durable copy in the bucket. `chunks(doi, chunk_no, heading, section,
+  line_start, line_end)` keyed (doi, chunk_no): passage POINTERS into the
+  R2 md (1-based inclusive line span); no passage text in D1.
+- **R2** bucket `repertoire-docs` (bytes), one bucket. The prefix encodes
+  NATURE, not pipeline stage:
   ```
-  raw/<doi_id>.{html,xml,pdf}   pristine originals, never rewritten
-  <doi_id>.html                 lean formatted HTML   (pipeline output)
-  <doi_id>.xml                  cleaned XML           (pipeline output)
-  <doi_id>.md                   corpus markdown       (pipeline output)
-  <doi_id>:<handle>.html        complex-table attachments
+  raw/<doi_id>.pdf                pristine; PDF is always raw (psy table source)
+  raw/<doi_id>.xml                pristine as received (never reformatted)
+  raw/<doi_id>.html               pristine html (psy re-fetch; jem where raw survived)
+  <doi_id>.html                   lean formatted html   (pipeline output)
+  <doi_id>.md                     corpus markdown       (pipeline output)
+  assets/<doi_id>:<handle>.html   complex-table attachments
+  assets/<doi_id>:<handle>.png    equation images, figures
+  reports/                        resume artifacts (miss lists, OCR state,
+                                  merge report)
   ```
-  Derived artifacts are uploaded only by the pipeline's final stage, so
-  the archive is by construction the last successful run's output.
-  `src/sync-r2.ts`, checkpointed. The old per-extension buckets
-  (repertoire-html/md/xml) are deleted after the migration verifies.
+  md objects are IMMUTABLE once uploaded (any change re-chunks, re-ranges,
+  re-embeds; drift is structurally impossible). Derived artifacts are
+  uploaded only by the pipeline's final stage (`src/upload-raw.ts`,
+  `src/upload-derived.ts`, `src/upload-eq-assets.ts`, all checkpointed),
+  so the bucket is by construction the last successful run's output.
+  The old per-extension buckets were deleted after verify-buckets.sh
+  passed (coverage, spot-gets, census).
 - **Vectorize** index `repertoire`: 1024 dims (1536 is the cap), cosine,
-  voyage-context-4, self-chunked passages. Metadata: doi, journal, year,
-  chunk_no, section (canonical bucket), heading, and the passage text
-  itself, so query results carry the passage. Recreated fresh at each
-  full rebuild (metadata indexes are set at creation); annual batches
-  append vectors.
+  voyage-context-4, self-chunked passages. Vector id `<doi_id>#cNNN`
+  encodes doi + chunk; metadata is FILTER FACETS ONLY (doi, journal,
+  year, section -- indexed at creation; filtering happens during ANN
+  traversal). Passage text never rides in metadata (10,240-byte cap;
+  text belongs to D1 pointers + the R2 md). Recreated fresh at each full
+  rebuild; annual increments append vectors for new papers only.
 
 ## Pipeline
 
 Entry: `src/pipeline.ts --journal jem|psychometrika`. Stages, in order:
 raw -> clean-html -> lean -> format -> convert -> merge-tables (psy) ->
-img2latex -> md-format -> chunk -> embed -> insert-vectors -> upload ->
-smoke query. Built for rare runs (annual batches): every stage
+img2latex -> md-format -> chunk (+ load-chunks) -> embed ->
+insert-vectors -> upload -> smoke query. Built for rare runs (annual batches): every stage
 checkpointed and resumable; annual increments list only new DOIs and
 append vectors. Validation gates run INSIDE the pipeline and stop it
 loudly on failure; per-stage sampling reports are emitted (sample and
@@ -165,35 +174,50 @@ fetch).
 - **src/img2latex.ts** -- resolves equation-image placeholders (JEM 2020-21
   PNGs, 2005-era GIFs converted to PNG) to TeX. Images download through
   the cf_clearance-riding session (asset URLs are Cloudflare-walled too);
-  OCR via the DeepSeek API (v4-flash-vision-exp). Acceptance gate before
-  the bulk run: sample 30 equations across eras, require near-verbatim TeX
-  on 90%+. Splices placeholders in md only; the full-corpus diff must show
-  only placeholder lines changed. Failures stay placeholders + report.
+  OCR via the DeepSeek API (v4-flash-vision-exp). Sub-20px images are
+  single-glyph fragments where OCR is unreliable: they stay placeholders
+  (fail-open) for the local-model pass in the roadmap. Downloaded images
+  and the (doi, handle) mapping are preserved in R2/D1, so OCR is
+  resumable offline. Failures stay placeholders + report.
 - **md-format stage** -- prettier on the md corpus, formatting only. No
   downstream fix lists: recurring artifact patterns found by sampling are
   fixed in the upstream converter that produces them, never patched
   one-by-one in md.
 - **src/chunk.ts** -- paragraph-aware chunks, ~1900 char cap, merge short
   blocks, split oversized on sentences, never across a `##` heading;
-  heading recorded per chunk. GFM tables are atomic blocks: never
-  sentence-split, never merged with prose. Table content IS embedded
-  (embed everything; revisit only if query quality suffers). Self-chunked
-  (not Voyage auto-chunking) because the API does not echo chunk
-  boundaries and queries must return the passage text. This policy is the
-  audit record for chunking decisions.
+  heading + section recorded per chunk. GFM tables are atomic blocks:
+  never sentence-split, never merged with prose. Table content IS
+  embedded. Each chunk records its 1-based inclusive line span in the md
+  (D1 serves pointers; passages are read from the document). Embedding
+  text transforms `@@eqNNNN@@` -> `[formula]` (noise to the embedder;
+  the md keeps real tokens for the future OCR pass). Self-chunked (not
+  Voyage auto-chunking): the API does not echo chunk boundaries and the
+  query client needs deterministic ids. This policy is the audit record.
+- **src/load-chunks.ts** [--doi id] -- chunk pointers into D1 `chunks`.
+  Full rebuild by default; per-doi delete+insert is idempotent for
+  increments (re-chunking shifts line ranges).
 - **src/embed.ts** -- voyage-context-4 contextualizedembeddings, one call
   per paper (manual chunking still yields document-contextualized vectors),
-  8-worker pool, per-paper NDJSON checkpoints, resumable.
-- **src/insert-vectors.ts** -- concatenate checkpoints into 1000-vector
-  batches -> `wrangler vectorize insert`.
-- **src/query.ts** -- the retrieval client: Voyage embeds the query ->
-  Vectorize via the Cloudflare TS SDK. Flags: --top-k, --distinct, metadata
-  filters --year/--doi/--journal, --section (hard filter on canonical
-  bucket), --prefer (soft boost). Query in the register you want back:
-  draft prose retrieves published prose; QA-style queries retrieve prose
-  ABOUT the question (worse).
-- **src/sync-r2.ts** -- final stage: uploads derived artifacts (lean html,
-  cleaned xml, md, attachments) to repertoire-docs and verifies counts.
+  8-worker pool, per-paper NDJSON checkpoints, resumable. Metadata =
+  filter facets only (doi, journal, year, section).
+- **src/insert-vectors.ts** [--fresh-index] -- concatenate checkpoints
+  into 1000-vector batches -> `wrangler vectorize insert`; --fresh-index
+  recreates the index (delete, create, metadata indexes) first.
+- **src/query.ts** -- the reference retrieval client. Contract: (1) Voyage
+  embeds the query; (2) Vectorize query with filter facets
+  (--year/--doi/--journal/--section -- filtering happens during traversal)
+  and --max-per-paper N (0 = unlimited, 1 = distinct papers; enforced by
+  over-fetching candidates); (3) one D1 call chunks JOIN papers; (4)
+  passages read from the R2 md by line span, deduped by doi, cached
+  forever locally (md objects are immutable); (5) bundle
+  {score, doi, title, journal, year, section, heading, chunk_no,
+  line_start, line_end, passage}. --prefer gives a section a soft score
+  boost. Query in the register you want back: draft prose retrieves
+  published prose; QA-style queries retrieve prose ABOUT the question.
+- **src/upload-raw.ts / upload-derived.ts / upload-eq-assets.ts** --
+  final stage uploads, all checkpointed and resumable; eq-assets also
+  snapshots resume artifacts to reports/. verify-buckets.sh gates any
+  destructive bucket step.
 
 Env (root .env): VOYAGE_API_KEY, DEEPSEEK_API_KEY, CF_API_TOKEN (+
 optional CF_ACCOUNT_ID), SPRINGER_API_KEY for xml.ts.
@@ -208,11 +232,11 @@ only on a full-corpus pass. The bucket's raw/ prefix preserves the
 originals, so in-place slimming of working copies is safe.
 
 Prettier: `--parser html` is whitespace-safe on both schemas (run for
-eyeballing; caption-boundary spaces improve). XML is formatted with
-xmllint instead (prettier strict mode is a no-op on Wiley XML, whitespace
-mode injects spaces around inline elements); a persistent cleaned-XML
-copy must pass the same MD-diff gate, and throwaway eyeball copies stay
-throwaway.
+eyeballing; caption-boundary spaces improve). XML ships PRISTINE: no
+cleaned copy, no formatter. (xmllint --format is unsafe on Wiley XML --
+it drops significant inter-element spaces; a structure-aware replacement
+was built and then deleted by decision: if formatting fails, keep the
+bytes as received.)
 
 ## Publisher facts (do not relearn)
 
@@ -245,6 +269,14 @@ throwaway.
 ## Gotchas (durable)
 
 - Vectorize caps dimensions at 1536: use Voyage output_dimension 1024.
+- Vectorize metadata is capped at 10,240 bytes per vector; metadata is
+  filter facets only (doi/journal/year/section), never payload.
+- Vectorize metadata filtering happens during ANN traversal (indexed
+  properties only); post-fetch client-side filtering loses true matches
+  below the cut -- filter facets belong IN the index.
+- `wrangler r2 bucket delete` refuses non-empty buckets; bulk cleanup
+  works via the REST API (GET .../objects?per_page=1000, cursor in
+  result_info.cursor; DELETE per object; back off on 429).
 - contextualizedembeddings: manual chunks = one chunk-list per document
   input (auto-chunking needs a FLAT list + enable_auto_chunking); 32K
   tokens TOTAL per call in manual mode (the 120K window is auto-chunk
@@ -281,11 +313,18 @@ noExtensions). Armed prototype: subagents/style-check.md.
 
 ## Roadmap
 
-1. Batch figure/table image download from assets.url (lazy by design;
-   keys land as `<doi_id>:figNN.<ext>`).
-2. query.ts --hyde (caller hallucinates an exemplar passage, embeds that)
+1. Tiny-glyph OCR pass (local model, pix2tex-class): ~11K sub-20px
+   single-glyph placeholders; images + (doi, handle) mapping are durable
+   in R2/D1, so this runs offline whenever.
+2. Retry passes: 3,539 equations that passed OCR once but regressed on
+   the lossy re-splice (state ok, images in R2); 1,829 equation downloads
+   that were interrupted, not dead.
+3. Batch figure image download from assets.url (eq images and pilot
+   figures are done; keys land as `<doi_id>:figNN.<ext>`).
+4. query.ts --hyde (caller hallucinates an exemplar passage, embeds that)
    for description-style queries; promote to a Worker endpoint only when
    the writer agent needs remote access.
-3. Optional agentic cosmetic pass: prose lint, KaTeX render-check.
-4. Identify the 2009-era Wiley math markup before extending conversion
+5. Identify the 2009-era Wiley math markup before extending conversion
    further back.
+6. 2026 increment: new DOIs only; chunk/embed/insert append; per-doi
+   load-chunks.

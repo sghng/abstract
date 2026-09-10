@@ -17,7 +17,9 @@ for pair in "md:@md" "jem/md:@jem" "html:@html" "jem/html:@jem" "assets:@assets"
   dir="${pair%%:*}"; rest="${pair#*:}"
   for f in "$dir"/*.html "$dir"/*.md; do
     [ -e "$f" ] || continue
-    grep -qxF "$(basename "$f")" .cache/r2-derived-state.txt || { echo "MISSING from checkpoint: $f"; miss=$((miss+1)); }
+    key="$(basename "$f")"
+    [[ "$dir" == "assets" ]] && key="assets/$(basename "$f")"
+    grep -qxF "$key" .cache/r2-derived-state.txt || { echo "MISSING from checkpoint: $f"; miss=$((miss+1)); }
   done
 done
 echo "uncovered files: $miss"
