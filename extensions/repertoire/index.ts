@@ -3,17 +3,22 @@
  *
  * One noun, three verbs:
  *   search  text -> exemplar passages (published psychometric prose) with
- *           optional metadata filters (year, doi, section) and a soft
- *           section preference
+ *           optional metadata filters (journal, year, doi, section), a
+ *           per-paper cap, and a soft section preference
  *   context chunk ref -> the surrounding chunks (read the neighborhood of a
  *           hit without a new vector query)
- *   outline doi -> the paper's section skeleton with chunk ranges, so the
- *           agent can follow a hit into the paper's rhetorical arc
+ *   outline doi -> the paper's section skeleton with chunk refs and md
+ *           line ranges, so the agent can follow a hit into the paper's
+ *           rhetorical arc
  *
- * Corpus: Psychometrika 2020-2025, 395 papers, 17,758 paragraph-aware
- * chunks, voyage-context-4 vectors in Cloudflare Vectorize. Chunk text and
- * headings ride in vector metadata; context/outline read the local chunk
- * cache (repertoire/.cache/chunks), the same files that were embedded.
+ * Corpus: Psychometrika 2012-2025 (833 papers) + JEM 2005-2025 (583
+ * papers), 59,747 paragraph-aware chunks in Cloudflare Vectorize.
+ *
+ * SERVING CONTRACT (see docs/repertoire.md): vector metadata carries
+ * filter facets only; passages are POINTERS -- D1 `chunks` rows give the
+ * md line span, the md itself is fetched from R2 (immutable, so the
+ * local cache keyed by doi never expires). No build-tree dependency:
+ * this tool answers from the cloud store alone.
  *
  * Registered for the writer and editor peers (HARNESS_ROLE). The tool object
  * is exported so extensions/subagents can pin it on subagent prototypes
@@ -24,12 +29,16 @@
 
 import * as fs from "node:fs";
 import * as path from "node:path";
+import { execFile } from "node:child_process";
 import { Type } from "typebox";
 import { defineTool, type ExtensionAPI } from "@earendil-works/pi-coding-agent";
 
 const REPO = path.resolve(import.meta.dir, "..", "..");
-const CHUNKS_DIR = path.join(REPO, "repertoire", ".cache", "chunks");
+const REPERTOIRE = path.join(REPO, "repertoire");
+const MD_CACHE = path.join(REPERTOIRE, ".cache", "mdcache");
 const ACCOUNT_ID = "931e2de500772326b331964159d3bd2d";
+const D1_DATABASE = "36c30d13-6ddd-4f7a-9b9b-d3d971e6f800";
+const BUCKET = "repertoire-docs";
 const INDEX = "repertoire";
 const MODEL = "voyage-context-4";
 const DIMS = 1024;
@@ -65,9 +74,9 @@ async function embedQuery(text: string): Promise<number[]> {
 }
 
 type Hit = {
-  id: string;
+  id: string; // <doi_id>#cNNN
   score: number;
-  metadata: { doi: string; year: number; section: string; heading: string; text: string };
+  metadata: { doi: string; journal: string; year: number | null; section: string };
 };
 
 async function vectorizeQuery(
@@ -83,7 +92,7 @@ async function vectorizeQuery(
         Authorization: `Bearer ${envKey("CF_API_TOKEN")}`,
         "Content-Type": "application/json",
       },
-      body: JSON.stringify({ vector, topK, returnMetadata: "all", ...(filter ? { filter } : {}) }),
+      body: JSON.stringify({ vector, topK, returnMetadata: "indexed", ...(filter ? { filter } : {}) }),
     },
   );
   if (!res.ok) throw new Error(`vectorize ${res.status}: ${(await res.text()).slice(0, 200)}`);
@@ -92,25 +101,64 @@ async function vectorizeQuery(
   return json.result.matches;
 }
 
-type Chunk = { chunk_no: number; heading: string; text: string };
+type ChunkRow = {
+  doi: string;
+  chunk_no: number;
+  heading: string | null;
+  section: string | null;
+  line_start: number;
+  line_end: number;
+  title?: string | null;
+  journal?: string | null;
+  year?: number | null;
+};
 
-/** doi in either form ("10.1017/psy.2024.18" or "10.1017:psy.2024.18") -> chunks file */
-function loadChunks(doi: string): Chunk[] {
-  const doiId = doi.replace("/", ":");
-  const file = path.join(CHUNKS_DIR, `${doiId}.json`);
-  if (!fs.existsSync(file)) throw new Error(`no local chunks for ${doi} (regenerate: bun repertoire/src/chunk.ts)`);
-  return JSON.parse(fs.readFileSync(file, "utf8"));
+/** one D1 round trip; params bind positionally */
+async function d1(sql: string, params: (string | number)[]): Promise<ChunkRow[]> {
+  const res = await fetch(
+    `https://api.cloudflare.com/client/v4/accounts/${ACCOUNT_ID}/d1/database/${D1_DATABASE}/query`,
+    {
+      method: "POST",
+      headers: {
+        Authorization: `Bearer ${envKey("CF_API_TOKEN")}`,
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ sql, params }),
+    },
+  );
+  if (!res.ok) throw new Error(`d1 ${res.status}: ${(await res.text()).slice(0, 200)}`);
+  const json = await res.json();
+  if (!json.success) throw new Error(`d1: ${JSON.stringify(json.errors).slice(0, 200)}`);
+  return json.result[0].results;
 }
 
-const fmtHit = (h: Hit, i: number) =>
-  `[${i + 1}] ${h.score.toFixed(4)} ${h.id} (${h.metadata.section}) ${h.metadata.heading}\n` +
-  h.metadata.text.replace(/^/gm, "    ");
+const doiToId = (doi: string) => doi.replace("/", ":");
+const idToDoi = (doiId: string) => doiId.replace(":", "/");
+
+/** the paper's md from R2; cached forever (md objects are immutable) */
+async function mdLines(doiId: string): Promise<string[]> {
+  const local = path.join(MD_CACHE, `${doiId}.md`);
+  if (!fs.existsSync(local)) {
+    fs.mkdirSync(MD_CACHE, { recursive: true });
+    await new Promise<void>((resolve, reject) => {
+      execFile(
+        "npx",
+        ["wrangler", "r2", "object", "get", `${BUCKET}/${doiId}.md`, "--file", local, "--remote"],
+        { cwd: REPERTOIRE, env: { ...process.env, CF_API_TOKEN: envKey("CF_API_TOKEN") } },
+        (err) => (err ? reject(err) : resolve()),
+      );
+    });
+  }
+  return fs.readFileSync(local, "utf8").split("\n");
+}
+
+const span = (lines: string[], r: ChunkRow) => lines.slice(r.line_start - 1, r.line_end).join("\n");
 
 export const repertoireTool = defineTool({
   name: "repertoire",
   label: "Repertoire",
   description:
-    "Consult the repertoire: a corpus of published psychometric prose (Psychometrika 2020-2025) used as a style guide. " +
+    "Consult the repertoire: a corpus of published psychometric prose (Psychometrika 2012-2025 + JEM 2005-2025) used as a style guide. " +
     "search: pass draft prose, get published passages in the same register (query in the register you want back). " +
     "context: read the chunks around a hit ref. outline: a paper's section skeleton with chunk refs. " +
     "Not for literature discovery or citation facts; it answers 'how do good writers say this kind of thing'.",
@@ -119,15 +167,19 @@ export const repertoireTool = defineTool({
     text: Type.Optional(Type.String({ description: "search: the draft prose to match" })),
     ref: Type.Optional(Type.String({ description: "context: a hit ref like 10.1017:psy.2024.18#c046" })),
     doi: Type.Optional(Type.String({ description: "restrict to one paper (outline target, or search filter)" })),
+    journal: Type.Optional(Type.String({ description: "filter: psychometrika or jem" })),
     section: Type.Optional(
       Type.String({
         description:
-          "hard filter on section bucket: abstract, introduction, background, methods, results, discussion, conclusion",
+          "filter on section bucket: abstract, introduction, methods, results, discussion, conclusion, backmatter (heading-derived values also match)",
       }),
     ),
     prefer: Type.Optional(Type.String({ description: "soft boost for a section bucket, results re-sorted" })),
-    year: Type.Optional(Type.Number({ description: "hard filter on publication year" })),
+    year: Type.Optional(Type.Number({ description: "filter on publication year" })),
     topK: Type.Optional(Type.Number({ description: "hits to return (default 6)" })),
+    maxPerPaper: Type.Optional(
+      Type.Number({ description: "max hits per paper (default 0 = unlimited; 1 = all-distinct papers)" }),
+    ),
     radius: Type.Optional(Type.Number({ description: "context: chunks on each side of ref (default 2)" })),
   }),
   async execute(_id, params) {
@@ -136,61 +188,111 @@ export const repertoireTool = defineTool({
     if (params.action === "search") {
       if (!params.text) return say("search requires text");
       const topK = params.topK ?? 6;
+      const maxPerPaper = params.maxPerPaper ?? 0;
       const filter: Record<string, unknown> = {};
       if (params.year) filter.year = params.year;
-      if (params.doi) filter.doi = params.doi.replace(":", "/");
+      if (params.doi) filter.doi = idToDoi(params.doi);
+      if (params.journal) filter.journal = params.journal;
       if (params.section) filter.section = params.section;
       const vector = await embedQuery(params.text);
       let matches = await vectorizeQuery(
         vector,
-        params.prefer ? topK * 5 : topK,
+        Math.max(topK, params.prefer ? topK * 5 : 0, maxPerPaper > 0 ? topK * 5 : 0),
         Object.keys(filter).length ? filter : undefined,
       );
       if (params.prefer) {
         for (const m of matches) if (m.metadata.section === params.prefer) m.score += PREFER_BOOST;
         matches.sort((a, b) => b.score - a.score);
       }
+      if (maxPerPaper > 0) {
+        const seen = new Map<string, number>();
+        matches = matches.filter((m) => {
+          const doiId = m.id.slice(0, m.id.indexOf("#"));
+          const n = (seen.get(doiId) ?? 0) + 1;
+          seen.set(doiId, n);
+          return n <= maxPerPaper;
+        });
+      }
       matches = matches.slice(0, topK);
       if (!matches.length) return say("no hits");
-      return say(matches.map(fmtHit).join("\n\n"));
+
+      // pointers -> D1 rows -> passages from the R2 md
+      const dois = [...new Set(matches.map((m) => m.metadata.doi))];
+      const rows = await d1(
+        `select c.doi, c.chunk_no, c.heading, c.section, c.line_start, c.line_end,
+                p.title, p.journal, p.year
+         from chunks c left join papers p on p.doi = c.doi
+         where c.doi in (${dois.map(() => "?").join(",")})`,
+        dois,
+      );
+      const rowBy = new Map(rows.map((r) => [`${r.doi}#${r.chunk_no}`, r]));
+      const mdByDoiId = new Map<string, string[]>();
+      const out: string[] = [];
+      for (const [i, m] of matches.entries()) {
+        const at = m.id.indexOf("#");
+        const doiId = m.id.slice(0, at);
+        const n = Number(m.id.slice(at + 2));
+        const r = rowBy.get(`${m.metadata.doi}#${n}`);
+        if (!r) continue;
+        if (!mdByDoiId.has(doiId)) mdByDoiId.set(doiId, await mdLines(doiId));
+        const passage = span(mdByDoiId.get(doiId)!, r);
+        out.push(
+          `[${i + 1}] ${m.score.toFixed(4)} ${doiId}#c${String(n).padStart(3, "0")} (${r.journal ?? "?"} ${r.year ?? "?"}) ` +
+            `${r.section ?? ""} | ${r.heading ?? ""} | lines ${r.line_start}-${r.line_end}\n` +
+            passage.replace(/^/gm, "    "),
+        );
+      }
+      return say(out.join("\n\n"));
     }
 
     if (params.action === "context") {
       if (!params.ref) return say("context requires ref (e.g. 10.1017:psy.2024.18#c046)");
       const m = params.ref.match(/^(.+)#c(\d+)$/);
       if (!m) return say("malformed ref; expected <doi>#c<NNN>");
-      const chunks = loadChunks(m[1]);
+      const doi = idToDoi(m[1]);
       const n = Number(m[2]);
       const r = params.radius ?? 2;
-      const lo = Math.max(0, n - r);
-      const hi = Math.min(chunks.length - 1, n + r);
-      const doiId = m[1].replace("/", ":");
-      const out = chunks
-        .slice(lo, hi + 1)
-        .map(
-          (c, i) =>
-            `[${lo + i === n ? "*" : ""}${doiId}#c${String(lo + i).padStart(3, "0")}] (${c.heading})\n` +
-            c.text.replace(/^/gm, "    "),
-        );
+      const rows = await d1(
+        `select doi, chunk_no, heading, section, line_start, line_end from chunks
+         where doi = ? and chunk_no between ? and ? order by chunk_no`,
+        [doi, Math.max(0, n - r), n + r],
+      );
+      if (!rows.length) return say(`no chunks for ${doi}`);
+      const lines = await mdLines(doiToId(doi));
+      const out = rows.map(
+        (c) =>
+          `[${c.chunk_no === n ? "*" : ""}${doiToId(doi)}#c${String(c.chunk_no).padStart(3, "0")}] ` +
+            `(${c.heading ?? ""} | lines ${c.line_start}-${c.line_end})\n` +
+            span(lines, c).replace(/^/gm, "    "),
+      );
       return say(out.join("\n\n"));
     }
 
     // outline
     if (!params.doi) return say("outline requires doi");
-    const chunks = loadChunks(params.doi);
-    const doiId = params.doi.replace("/", ":");
+    const doi = idToDoi(params.doi);
+    const rows = await d1(
+      `select c.chunk_no, c.heading, c.section, c.line_start, c.line_end, p.title, p.journal, p.year
+       from chunks c left join papers p on p.doi = c.doi
+       where c.doi = ? order by c.chunk_no`,
+      [doi],
+    );
+    if (!rows.length) return say(`no chunks for ${doi}`);
     const lines: string[] = [];
     let start = 0;
-    for (let i = 1; i <= chunks.length; i++) {
-      if (i === chunks.length || chunks[i].heading !== chunks[start].heading) {
-        const chars = chunks.slice(start, i).reduce((s, c) => s + c.text.length, 0);
+    for (let i = 1; i <= rows.length; i++) {
+      if (i === rows.length || rows[i].heading !== rows[start].heading) {
         lines.push(
-          `#c${String(start).padStart(3, "0")}-#c${String(i - 1).padStart(3, "0")}  ${chunks[start].heading}  (${chars} chars)`,
+          `#c${String(rows[start].chunk_no).padStart(3, "0")}-#c${String(rows[i - 1].chunk_no).padStart(3, "0")}  ` +
+            `${rows[start].heading ?? ""}  (md lines ${rows[start].line_start}-${rows[i - 1].line_end})`,
         );
         start = i;
       }
     }
-    return say(`${doiId}: ${chunks.length} chunks\n` + lines.join("\n"));
+    const p = rows[0];
+    return say(
+      `${doi}: ${rows.length} chunks\n${p.title ?? ""} (${p.journal ?? "?"} ${p.year ?? "?"})\n` + lines.join("\n"),
+    );
   },
 });
 
