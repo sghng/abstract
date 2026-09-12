@@ -39,6 +39,9 @@ project-root/
 `-- draft/                  # Deliverables: publications, presentations, proposals
 ```
 
+Reference material lives in `$HARNESS_DIR/reference/` (the environment
+variable holds the lab repository's path); read it when asked.
+
 ## Never Forget
 
 - **Read `notes/story.md` first.** Only the orchestrator edits it.

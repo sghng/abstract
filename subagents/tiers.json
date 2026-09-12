@@ -1,5 +1,14 @@
 {
-  "routine": { "model": "minimax-cn/MiniMax-M3", "thinking": "low" },
-  "standard": { "model": "minimax-cn/MiniMax-M3", "thinking": "medium" },
-  "deep": { "model": "kimi-coding/k3", "thinking": "high" }
+  "routine": {
+    "model": "minimax-cn/MiniMax-M3",
+    "thinking": "high"
+  },
+  "standard": {
+    "model": "zai/glm-5.3",
+    "thinking": "low"
+  },
+  "deep": {
+    "model": "zai/glm-5.3",
+    "thinking": "max"
+  }
 }

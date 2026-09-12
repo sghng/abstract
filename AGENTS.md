@@ -25,6 +25,8 @@ here.
   `noContextFiles: true`.
 - `SYSTEM.md` -- replaces pi's default system prompt for lab agents (discovered
   natively from the agent dir)
+- `reference/` -- reference material agents read on request; its location
+  reaches agents via `HARNESS_DIR`, stated in `movement/invariants.md`
 - `extensions/` -- pi extensions, one directory per extension: `cue/`
   (brokerless message exchange, see `docs/harness.md`), `subagents/` (disposable
   delegate sessions, issue #27), `repertoire/` (the corpus as a tool:

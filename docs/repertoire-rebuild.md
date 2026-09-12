@@ -3,6 +3,41 @@
 Decisions from the grill session. Execution order at the bottom. This note
 governs the rebuild; docs/repertoire.md gets updated when the rebuild lands.
 
+## Serving design (grill round 2, 2026-09-09 evening)
+
+- Vectorize metadata = filter facets only: doi, journal, year, section
+  (indexed; filtering happens during ANN traversal -- use it as designed).
+  No text payload in metadata ever again.
+- D1 chunks table: (doi, chunk_no) PK + heading, section, line_start,
+  line_end. Minimal + join papers for title/journal/year. No passage
+  text anywhere in D1; full rebuild now, per-doi delete+insert on
+  increments (re-chunking shifts line ranges).
+- md objects in R2 are immutable once uploaded; any md change goes through
+  re-chunk + re-range + re-embed. Drift is structurally impossible.
+- Embedding input transforms @@eqNNNN@@ -> [formula] (chunk stage); md
+  keeps real tokens for the future OCR pass.
+- Query client contract (reference impl src/query.ts):
+  vectorize query (filter facets, over-fetch for max_per_paper cap;
+  0 = unlimited) -> D1 chunks JOIN papers -> fetch md from R2 (dedupe
+  by doi, cache forever keyed by doi -- immutable) -> bundle
+  {score, doi, title, journal, year, section, heading, chunk_no,
+  line_start, line_end, passage}. Local TS client; a Worker endpoint
+  only if client-side proves clumsy.
+- Bucket layout: one bucket; prefix encodes NATURE not stage:
+  raw/ = pdf (always pristine), xml (pristine as received -- cleaned-xml
+  copy and the homebrew formatter are DELETED; if XML formatting fails
+  we keep it as-is), pristine html. Root = lean html + md (generated).
+  Conversion precedence: XML if it exists, else lean HTML; PDF feeds
+  only psy merge-tables; Markdown serves everything downstream.
+- Old buckets (repertoire-html/-md/-xml): delete after smoke passes and
+  the new-bucket object-count check + key spot-verification (every old
+  object is copied or re-derivable from raw/).
+- Parked for later passes: 3,539 equations that passed OCR once but
+  regressed on the lossy re-splice (state ok, images in R2), 1,829
+  unfinished image downloads (not dead), ~11K tiny single-glyph
+  placeholders (local model, e.g. pix2tex-class), 2026 increment.
+
+
 ## Transition log (2026-09-09 overnight, dev agent)
 
 - Raw recovery DONE: 833 psy html re-fetched from Cambridge; 172 JEM raw
@@ -34,6 +69,12 @@ governs the rebuild; docs/repertoire.md gets updated when the rebuild lands.
   -- neither meets the near-verbatim bar.
 - Known race: merge-tables and img2latex both write md; run-tail.sh
   re-runs the eq splice after merge to repair clobbered papers.
+- TAIL ARMED (~07:00): run-tail.sh waits for merge + OCR to finish, then
+  resplice -> md-format -> chunk -> embed -> insert (fresh index, correct
+  wrangler syntax: separate create-metadata-index calls) ->
+  upload-derived -> smoke. Logs: .cache/tail*.log. Morning reading order:
+  .cache/tail.log, .cache/merge-report.json, .cache/img2latex-report.json,
+  .cache/eqimg-misses.json.
 
 ## 1. Clean slate: raw recovery
 
