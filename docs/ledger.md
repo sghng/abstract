@@ -1,7 +1,7 @@
 # The Lab Ledger
 
 Design spec and migration roadmap for the lab ledger: the semantic event layer.
-Dev-facing. Status: accepted, Phase 1 not yet implemented. Tracking: issue #28.
+Dev-facing. Status: accepted, Phase 1 not yet implemented. Tracking: issue #35.
 
 ## Context
 
@@ -235,7 +235,7 @@ audience, with no pi session.
 Each phase is independently useful and independently revertible (additive files;
 the only edit to an existing tool is one logging line).
 
-- **Phase 1 -- the ledger** (issue #28): core module, extension, CLI
+- **Phase 1 -- the ledger** (issue #35): core module, extension, CLI
   subcommands, cue logging, doctrine lines, tests, TODO log. Existing sessions
   pick the tools up on next ensemble restart.
 - **Phase 2 -- observation** (1-2 weeks): run the lab normally. Watch bracket
