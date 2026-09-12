@@ -19,6 +19,7 @@
  *     prompt as file paths (DefaultResourceLoader re-reads them on every
  *     /reload)
  *   - HARNESS_ROLE set so extensions/cue self-configures
+ *   - HARNESS_DIR set so agents can locate the reference corpus
  *   - no context files (no ambient AGENTS.md/CLAUDE.md)
  *
  * Files are memory; processes are attention. Detaching tmux leaves agents
@@ -201,6 +202,7 @@ function linkGlobalConfig(name: string, required: boolean): void {
 /** Run one role's persistent interactive session in this terminal. */
 async function runRole(role: Role): Promise<void> {
   process.env.HARNESS_ROLE = role;
+  process.env.HARNESS_DIR = HARNESS_DIR;
 
   // Resource inheritance: credentials and model config come from the Pi
   // Agent global layer (~/.pi/agent) via symlinks; prompts and themes via
