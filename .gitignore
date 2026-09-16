@@ -28,3 +28,6 @@ repertoire/inserts.sql
 repertoire/raw-new/
 repertoire/cf-profile*/
 .playwright-mcp/
+docs/.vitepress/cache/
+docs/.vitepress/dist/
+repertoire/legacy/__pycache__/
