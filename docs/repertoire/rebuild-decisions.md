@@ -1,7 +1,7 @@
 # repertoire rebuild plan (aligned 2026-09-09)
 
 Decisions from the grill session. Execution order at the bottom. This note
-governs the rebuild; docs/repertoire.md gets updated when the rebuild lands.
+governs the rebuild; docs/repertoire/index.md gets updated when the rebuild lands.
 
 ## Serving design (grill round 2, 2026-09-09 evening)
 
@@ -194,4 +194,4 @@ raw/<doi_id>.{html,xml,pdf}      # pristine, never rewritten
 9. chunk (atomic tables, documented policy) -> embed -> insert (fresh
    index) -> smoke query.
 10. Upload derived artifacts; verify; delete old buckets.
-11. Update docs/repertoire.md + TODO.md decisions log; final commit.
+11. Update docs/repertoire/index.md + TODO.md decisions log; final commit.

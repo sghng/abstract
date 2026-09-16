@@ -372,3 +372,69 @@ mjx rendering empties assistive MathML and the live DOM loses TeX), jem2md
 session). Complex tables become caption+asset refs, never raw HTML (single-line
 100K-char chunks broke the chunker cap). Raw corpus preserved in R2 buckets
 repertoire-html / repertoire-md; sync-r2.ts is checkpointed and resumable.
+
+## 2026-09-16: repertoire expansion fetch round (phases 0-1)
+
+Outcome of the audit (2026-09-14) plus the expansion plan
+(repertoire-rebuild-expansion.md, D1-D10). Durable state and recipes
+documented in docs/repertoire-fetch.md; this entry records the
+decisions made executing it.
+
+- Family set grew to six: BJMSP 1965+ joined the four planned
+  expansions mid-round (owner). All five journal families complete
+  end-to-end (fetch -> R2 raw/ -> D1 papers+sources -> spot-verify);
+  arxiv stat set on the 7-host fleet, one fetcher per host, wave-based
+  centralization.
+- Content additions beyond the plan: full-text HTML backfill for every
+  Wiley paper lacking JATS XML (era + per-paper gaps; the plan's D2
+  source-form doctrine extended to html-as-raw). EPUB skipped
+  (derivative). JSTOR permanently parked (SAGE covers JEBS). PsyArXiv
+  .docx primaries (699) skipped pending an owner format-contract call.
+- arXiv doctrine held: fetch EVERYTHING with metadata intact (cats
+  primary-first from OAI), filter later, never at fetch time.
+  Withheld-source 403s fall back to PDF (via:pdf-fallback in the
+  manifest). Observed mix ~91% tex.
+- Storage decisions: raw/<doi_id>.<fmt> flat (D6) confirmed at scale
+  (~132k arxiv objects, ~160GB projected; R2 limits are nowhere near
+  binding). D1 gotcha: 100KB statement cap means 50-row insert batches;
+  a 1,000-row batch fails SQLITE_TOOBIG with an easily-missed error.
+  Old D1 rows get an explicit reset on refetch (state, parse_source,
+  local_path, sha256) so stale parse pointers cannot mask fresh bytes.
+- Transport (D7): per-object npx wrangler spawns (~2 obj/s) replaced by
+  the Cloudflare REST API with the existing CF_API_TOKEN
+  (probe-verified R2 read/write; no new credentials needed).
+- Code/state split enforced: durable fetchers in repertoire/src/families/
+  (copied from run dirs; originals stay as run state in .cache/bulk/),
+  ML/pilot artifacts moved to repertoire/legacy/, run-tail scripts
+  deleted. Phase 0 closed.
+- Fetcher armor lessons now convention: AbortController inside in-page
+  fetches (silent-wedge fix), block-page detection -> clean stop,
+  year-aware validator floors, structural (not size) validation,
+  profile-per-family with clone-to-parallelize, absolute bun paths in
+  nohup'd gates, and no pkill -f on family prefixes (bulk/psy once
+  killed bulk/psyarxiv).
+- Open (owner): md/ prefix for derived markdown + lean-html demoted to
+  local-only + arxiv uploads both tex and pdf
+  (docs/repertoire-layout-2026-09-15.md); PsyArXiv docx format question.
+
+- Owner layout decisions (2026-09-16, final): derived md under md/
+  prefix; pipeline intermediates local-only (revises D6's keep-in-bucket);
+  arxiv one artifact per item (no second-format pass); psyarxiv .docx
+  primaries join the format contract (sources check extended, live
+  table rebuilt pre-arxiv-apply); local copy mandatory (raw-new/ is the
+  canonical flat mirror, manifests verbatim-valid forever). Next design
+  pass: whole-storage layout discussion (owner-flagged).
+
+## 2026-09-16: docs reorganization; VitePress manual (owner decision)
+
+- Corpus docs concentrate under `docs/repertoire/` as the manual:
+  index (spec), fetch, parse, storage, hostfleet, plus dated decision
+  records (audit, rebuild-decisions). Manual standard (owner): explains
+  what/how/options-compared so anyone can rebuild from zero.
+- Manual vs memo split (owner): ephemeral logistics state is NOT docs;
+  working memos live on local disk at `repertoire/.cache/notes/`
+  (first residents: the expansion plan, the fetch spike note).
+- Served as a local VitePress site (`bun run docs:dev`; never deployed):
+  `docs/.vitepress/config.ts`. `markdown.html: false` because the docs
+  are GFM-only with bare `<family>`/`<doi_id>` tokens in prose that the
+  Vue compiler would parse as HTML.

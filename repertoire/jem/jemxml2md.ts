@@ -3,24 +3,34 @@
  * repertoire jemxml2md: Wiley-namespaced XML -> Markdown. XML shadows HTML:
  * run after jem2md; overwrites jem/md/{doi_id}.md for every paper with XML.
  *
- * Tag policy (empirical, see docs/repertoire.md):
+ * Tag policy (empirical, see docs/repertoire/index.md):
  *   STRUCTURE  section/title -> headings by depth; p; list/listItem;
- *              abstractGroup (header) -> "## Abstract"; bibliography -> refs;
- *              appendix/noteGroup rendered in place
- *   STYLING    i -> _x_, b -> **x**; sub/sup/sc/span -> bare text
+ *              abstractGroup (header) -> "## Abstract"; appendix/noteGroup
+ *              rendered in place
+ *              bibliography -> STRIPPED at the source construct (training
+ *              mandate 2026-09-16: no ref lists; in-prose citations stay);
+ *              header contentMeta (creators/bios) never visited
+ *   STYLING    i -> _x_, b -> **x**; sub/sup/sc/span -> bare text.
+ *              Titles are structure: styling dropped there (2012-era XML
+ *              splits labels as <i>2.1</i> . <i>Details</i>; plain + ". ")
  *   NAVIGATION link -> bare text (citation xrefs; pointers discarded)
  *   CONTENT    figure/tabular/displayedItem/inlineGraphic/math-without-TeX
  *              -> asset placeholders, rows appended to
  *              .cache/jem-xml-assets.ndjson (id {doi_id}-fig-NNNN etc.)
  *   MATH       annotation[encoding="application/x-tex"] verbatim (Wiley's
  *              annotations include the $..$ delimiters); math without
- *              annotation (12 files) -> @@EQIMG via wiley:location PNG
+ *              annotation (MathML-noTeX era, 2021+ bjmsp: 86/160 files)
+ *              -> @@EQIMG via wiley:location PNG
  *   DROP       copyright/legalStatement/publisherInfo boilerplate
+ *   SKIP       book reviews (articleCategory) and front-matter titles
+ *              (jem2md FRONT_MATTER parity) recorded in a skipped list,
+ *              never silently vanished
  *
  * Tables: CALS tgroup; any entry span -> caption + asset ref (never raw
  * HTML), else pipe table (parity with jem2md).
  *
- * Usage: bun jem/jemxml2md.ts [--only <doi_id>]
+ * Usage: bun jem/jemxml2md.ts [--only <doi_id>] [--xml-dir <dir>]
+ *   [--md-dir <dir>] [--ndjson <file>] [--skipped <file>]
  */
 import { readdirSync, readFileSync, writeFileSync, openSync, closeSync, writeSync, mkdirSync, existsSync, unlinkSync } from "node:fs";
 import * as cheerio from "cheerio";
@@ -33,6 +43,8 @@ const arg = (name: string, dflt: string) => {
 const XML_DIR = arg("xml-dir", `${ROOT}/jem/xml`);
 const MD_DIR = arg("md-dir", `${ROOT}/jem/md`);
 const ASSETS_ND = arg("ndjson", `${ROOT}/.cache/jem-xml-assets.ndjson`);
+// skips (book reviews, front matter) land beside the asset log, same base
+const SKIPPED = arg("skipped", ASSETS_ND.replace(/\.ndjson$/, "-skipped.jsonl"));
 const ONLY = process.argv.includes("--only")
   ? process.argv[process.argv.indexOf("--only") + 1]
   : null;
@@ -41,6 +53,9 @@ type Asset = { doi: string; doi_id: string; asset_id: string; kind: string; url:
 type Ctx = { doi: string; doiId: string; assets: Asset[]; eqSeq: number; figSeq: number; tabSeq: number; tokens: Map<string, string>; tokSeq: number };
 
 const norm = (s: string) => s.replace(/\s+/g, " ").trim();
+/** Front-matter titles, parity with jem2md (html route) */
+const FRONT_MATTER =
+  /^(issue information|cover|erratum|corrigendum|correction|obituary|in memoriam|book review|front matter|back matter|list of reviewers|editorial)/i;
 /** Wiley caption boilerplate, not content */
 const BOILER = /\s*[Cc]olo?ur figure can be viewed at wileyonlinelibrary\.com\s*/g;
 const cleanCap = (s: string) => norm(s.replace(BOILER, " "));
@@ -58,8 +73,9 @@ const blockToken = (ctx: Ctx, body: string): string => {
   return t;
 };
 
-/** inline rendering of mixed content -> markdown string */
-const inline = ($: cheerio.CheerioAPI, node: any, ctx: Ctx): string => {
+/** inline rendering of mixed content -> markdown string. plain: drop
+ * styling (titles are structure; 2012 XML styles labels in <i>) */
+const inline = ($: cheerio.CheerioAPI, node: any, ctx: Ctx, plain = false): string => {
   if (!node) return "";
   let out = "";
   for (const el of node.children ?? []) {
@@ -69,17 +85,17 @@ const inline = ($: cheerio.CheerioAPI, node: any, ctx: Ctx): string => {
     }
     if (el.type !== "tag") continue;
     const $el = $(el);
-    const inner = () => inline($, el, ctx);
+    const inner = () => inline($, el, ctx, plain);
     switch (el.tagName) {
       case "i": {
         const t = inner();
         // whole-paragraph italics are layout styling, not emphasis
-        out += t.length > 300 ? t : `_${t}_`;
+        out += plain || t.length > 300 ? t : `_${t}_`;
         break;
       }
       case "b": {
         const t = inner();
-        out += t.length > 300 ? t : `**${t}**`;
+        out += plain || t.length > 300 ? t : `**${t}**`;
         break;
       }
       case "sub":
@@ -230,9 +246,13 @@ const blocks = ($: cheerio.CheerioAPI, node: any, ctx: Ctx, depth: number): stri
     if (el.type !== "tag") continue;
     const $el = $(el);
     switch (el.tagName) {
-      case "title":
-        out += `\n\n${"#".repeat(Math.min(depth + 1, 6))} ${norm(inline($, el, ctx))}\n\n`;
+      case "title": {
+        // plain walk (no emphasis); collapse 2012-era label splits
+        // "<i>2.1</i> . <i>Details</i>" -> "2.1. Details"
+        const t = norm(inline($, el, ctx, true)).replace(/\s+\.\s+/g, ". ");
+        out += `\n\n${"#".repeat(Math.min(depth + 1, 6))} ${t}\n\n`;
         break;
+      }
       case "p":
         out += `\n\n${norm(inline($, el, ctx))}\n\n`;
         break;
@@ -287,12 +307,21 @@ const blocks = ($: cheerio.CheerioAPI, node: any, ctx: Ctx, depth: number): stri
         out += `\n\n${norm(inline($, el, ctx))}\n\n`;
         break;
       case "bibliography":
-        break; // handled separately at top level
+        break; // stripped per mandate; never rendered
       default:
         out += `\n\n${norm(inline($, el, ctx))}\n\n`;
     }
   }
   return out;
+};
+
+/** front-matter/book-review detection: recorded, never silently dropped */
+const skipReason = ($: cheerio.CheerioAPI): string | null => {
+  const cat = $("publicationMeta titleGroup title[type=articleCategory]").first().text().trim();
+  if (/^book reviews?$/i.test(cat)) return "book-review";
+  const title = $("contentMeta titleGroup title[type=main]").first().text().trim();
+  if (FRONT_MATTER.test(title)) return "front-matter";
+  return null;
 };
 
 function convert(doi: string, doiId: string, xml: string): { md: string; assets: Asset[] } {
@@ -312,15 +341,9 @@ function convert(doi: string, doiId: string, xml: string): { md: string; assets:
   if (!body.length) throw new Error("no <body>");
   md += blocks($, body.get(0), ctx, 0);
 
-  // bibliography
-  const bib = $("bibliography").first();
-  if (bib.length) {
-    md += `\n\n## References\n\n`;
-    for (const b of bib.find("bib").toArray()) {
-      const text = norm(inline($, b, ctx));
-      if (text) md += `- ${text}\n`;
-    }
-  }
+  // bibliography STRIPPED at the source construct (training mandate
+  // 2026-09-16): the bibliography element is never rendered; in-flow
+  // `case "bibliography"` in blocks() also skips it.
 
   // restore block tokens, then collapse 3+ newlines, trim
   for (const [t, body] of ctx.tokens) md = md.split(t).join(body);
@@ -330,17 +353,36 @@ function convert(doi: string, doiId: string, xml: string): { md: string; assets:
 
 const main = () => {
   mkdirSync(MD_DIR, { recursive: true });
-  // JEM converter: only Wiley DOIs, whatever dir the xml lives in
-  const files = readdirSync(XML_DIR).filter((f) => f.startsWith("10.1111") && f.endsWith(".xml"));
+  // Wiley XML converter (jem + bjmsp): any DOI prefix -- 10.1348 bjmsp
+  // (2005-2011) are the same Wiley schema (T1 fix 2026-09-16)
+  const files = readdirSync(XML_DIR).filter((f) => f.endsWith(".xml"));
   const out = openSync(ASSETS_ND, "w");
+  const skipped = openSync(SKIPPED, "w");
   let converted = 0;
   let failures = 0;
+  let skips = 0;
   for (const f of files) {
     const doiId = f.replace(/\.xml$/, "");
     if (ONLY && doiId !== ONLY) continue;
     const doi = doiId.replace(":", "/");
     try {
-      const { md, assets } = convert(doi, doiId, readFileSync(`${XML_DIR}/${f}`, "utf8"));
+      const xml = readFileSync(`${XML_DIR}/${f}`, "utf8");
+      const $ = cheerio.load(xml, { xml: true });
+      const reason = skipReason($);
+      if (reason) {
+        writeSync(
+          skipped,
+          JSON.stringify({
+            doi_id: doiId,
+            reason,
+            category: $("publicationMeta titleGroup title[type=articleCategory]").first().text().trim() || null,
+            title: $("contentMeta titleGroup title[type=main]").first().text().trim() || null,
+          }) + "\n",
+        );
+        skips++;
+        continue;
+      }
+      const { md, assets } = convert(doi, doiId, xml);
       writeFileSync(`${MD_DIR}/${doiId}.md`, md);
       for (const a of assets) writeSync(out, JSON.stringify(a) + "\n");
       converted++;
@@ -350,8 +392,10 @@ const main = () => {
     }
   }
   closeSync(out);
+  closeSync(skipped);
   if (existsSync(ASSETS_ND) && ONLY) unlinkSync(ASSETS_ND); // probe mode leaves no state
-  console.log(`converted ${converted}, failures ${failures}`);
+  if (existsSync(SKIPPED) && ONLY) unlinkSync(SKIPPED);
+  console.log(`converted ${converted}, skipped ${skips} (-> ${SKIPPED}), failures ${failures}`);
 };
 
 main();

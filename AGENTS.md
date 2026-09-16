@@ -41,15 +41,21 @@ here.
 - `skills/` -- pi skills: procedures and standards, one directory per skill
 - `TODO.md` -- design rationale, roadmap, and decisions log; read before
   changing the architecture
-- `docs/` -- design documents for the harness (`multi-agent.md` for the
-  message-exchange pattern, `harness.md` for the implementation plan);
-  dev-facing, not loaded by lab agents. Also `repertoire.md`, the design of
-  the retrieval system below
-- `repertoire/` -- the writer's convention corpus: pipeline scripts (list,
-  download, convert, embed, sync) that turn journal articles (initially
-  Psychometrika 2020-2025) into PDF/Markdown/asset stores on Cloudflare R2
-  plus a Vectorize index, with a D1 metadata table as source of truth. See
-  `docs/repertoire.md`. Musical name, and earned: it enters the writer
+- `docs/` -- design documents; dev-facing, not loaded by lab agents.
+  `docs/repertoire/` is the corpus manual (spec, fetch, parse, storage,
+  hostfleet, plus dated decision records): a rebuild-from-zero reference,
+  served as a local VitePress site (`bun run docs:dev`). Ephemeral
+  working memos are NOT docs; they live in `repertoire/.cache/notes/`.
+  Harness docs stay at the root: `multi-agent.md` (message-exchange
+  pattern), `harness.md` (implementation plan)
+- `repertoire/` -- the writer's convention corpus: pipeline scripts
+  (`src/` journal-agnostic stages + `src/families/<j>/` fetchers) that
+  turn journal articles (six families: psychometrika, jem, jebs, bjmsp,
+  psyarxiv, arxiv stat) into raw PDF/HTML/XML/TeX + Markdown/asset
+  stores on Cloudflare R2, a Vectorize index, and D1 papers/sources as
+  source of truth; `legacy/` holds the parked ML stages. See
+  `docs/repertoire/index.md` (spec) and `docs/repertoire/fetch.md` (fetch
+  state + recipes). Musical name, and earned: it enters the writer
   agent's context as the retrieval tool name
 - `manifesto.md` -- human-facing philosophy behind the project
 - `settings.json` -- pi settings for the agent directory

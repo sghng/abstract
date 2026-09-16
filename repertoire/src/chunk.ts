@@ -2,7 +2,7 @@
 /**
  * repertoire chunk: Markdown -> paragraph-aware chunks (~500 tokens).
  *
- * POLICY (audit record; see docs/repertoire.md):
+ * POLICY (audit record; see docs/repertoire/index.md):
  *   - split on blank lines; track the current ## heading
  *   - merge blocks until ~1900 chars (~475 tokens); split oversized
  *     prose blocks on sentences; never merge across a heading

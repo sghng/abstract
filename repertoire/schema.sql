@@ -17,6 +17,34 @@ create table if not exists papers (
 
 create index if not exists idx_papers_state on papers(state);
 
+-- D5: which artifact fed the md (html|xml|pdf|tex|docx); null until parsed.
+alter table papers add column parse_source text;
+
+-- D5: one row per raw artifact. key is the bucket object key
+-- (raw/<doi_id>.<fmt>); format in pdf/html/xml/tex ('tex' = the gzipped
+-- e-print tarball bytes for arXiv).
+create table sources (
+  doi text not null,
+  format text not null check (format in ('pdf','html','xml','tex','docx')),
+  key text,
+  bytes integer,
+  sha256 text,
+  fetched_at text default current_timestamp,
+  primary key (doi, format)
+);
+
+-- shipped in live D1 since the first build; DDL committed per the
+-- rebuild plan (was missing from this file).
+create table if not exists chunks (
+  doi text not null,
+  chunk_no integer not null,
+  heading text,
+  section text,
+  line_start integer not null,
+  line_end integer not null,
+  primary key (doi, chunk_no)
+);
+
 -- assets: one row per referenced figure/table/equation. handle is the
 -- short per-paper id in document order (fig01, tab01, math-0001); url is
 -- the publisher URL for images, or the attachment key (<doi_id>:tab03.html)

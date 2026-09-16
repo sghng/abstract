@@ -6,7 +6,7 @@
  * failing its command stops the run loudly.
  *
  * Stage sequences (exactly the chains proven byte-identical on the
- * 2025-09 rebuild; see docs/repertoire.md):
+ * 2025-09 rebuild; see docs/repertoire/index.md):
  *
  *   psychometrika: fetch-raw -> clean -> lean -> format -> convert ->
  *     merge-tables -> img2latex -> md-format -> chunk -> embed ->

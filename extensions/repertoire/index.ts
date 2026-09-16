@@ -14,7 +14,7 @@
  * Corpus: Psychometrika 2012-2025 (833 papers) + JEM 2005-2025 (583
  * papers), 59,747 paragraph-aware chunks in Cloudflare Vectorize.
  *
- * SERVING CONTRACT (see docs/repertoire.md): vector metadata carries
+ * SERVING CONTRACT (see docs/repertoire/index.md): vector metadata carries
  * filter facets only; passages are POINTERS -- D1 `chunks` rows give the
  * md line span, the md itself is fetched from R2 (immutable, so the
  * local cache keyed by doi never expires). No build-tree dependency:

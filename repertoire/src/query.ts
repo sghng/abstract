@@ -7,7 +7,7 @@
  *   bun src/query.ts "..." --doi 10.1017/psy.2025.10034    # within one paper
  *   bun src/query.ts "..." --max-per-paper 1               # all hits distinct papers
  *
- * CONTRACT (reference implementation; see docs/repertoire.md):
+ * CONTRACT (reference implementation; see docs/repertoire/index.md):
  *   1. Voyage embeds the query (voyage-context-4, input_type=query)
  *   2. Vectorize query with filter facets (doi/journal/year/section --
  *      filtering happens during ANN traversal) + over-fetch when

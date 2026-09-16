@@ -1,5 +1,13 @@
 # repertoire: a convention corpus for the writer agent
 
+> STATUS (2026-09-16): the expansion rebuild is in flight; this spec
+> describes the PRE-expansion system and will be rewritten at Phase 5.
+> Current truth: corpus is six families (~145k papers fetching),
+> fetch state + recipes in docs/repertoire/fetch.md, storage decisions
+> and open questions in docs/repertoire/storage.md, working
+> plan (temporary) at repertoire/.cache/notes/repertoire-rebuild-expansion.md (local memo).
+> Numbers below (833 psy + 583 jem) are the old corpus.
+
 (The writer plays from the repertoire when it needs conventional phrasing.
 The name enters the writer's context as the retrieval tool name, so it
 follows the musical naming rule for context-visible tokens.)
@@ -15,7 +23,7 @@ convert are the only per-journal code.
 
 This document is the SPEC of the rebuilt system: one bucket, an end-to-end
 orchestrator, complete md (real LaTeX and reconstructed tables). The
-transition from the pre-rebuild state lives in docs/repertoire-rebuild.md
+transition from the pre-rebuild state lives in docs/repertoire/rebuild-decisions.md
 until the rebuild lands, then that note is deleted.
 
 ## Source strategy: publisher HTML/XML, never PDF conversion
