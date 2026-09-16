@@ -25,3 +25,6 @@ repertoire/pdf/
 repertoire/assets/
 repertoire/.cache/
 repertoire/inserts.sql
+repertoire/raw-new/
+repertoire/cf-profile*/
+.playwright-mcp/
