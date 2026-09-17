@@ -1,8 +1,11 @@
 ---
-description:
-  Read-only recon over project files; answers where-and-what questions with file
-  and line citations
-tier: standard
+description: Read-only recon over project files. Answers where-and-what questions with file and line citations.
+mode: subagent
+model: zai-coding-plan/glm-5.3
+permissions:
+  - action: cue
+    resource: "*"
+    effect: deny
 ---
 
 # Scout

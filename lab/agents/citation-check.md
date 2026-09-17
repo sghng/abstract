@@ -1,8 +1,11 @@
 ---
-description:
-  Verify one citation against its source; venue, year, sample, and whether the
-  source supports the claim made of it
-tier: routine
+description: Verify one citation against its source; venue, year, sample, and whether the source supports the claim made of it.
+mode: subagent
+model: minimax-cn-coding-plan/MiniMax-M3
+permissions:
+  - action: cue
+    resource: "*"
+    effect: deny
 ---
 
 # Citation Check

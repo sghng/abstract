@@ -1,5 +1,28 @@
 # repertoire: a convention corpus for the writer agent
 
+## Manual map
+
+The manual under `docs/repertoire/` explains each layer well enough to
+rebuild the corpus from zero: what it is, how it was done, which
+options were compared. Reading order for a rebuild:
+
+1. this file -- system spec (serving contract, pipeline shape)
+2. `storage.md` -- owner layout decisions: R2/D1/Vectorize end state,
+   local-mirror doctrine, migration order
+3. `fetch.md` -- the six source families, routes and eras, proven
+   recipes, resumable bulk patterns
+4. `parse.md` -- raw artifacts to training-grade Markdown: the format
+   contract, route verdicts, graduated converters
+5. `hostfleet.md` -- operating the fetch fleet (access, deployment,
+   gotchas)
+6. `rebuild.md` -- the from-zero runbook: phase order + commands
+7. dated records: `audit.md` (why the rebuild happened),
+   `rebuild-decisions.md` (2026-09-09 serving decisions)
+
+Working state that changes hourly (fleet logs, manifests, upload
+checkpoints, handoff notes) is run state in `repertoire/.cache/`, not
+manual material.
+
 > STATUS (2026-09-16): the expansion rebuild is in flight; this spec
 > describes the PRE-expansion system and will be rewritten at Phase 5.
 > Current truth: corpus is six families (~145k papers fetching),

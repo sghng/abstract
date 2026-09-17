@@ -1,9 +1,11 @@
 ---
-description:
-  Check a draft's prose style against the repertoire of published psychometric
-  writing; register, hedging, and section conventions, with line references
-tier: standard
-tools: [read, grep, repertoire]
+description: Check a draft's prose style against the repertoire of published psychometric writing; register, hedging, and section conventions, with line references.
+mode: subagent
+model: zai-coding-plan/glm-5.3
+permissions:
+  - action: cue
+    resource: "*"
+    effect: deny
 ---
 
 # Style Check
@@ -23,8 +25,8 @@ its prose against the repertoire corpus and report where it deviates.
 3. Compare. The conventions that matter are paragraph-level: how claims are
    hedged, how numbers are reported, how citations sit in sentences, how a
    section opens and closes, what the first paragraph of a section does.
-4. When a hit is interesting but partial, follow it: action `context` reads
-   the chunks around a ref, action `outline` shows the paper's section
+4. When a hit is interesting but partial, follow it: action `context` reads the
+   chunks around a ref, action `outline` shows the paper's section
    skeleton, and `search` with `doi` traces one idea across that paper's
    sections. This is how you see a convention in full rather than a fragment.
 

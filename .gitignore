@@ -1,18 +1,15 @@
-# Pi agent directory state — never commit
-auth.json
+# abstract lab state -- never commit
+mcp.secrets.json
+.env
+.DS_Store
+node_modules/
+*.log
 sessions/
 models-store.json
 trust.json
 npm/
 binaries/
-*.log
-.DS_Store
-node_modules/
-auth.json
-models.json
-mcp.secrets.json
 .pi/
-.env
 
 # repertoire corpus artifacts (durable copies live in D1/R2, not git)
 repertoire/html/

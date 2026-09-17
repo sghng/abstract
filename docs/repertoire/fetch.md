@@ -101,7 +101,7 @@ profile.
   `via: pdf-fallback`). Observed mix: ~91% tex, ~9% pdf. Sizes: tex
   p50 416KB / p90 3.9MB / max 79MB; pdf p50 503KB. Projected total
   ~132k objects, ~155-170GB.
-- Distribution: 7-host fleet (5 student servers + NODE-C + this
+- Distribution: 7-host fleet (5 lab nodes + 1 fast Linux box + this
   Mac), one fetcher per host, partitions ~18.8k items. See
   `docs/repertoire/hostfleet.md` (access, deployment, gotchas) and
   `repertoire/.cache/bulk/arxiv/README.md` (code/state split).

@@ -1,308 +1,473 @@
 #!/usr/bin/env bun
 /**
- * abstract -- SDK harness CLI for the lab.
+ * abstract -- the lab harness CLI (OpenCode v2).
  *
- * Replaces the bin/ shell launchers. One entry point:
+ * One central per-host "Abstract" server runs the lab: a pinned
+ * @opencode/cli install spawned with a lab-owned environment (config dir,
+ * database, state, credentials synced from the daily install). Research
+ * projects get five persistent role sessions (created once, metadata.role,
+ * per project directory). The TUI attaches to the server; sessions outlive
+ * views, so detach is "close the TUI, re-run abstract".
  *
- *   abstract              create or reattach the tmux ensemble (core window:
- *                         orchestrator | engineer | librarian; writing window:
- *                         writer | editor) anchored at the current project dir
- *   abstract __run <role> internal: run one role's pi session in this
- *                         terminal (spawned into tmux panes by `abstract`)
+ *   abstract              ensure runtime, server, credentials, and the five
+ *                         role sessions for the current project; attach the
+ *                         TUI (one tab per role session)
+ *   abstract doctor       contract smoke test against the pinned runtime
+ *   abstract stop         stop the lab server
+ *   abstract upgrade [v]  bump the pinned @opencode/cli version, then doctor
  *
- * Design: TODO.md decisions log ("SDK harness v1"). Three peer SDK
- * processes, one per pane, each a full pi InteractiveMode with:
- *   - agentDir pinned to this repository (SYSTEM.md, extensions/, skills/,
- *     settings.json are discovered natively)
- *   - a persistent per-role session at <project>/.pi/sessions/<role>.jsonl
- *   - movements from the score (src/score.ts) appended to the system
- *     prompt as file paths (DefaultResourceLoader re-reads them on every
- *     /reload)
- *   - HARNESS_ROLE set so extensions/cue self-configures
- *   - HARNESS_DIR set so agents can locate the reference corpus
- *   - no context files (no ambient AGENTS.md/CLAUDE.md)
- *
- * Files are memory; processes are attention. Detaching tmux leaves agents
- * running; if the tmux server died, panes resume the same session files.
+ * Files are memory; sessions are a lossy cache. The server is the only
+ * long-running thing, and it is rebuildable from the DB.
  */
-import { execFileSync } from "node:child_process";
-import {
-  existsSync,
-  lstatSync,
-  mkdirSync,
-  realpathSync,
-  symlinkSync,
-  unlinkSync,
-} from "node:fs";
+import { spawn, spawnSync } from "node:child_process";
+import { chmodSync, closeSync, existsSync, mkdirSync, openSync, readFileSync, writeFileSync } from "node:fs";
+import { randomBytes } from "node:crypto";
 import { homedir } from "node:os";
-import { basename, dirname, join, resolve } from "node:path";
+import { basename, join, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
-import {
-  type CreateAgentSessionRuntimeFactory,
-  createAgentSessionFromServices,
-  createAgentSessionRuntime,
-  createAgentSessionServices,
-  InteractiveMode,
-  SessionManager,
-  SettingsManager,
-} from "@earendil-works/pi-coding-agent";
-import { ROLES, type Role, SCORE } from "./score.ts";
+import { OpenCode } from "@opencode/client";
+import { ROLES } from "./score.ts";
 
-const CLI_PATH = realpathSync(fileURLToPath(import.meta.url));
-const HARNESS_DIR = dirname(CLI_PATH).replace(/\/src$/, "");
-const PI_AGENT_DIR = join(homedir(), ".pi", "agent");
+const CLI_PATH = resolve(fileURLToPath(import.meta.url));
+const HARNESS_DIR = resolve(CLI_PATH, "..", "..");
+const LAB_DIR = join(HARNESS_DIR, "lab");
 
-/** Resolve a movement stem to its Markdown file. */
-const movement = (stem: string) => join(HARNESS_DIR, "movement", `${stem}.md`);
+const PIN_FILE = join(LAB_DIR, "runtime.json");
+const PIN = (JSON.parse(readFileSync(PIN_FILE, "utf8")) as { version: string }).version;
+
+const ABSTRACT_HOME = process.env.ABSTRACT_HOME ?? join(homedir(), ".local", "share", "abstract");
+const RUNTIME_DIR = join(ABSTRACT_HOME, "runtime");
+const BIN = join(RUNTIME_DIR, "node_modules", ".bin", "opencode");
+const DB_PATH = join(ABSTRACT_HOME, "lab.db");
+const STATE_HOME = process.env.ABSTRACT_STATE ?? join(homedir(), ".local", "state", "abstract");
+const LOGS_DIR = join(ABSTRACT_HOME, "logs");
+const SERVER_LOG = join(LOGS_DIR, "server.log");
+const PID_FILE = join(ABSTRACT_HOME, "server.pid");
+const PW_FILE = join(ABSTRACT_HOME, "server.pw");
+
+const DAILY_DB = join(homedir(), ".local", "share", "opencode", "opencode.db");
+const PORT = Number(process.env.ABSTRACT_PORT ?? 4319);
+const URL = `http://127.0.0.1:${PORT}`;
 
 function fail(message: string): never {
   console.error(`abstract: ${message}`);
   process.exit(1);
 }
 
-function tmux(args: string[], inheritStdio = false): string {
+/** Secrets for the server env: repo .env plus mcp.secrets.json, both optional. */
+function loadSecrets(): Record<string, string> {
+  const env: Record<string, string> = {};
   try {
-    return execFileSync("tmux", args, {
-      encoding: "utf-8",
-      stdio: inheritStdio ? "inherit" : ["ignore", "pipe", "pipe"],
+    for (const line of readFileSync(join(HARNESS_DIR, ".env"), "utf8").split("\n")) {
+      const m = line.match(/^(\w+)=(.*)$/);
+      if (m && !(m[1] in process.env)) env[m[1]] = m[2].trim();
+    }
+  } catch {}
+  try {
+    const secrets = JSON.parse(readFileSync(join(HARNESS_DIR, "mcp.secrets.json"), "utf8"));
+    for (const [k, v] of Object.entries(secrets as Record<string, string>))
+      if (!(k in process.env)) env[k] = v;
+  } catch {}
+  return env;
+}
+
+function serverEnv(): Record<string, string> {
+  const pw = readFileSync(PW_FILE, "utf8").trim();
+  return {
+    ...loadSecrets(),
+    OPENCODE_CONFIG_DIR: LAB_DIR,
+    OPENCODE_DISABLE_PROJECT_CONFIG: "1",
+    XDG_STATE_HOME: STATE_HOME,
+    OPENCODE_DB: DB_PATH,
+    OPENCODE_DISABLE_AUTOUPDATE: "1",
+    OPENCODE_PASSWORD: pw,
+    ABSTRACT_SERVER_URL: URL,
+    HARNESS_DIR,
+  };
+}
+
+function client() {
+  const pw = readFileSync(PW_FILE, "utf8").trim();
+  const headers = { Authorization: "Basic " + Buffer.from(`opencode:${pw}`).toString("base64") };
+  return OpenCode.make({ baseUrl: URL, headers });
+}
+
+/* -- runtime ------------------------------------------------------------ */
+
+function ensureRuntime(): void {
+  mkdirSync(RUNTIME_DIR, { recursive: true });
+  const pkg = join(RUNTIME_DIR, "package.json");
+  if (!existsSync(pkg)) writeFileSync(pkg, '{"name":"abstract-runtime","private":true}\n');
+  const installed = existsSync(BIN);
+  let version = "";
+  if (installed) {
+    version = spawnSync(BIN, ["--version"], { encoding: "utf8" }).stdout.trim();
+  }
+  if (!installed || !version.includes(PIN)) {
+    console.log(`abstract: installing @opencode/cli@${PIN} into ${RUNTIME_DIR}`);
+    const out = spawnSync("bun", ["add", "-E", `@opencode/cli@${PIN}`], {
+      cwd: RUNTIME_DIR,
+      encoding: "utf8",
     });
+    if (out.status !== 0) fail(`runtime install failed: ${out.stderr}`);
+  }
+}
+
+/* -- server ------------------------------------------------------------- */
+
+function ensurePassword(): void {
+  if (!existsSync(PW_FILE)) {
+    writeFileSync(PW_FILE, randomBytes(24).toString("hex"));
+    chmodSync(PW_FILE, 0o600);
+  }
+}
+
+async function healthy(): Promise<string> {
+  try {
+    const status = await client().server.status();
+    return status.version;
   } catch {
     return "";
   }
 }
 
-function shQuote(s: string): string {
-  return `'${s.replace(/'/g, `'\\''`)}'`;
-}
+async function ensureServer(): Promise<void> {
+  mkdirSync(LOGS_DIR, { recursive: true });
+  mkdirSync(STATE_HOME, { recursive: true });
+  if (await healthy()) return;
 
-/** Create or reattach the tmux ensemble (core + writing windows). */
-function launch(): void {
-  if (!tmux(["-V"])) fail("tmux not found (brew install tmux)");
-  const cwd = process.cwd();
-  const session = `abs-${basename(resolve(cwd))}`;
-  const run = (role: Role) =>
-    `${shQuote(process.execPath)} ${shQuote(CLI_PATH)} __run ${role}`;
-
-  const has = (() => {
+  if (existsSync(PID_FILE)) {
+    const pid = Number(readFileSync(PID_FILE, "utf8"));
     try {
-      execFileSync("tmux", ["has-session", "-t", session], { stdio: "ignore" });
-      return true;
-    } catch {
-      return false;
-    }
-  })();
+      process.kill(pid, 0);
+      process.kill(pid, "SIGTERM");
+    } catch {}
+  }
+  const logFd = openSync(SERVER_LOG, "a");
+  const child = spawn(BIN, ["serve", "--hostname", "127.0.0.1", "--port", String(PORT)], {
+    env: { ...process.env, ...serverEnv() },
+    stdio: ["ignore", logFd, logFd],
+    detached: true,
+  });
+  writeFileSync(PID_FILE, String(child.pid));
+  child.unref();
+  closeSync(logFd);
 
-  const expectedWindows: Record<string, number> = {
-    core: 3,
-    writing: 2,
-  };
-
-  if (has) {
-    const windows = tmux([
-      "list-windows",
-      "-t",
-      session,
-      "-F",
-      "#{window_name} #{window_panes}",
-    ])
-      .trim()
-      .split("\n")
-      .filter(Boolean)
-      .map((line) => line.split(" "));
-    const ok =
-      windows.length === 2 &&
-      windows.every(([name, panes]) => expectedWindows[name] === Number(panes));
-    if (ok) {
-      tmux(["attach-session", "-t", `${session}:core`], true);
+  for (let i = 0; i < 60; i++) {
+    await new Promise((r) => setTimeout(r, 500));
+    const v = await healthy();
+    if (v) {
+      if (!v.includes(PIN)) fail(`server reports ${v}, pin is ${PIN}`);
       return;
     }
-    console.error(
-      `abstract: recreating session ${session} (layout stale; agent memory preserved in .pi/sessions/)`,
-    );
-    tmux(["kill-session", "-t", session]);
   }
-
-  tmux([
-    "new-session",
-    "-d",
-    "-s",
-    session,
-    "-n",
-    "core",
-    "-c",
-    cwd,
-    run("orchestrator"),
-  ]);
-  tmux([
-    "split-window",
-    "-h",
-    "-t",
-    `${session}:core`,
-    "-c",
-    cwd,
-    run("engineer"),
-  ]);
-  tmux([
-    "split-window",
-    "-h",
-    "-t",
-    `${session}:core.1`,
-    "-c",
-    cwd,
-    run("librarian"),
-  ]);
-  tmux(["select-layout", "-t", `${session}:core`, "even-horizontal"]);
-
-  tmux([
-    "new-window",
-    "-t",
-    `${session}:1`,
-    "-n",
-    "writing",
-    "-c",
-    cwd,
-    run("writer"),
-  ]);
-  tmux([
-    "split-window",
-    "-h",
-    "-t",
-    `${session}:writing`,
-    "-c",
-    cwd,
-    run("editor"),
-  ]);
-  tmux(["select-layout", "-t", `${session}:writing`, "even-horizontal"]);
-
-  tmux(["attach-session", "-t", `${session}:core`], true);
+  fail(`server did not become healthy; see ${SERVER_LOG}`);
 }
 
-/** Symlink a global pi config file into the harness agent dir. */
-function linkGlobalConfig(name: string, required: boolean): void {
-  const source = join(PI_AGENT_DIR, name);
-  const target = join(HARNESS_DIR, name);
-  if (!existsSync(source)) {
-    if (required)
-      fail(`${source} not found -- run pi once to set up credentials`);
+/**
+ * Config/agent/plugin discovery is asynchronous after boot; a check fired
+ * the instant health passes races it. Wait until the lab's agents surface.
+ */
+async function awaitDiscovery(): Promise<void> {
+  for (let i = 0; i < 40; i++) {
+    try {
+      const a = await client().agent.list();
+      if (ROLES.every((r) => a.data.some((x: any) => x.id === r))) return;
+    } catch {}
+    await new Promise((r) => setTimeout(r, 500));
+  }
+  fail("lab agents never appeared; config discovery failed (see server log)");
+}
+
+/**
+ * Credentials live in the DB, and a fresh lab DB never imports the daily
+ * auth.json (legacy imports run only on upgrade). Copy credential rows from
+ * the daily install so the lab shares the user's providers. The daily DB
+ * stays canonical: every launch re-syncs.
+ */
+function syncCredentials(): void {
+  if (!existsSync(DAILY_DB)) return;
+  const sql =
+    `ATTACH '${DAILY_DB}' AS daily;` +
+    "INSERT OR REPLACE INTO credential SELECT * FROM daily.credential;" +
+    "DETACH daily;";
+  const out = spawnSync("sqlite3", [DB_PATH, sql], { encoding: "utf8" });
+  if (out.status !== 0 && out.stderr) console.error(`abstract: credential sync: ${out.stderr.trim()}`);
+}
+
+/* -- sessions ----------------------------------------------------------- */
+
+type Session = { id: string; metadata?: Record<string, unknown> | null };
+
+async function roleSessions(dir: string): Promise<Map<string, Session>> {
+  const listed = await client().session.list({ directory: dir, parentID: null });
+  const byRole = new Map<string, Session>();
+  for (const s of listed.data) {
+    const role = (s.metadata as Record<string, unknown> | undefined)?.role;
+    if (typeof role === "string") byRole.set(role, s);
+  }
+  return byRole;
+}
+
+async function ensureSessions(dir: string): Promise<Map<string, Session>> {
+  let byRole = await roleSessions(dir);
+  for (const role of ROLES) {
+    if (byRole.has(role)) continue;
+    const created = await client().session.create({
+      title: role,
+      agent: role,
+      location: { directory: dir },
+      metadata: { role },
+    });
+    byRole.set(role, created);
+    console.log(`abstract: created ${role} session (${basename(dir)})`);
+  }
+  return byRole;
+}
+
+/* -- commands ----------------------------------------------------------- */
+
+async function launch(): Promise<void> {
+  const dir = resolve(process.cwd());
+  ensurePassword();
+  ensureRuntime();
+  await ensureServer();
+  syncCredentials();
+  const byRole = await ensureSessions(dir);
+
+  const env = { ...process.env, OPENCODE_PASSWORD: readFileSync(PW_FILE, "utf8").trim() };
+  const orchestrator = byRole.get("orchestrator")!;
+  const tui = spawnSync(
+    BIN,
+    [dir, "--server", URL, "--session", orchestrator.id],
+    { env, stdio: "inherit" },
+  );
+  if (tui.status && tui.status !== 0) fail(`tui exited with ${tui.status}`);
+}
+
+async function stop(): Promise<void> {
+  if (!existsSync(PID_FILE)) {
+    console.log("abstract: no server pid file (nothing to stop)");
     return;
   }
+  const pid = Number(readFileSync(PID_FILE, "utf8"));
   try {
-    if (
-      lstatSync(target).isSymbolicLink() &&
-      realpathSync(target) === realpathSync(source)
-    )
-      return;
-    unlinkSync(target);
+    process.kill(pid, "SIGTERM");
+    console.log(`abstract: stopped server (pid ${pid})`);
   } catch {
-    // missing or not removable as link; fall through to symlinkSync
+    console.log("abstract: server already stopped");
   }
-  symlinkSync(source, target);
 }
 
-/** Run one role's persistent interactive session in this terminal. */
-async function runRole(role: Role): Promise<void> {
-  process.env.HARNESS_ROLE = role;
-  process.env.HARNESS_DIR = HARNESS_DIR;
+async function upgrade(version?: string): Promise<void> {
+  const v = version ?? PIN;
+  writeFileSync(PIN_FILE, `${JSON.stringify({ version: v }, null, 2)}\n`);
+  console.log(`abstract: pin set to ${v}`);
+  ensureRuntime();
+  await stop();
+  console.log("abstract: run `abstract doctor` against the new pin");
+}
 
-  // Resource inheritance: credentials and model config come from the Pi
-  // Agent global layer (~/.pi/agent) via symlinks; prompts and themes via
-  // explicit paths; skills and MCP servers are NOT inherited. See TODO.md.
-  linkGlobalConfig("auth.json", true);
-  linkGlobalConfig("models.json", false);
+/* -- doctor -------------------------------------------------------------- */
 
-  const cwd = process.cwd();
-  mkdirSync(join(cwd, ".pi", "sessions"), { recursive: true });
-  const sessionManager = SessionManager.open(
-    join(cwd, ".pi", "sessions", `${role}.jsonl`),
-  );
-  sessionManager.appendSessionInfo(role);
+/** Live model checks get a leash: a hung turn must not hang doctor. */
+function withTimeout<T>(p: Promise<T>, ms: number, label: string): Promise<T> {
+  return Promise.race([
+    p,
+    new Promise<T>((_, reject) => setTimeout(() => reject(new Error(`${label} timed out`)), ms)),
+  ]);
+}
 
-  const globalPrompts = join(PI_AGENT_DIR, "prompts");
-  const globalThemes = join(PI_AGENT_DIR, "themes");
+type Check = { name: string; run: () => Promise<string | false> };
 
-  const createRuntime: CreateAgentSessionRuntimeFactory = async ({
-    cwd: effectiveCwd,
-    agentDir,
-    sessionManager: sm,
-    sessionStartEvent,
-  }) => {
-    const settingsManager = SettingsManager.create(effectiveCwd, agentDir, {
-      projectTrusted: false,
-    });
-    const services = await createAgentSessionServices({
-      cwd: effectiveCwd,
-      agentDir,
-      settingsManager,
-      modelRuntimeSignal: AbortSignal.timeout(15_000),
-      resourceLoaderOptions: {
-        noContextFiles: true,
-        // File paths, not strings: DefaultResourceLoader reads them from
-        // disk and re-resolves on every /reload, so edits to any movement
-        // take effect without code changes.
-        appendSystemPrompt: SCORE[role].map(movement),
-        additionalPromptTemplatePaths: existsSync(globalPrompts)
-          ? [globalPrompts]
-          : [],
-        additionalThemePaths: existsSync(globalThemes) ? [globalThemes] : [],
-      },
-    });
-    const created = await createAgentSessionFromServices({
-      services,
-      sessionManager: sm,
-      sessionStartEvent,
-    });
-    const diagnostics = [
-      ...services.diagnostics,
-      ...services.resourceLoader
-        .getExtensions()
-        .errors.map(({ path, error }) => ({
-          type: "error" as const,
-          message: `Failed to load extension "${path}": ${error}`,
-        })),
-    ];
-    return { ...created, services, diagnostics };
+async function doctor(): Promise<void> {
+  ensurePassword();
+  ensureRuntime();
+  await ensureServer();
+  syncCredentials();
+  await awaitDiscovery();
+  const api = client();
+  let failures = 0;
+  const check = async (name: string, run: () => Promise<string>) => {
+    try {
+      const detail = await run();
+      console.log(`pass  ${name}  ${detail}`);
+    } catch (e) {
+      failures++;
+      console.log(`FAIL  ${name}  ${e instanceof Error ? e.message : String(e)}`);
+    }
+  };
+  const assert = (cond: unknown, message: string): void => {
+    if (!cond) throw new Error(message);
   };
 
-  const runtime = await createAgentSessionRuntime(createRuntime, {
-    cwd,
-    agentDir: HARNESS_DIR,
-    sessionManager,
+  await check("runtime pin", async () => {
+    const v = spawnSync(BIN, ["--version"], { encoding: "utf8" }).stdout.trim();
+    assert(v.includes(PIN), `binary ${v} != pin ${PIN}`);
+    return v;
+  });
+  await check("server healthy", async () => {
+    const s = await api.server.status();
+    assert(s.version.includes(PIN), `server ${s.version} != pin ${PIN}`);
+    return s.version;
+  });
+  await check("config dir read (model default)", async () => {
+    const m = await api.model.default();
+    assert(m.data, "no default model (lab/opencode.json not read?)");
+    return `${m.data!.providerID}/${m.data!.id}`;
+  });
+  await check("role agents present", async () => {
+    const a = await api.agent.list();
+    const ids = new Set(a.data.map((x: any) => x.id));
+    const missing = ROLES.filter((r) => !ids.has(r));
+    assert(!missing.length, `missing: ${missing.join(", ")}`);
+    return ROLES.join(",");
+  });
+  await check("subagent catalog present", async () => {
+    const a = await api.agent.list();
+    const ids = new Set(a.data.map((x: any) => x.id));
+    const want = ["scout", "citation-check", "literature-review", "nlpatch", "stale-number-sweep", "style-check",
+      "reviewer-zai", "reviewer-deepseek", "reviewer-kimi", "reviewer-minimax"];
+    const missing = want.filter((r) => !ids.has(r));
+    assert(!missing.length, `missing: ${missing.join(", ")}`);
+    return `${want.length} agents`;
+  });
+  await check("skills discovered", async () => {
+    const s = await api.skill.list();
+    const names = s.data.map((x: any) => x.name ?? x.id);
+    assert(names.includes("logistics"), `logistics missing; found: ${names.join(",")}`);
+    return `${names.length} skills`;
+  });
+  await check("credentials synced (providers live)", async () => {
+    const m = await api.model.list();
+    const providers = new Set(m.data.map((x: any) => x.providerID));
+    assert(providers.has("minimax-cn-coding-plan"), "minimax provider missing (credential sync failed?)");
+    return [...providers].join(",");
+  });
+  await check("mcp servers connected", async () => {
+    const m = await api.mcp.list();
+    const names = m.data.map((x: any) => x.name);
+    for (const want of ["web", "context7", "zotero"]) assert(names.includes(want), `mcp ${want} missing (${names.join(",")})`);
+    return names.join(",");
+  });
+  await check("harness plugin loaded", async () => {
+    const p = await api.plugin.list();
+    const ids = p.data.map((x: any) => x.id);
+    assert(ids.includes("abstract-harness"), `abstract-harness missing`);
+    return `${ids.length} plugins`;
   });
 
-  const errors = runtime.diagnostics.filter((d) => d.type === "error");
-  if (errors.length > 0) {
-    for (const d of runtime.diagnostics)
-      console.error(`${d.type}: ${d.message}`);
-    process.exit(1);
-  }
-
-  const mode = new InteractiveMode(runtime, {
-    startupDiagnostics: [...runtime.diagnostics],
-    modelFallbackMessage: runtime.modelFallbackMessage,
+  // Live round trip: a queue-delivered prompt through a real model turn in a
+  // throwaway role session. Exercises score assembly (context hook), prompt
+  // admission, and wait/drain.
+  const scratch = join(ABSTRACT_HOME, "doctor-scratch");
+  mkdirSync(scratch, { recursive: true });
+  const ephemeral: string[] = [];
+  await check("score assembly + queue round trip", async () => {
+    const s = await api.session.create({
+      title: "doctor",
+      agent: "orchestrator",
+      location: { directory: scratch },
+      metadata: { role: "orchestrator", ephemeral: true },
+    });
+    ephemeral.push(s.id);
+    await withTimeout(
+      api.session.prompt({
+        sessionID: s.id,
+        text: "Reply with exactly one word: ok",
+        delivery: "queue",
+      }),
+      15_000,
+      "prompt",
+    );
+    await withTimeout(api.session.wait({ sessionID: s.id }), 90_000, "model turn");
+    const messages = await api.message.list({ sessionID: s.id, order: "desc", limit: 5, type: "assistant" });
+    const text = JSON.stringify(messages);
+    assert(text.toLowerCase().includes("ok"), `unexpected reply: ${text.slice(0, 160)}`);
+    return "model replied";
   });
-  await mode.run();
+
+  // Cue bus end to end: a real role session calls the cue tool; the peer
+  // session's transcript must contain the delivered cue.
+  await check("cue bus end to end", async () => {
+    const a = await api.session.create({
+      title: "doctor-a",
+      agent: "orchestrator",
+      location: { directory: scratch },
+      metadata: { role: "orchestrator", ephemeral: true },
+    });
+    const b = await api.session.create({
+      title: "doctor-b",
+      agent: "engineer",
+      location: { directory: scratch },
+      metadata: { role: "engineer", ephemeral: true },
+    });
+    ephemeral.push(a.id, b.id);
+    await withTimeout(
+      api.session.prompt({
+        sessionID: a.id,
+        text:
+          'Call the cue tool exactly once with target "engineer" and message "doctor ping" ' +
+          "(calling the tool is the whole point of this task). Then reply with exactly: done",
+        delivery: "queue",
+      }),
+      15_000,
+      "prompt",
+    );
+    await withTimeout(api.session.wait({ sessionID: a.id }), 120_000, "orchestrator turn");
+    const ma = await api.message.list({ sessionID: a.id, order: "asc" });
+    const ta = JSON.stringify(ma);
+    const toolResults = ma.data
+      .flatMap((m: any) => (m.content ?? []).filter((p: any) => p.type === "tool"))
+      .map((p: any) => `${p.name}: ${JSON.stringify(p.state?.content ?? p.state ?? {}).slice(0, 200)}`)
+      .join(" ;; ");
+    assert(
+      ta.includes("cue sent to engineer"),
+      `cue tool did not succeed; results: ${toolResults || "no tool calls"}`,
+    );
+    await withTimeout(api.session.wait({ sessionID: b.id }), 120_000, "engineer cue turn");
+    const messages = await api.message.list({ sessionID: b.id, order: "asc" });
+    const text = JSON.stringify(messages);
+    assert(
+      text.includes("[cue from orchestrator] doctor ping"),
+      `no cue in engineer transcript: ${text.slice(0, 160)}`,
+    );
+    return "cue delivered";
+  });
+
+  for (const id of ephemeral) await api.session.remove({ sessionID: id }).catch(() => {});
+
+  if (failures) fail(`${failures} check(s) failed`);
+  console.log("abstract: all checks passed");
 }
+
+/* -- main ---------------------------------------------------------------- */
 
 async function main(): Promise<void> {
-  const [arg, ...rest] = process.argv.slice(2);
-  if (arg === "__run") {
-    const role = rest[0] as Role | undefined;
-    if (!role || !ROLES.includes(role))
-      fail(`__run requires a role: ${ROLES.join("|")}`);
-    await runRole(role);
-    return;
+  const [cmd, ...rest] = process.argv.slice(2);
+  switch (cmd) {
+    case undefined:
+      await launch();
+      return;
+    case "doctor":
+      await doctor();
+      return;
+    case "stop":
+      await stop();
+      return;
+    case "upgrade":
+      await upgrade(rest[0]);
+      return;
+    case "--help":
+    case "-h":
+      console.log("usage: abstract          ensure runtime/server/sessions for the current project, attach the TUI");
+      console.log("       abstract doctor   contract smoke test against the pinned runtime");
+      console.log("       abstract stop     stop the lab server");
+      console.log("       abstract upgrade [v]  pin a new @opencode/cli version");
+      return;
+    default:
+      fail(`unknown argument: ${cmd} (try --help)`);
   }
-  if (arg === "--help" || arg === "-h") {
-    console.log(
-      "usage: abstract          create/reattach the tmux ensemble (core: orchestrator|engineer|librarian; writing: writer|editor)",
-    );
-    console.log(
-      "       abstract __run r  internal: run role r in this terminal",
-    );
-    return;
-  }
-  if (arg !== undefined) fail(`unknown argument: ${arg} (try --help)`);
-  launch();
 }
 
 await main();

@@ -10,16 +10,18 @@ You never edit `draft/`; consultant, not co-author, not gate.
 
 ## The Panel
 
-A full review convenes a panel of reviewer subagents, one subagent per reviewer,
-each born blind. Compose the panel the way a journal editor does: decide what
+A full review convenes a panel of reviewer subagents, one per reviewer, each
+born blind. Compose the panel the way a journal editor does: decide what
 this manuscript is, then decide who you want reading it. Vary two axes:
 
 - **Familiarity**: at minimum one insider who knows the subfield and its
   conventions, one neighbor from a neighboring subfield, one outsider who is
   simply intelligent. Familiarity is the reviewer's blind spot budget; a panel
   of insiders cannot catch jargon leakage.
-- **Model family**: pin reviewers to different lineages. Same-family reviewers
-  share blind spots; three lineages triangulate.
+- **Model family**: spawn one reviewer per lineage so blind spots do not
+  correlate. The named equipment: `reviewer-zai`, `reviewer-deepseek`,
+  `reviewer-kimi`, `reviewer-minimax`; pick three, the persona comes from
+  your brief.
 
 Write each reviewer a bespoke brief: the persona, the scope (whole draft or one
 section), the aspects below, and what a useful report looks like (concrete

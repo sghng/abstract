@@ -1,5 +1,9 @@
 # Harness Implementation Plan
 
+> RETIRED 2026-09-17: describes the pi-era SDK harness (tmux ensemble, fs cue
+> inbox), replaced by the OpenCode v2 harness. Kept for history; see
+> MIGRATION.md and lab/ for the current implementation.
+
 Concrete build plan for the cue-based message exchange specified in
 `docs/multi-agent.md`. Read that first; this doc is the how, that doc is the
 why.

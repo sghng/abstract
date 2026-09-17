@@ -1,8 +1,9 @@
-# Invariants
+# Lab Kernel
 
-The shared invariants loaded into every agent session, which survive compaction.
-It contains **only invariants**: the rules that must never be forgotten.
-Procedures and templates live in skills; project state lives in `notes/`.
+Invariants loaded into every session (they survive compaction) plus the
+delegation doctrine. It contains **only invariants**: rules whose forgetting is
+silent and costly. Procedures and templates live in skills; project state lives
+in `notes/`.
 
 ## The Team
 
@@ -21,6 +22,10 @@ into reports. Only the orchestrator assigns work.
 Consultations are conversations; artifacts are files. If a consultation produces
 a lasting fact, it must land in `notes/` (a memo, a ticket's "Because", or
 `notes/literature.md`) before it is forgotten.
+
+Peers are reached with the `cue` tool: a short pointer or question, never a
+document. Cues land at the recipient's next turn boundary; anything urgent or
+interactive goes through the orchestrator.
 
 ## Project Layout (Invariant)
 
@@ -67,3 +72,41 @@ variable holds the lab repository's path); read it when asked.
 Skills hold the _procedures and templates_. Each is self-contained: read one
 when its description matches your task, and re-read it after compaction.
 Ticket/report templates live in the **logistics** skill.
+
+## Delegation
+
+You may spawn subagents through the `task` tool: disposable child sessions that
+work a task in isolation and return a report. They exist to protect your
+context window, the lab's scarcest resource.
+
+### When to Delegate
+
+Delegate when the work is independent (needs nothing from your session),
+disposable (only the report matters), and either attention-heavy (it would fill
+your context with transient detail, like bulk reading) or familiarity-sensitive
+(fresh eyes are the point, like review).
+
+Never delegate judgment calls, narrative decisions, or work that needs lab
+memory.
+
+### The Self-Containment Rule
+
+A subagent is born knowing nothing and dies when the report returns: no memory,
+no peers, no cues. The task must carry everything: persona, criteria, file
+paths, and what done looks like. If a report comes back unusable, the brief was
+wrong; rewrite it and respawn.
+
+### Named and Bespoke
+
+Named subagents cover recurring task shapes; the model each runs on is pinned
+per agent, chosen once, and not your concern:
+
+- `scout`, `literature-review`, `nlpatch`, `style-check` -- reading and
+  synthesis shapes.
+- `citation-check`, `stale-number-sweep` -- mechanical verification shapes.
+- `reviewer-zai`, `reviewer-deepseek`, `reviewer-kimi`, `reviewer-minimax` --
+  fresh-eyed readers, one per model lineage; the editor's panel equipment.
+
+For bespoke work, spawn with a custom prompt; the editor's reviewer briefs are
+the standing example. A custom delegation that recurs gets named; propose it to
+the orchestrator.

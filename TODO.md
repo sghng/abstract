@@ -438,3 +438,36 @@ decisions made executing it.
   `docs/.vitepress/config.ts`. `markdown.html: false` because the docs
   are GFM-only with bare `<family>`/`<doi_id>` tokens in prose that the
   Vue compiler would parse as HTML.
+
+## 2026-09-17: harness migrated to OpenCode v2 (supersedes 2026-09-05 shelving)
+
+The lab now runs on OpenCode v2 (`@opencode/cli`, exact pin in
+`lab/runtime.json`) instead of the pi SDK. What changed the calculus since the
+shelved spike: daily-driver satisfaction with the v2 TUI, native subagents with
+continuation, robust background execution, and builtin plugins/MCP/skills --
+most of what this harness handmade in pi now ships upstream. Full roadmap and
+implementation findings: `MIGRATION.md` (temporary; deleted at cleanup).
+
+Shape of the new harness:
+
+- One central per-host server (`abstract` lifecycle, port 4319, own
+  config/state/DB under `~/.local/share/abstract` + `~/.local/state/abstract`);
+  credentials synced from the daily install's DB on every launch (fresh DBs
+  baseline migrations without running them, so auth.json never imports; the
+  sync is one sqlite copy).
+- Five persistent role sessions per project (`metadata.role`, created once by
+  `abstract`); one attached TUI with a tab per session (`--server`, no tmux).
+- Cues are pure HTTP: plugin tool --> `session.prompt` with
+  `delivery: "queue"`; SQLite is the record. The fs inbox is gone.
+- Prompts: kernel (old invariants + delegation) lives in `lab/AGENTS.md`;
+  the plugin's `session.hook("context")` appends each role's movements from
+  `src/score.ts`, re-reading `movement/` from disk per request.
+- Subagents: native `task` tool; catalog ported to `lab/agents/*.md` with
+  per-file model pins (tiers dissolved); reviewer panels are named
+  per-lineage agents (`reviewer-zai|deepseek|kimi|minimax`).
+- Default model is MiniMax-M3 (test posture; cheap). `abstract doctor` is the
+  contract test over every surface the lab stands on; upgrades go through it.
+
+Retired: `extensions/` (cue, subagents, mcp, repertoire-port), `SYSTEM.md`,
+`settings.json`, `subagents/`, `tools.json`, pi symlinks. Git history is the
+rollback. Sessions did not migrate: files are memory, sessions were cache.

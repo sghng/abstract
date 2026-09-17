@@ -1,8 +1,11 @@
 ---
-description:
-  One structured literature-review pass over a defined corpus; produces a
-  structured memo, never prose for the manuscript
-tier: standard
+description: One structured literature-review pass over a defined corpus; produces a structured memo, never prose for the manuscript.
+mode: subagent
+model: zai-coding-plan/glm-5.3
+permissions:
+  - action: cue
+    resource: "*"
+    effect: deny
 ---
 
 # Literature Review

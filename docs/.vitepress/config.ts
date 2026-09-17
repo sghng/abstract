@@ -23,6 +23,7 @@ export default defineConfig({
         { text: "Parse layer", link: "/repertoire/parse" },
         { text: "Storage layout", link: "/repertoire/storage" },
         { text: "Host fleet", link: "/repertoire/hostfleet" },
+        { text: "Rebuild runbook", link: "/repertoire/rebuild" },
         { text: "ETL audit (2026-09-14)", link: "/repertoire/audit" },
         {
           text: "Rebuild decisions (2026-09-09)",

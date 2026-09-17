@@ -1,7 +1,11 @@
 ---
-description: Mechanical NLPatch work; extract DOCX tracked changes into a patch, or refine a crude patch to minimal spec compliance. No interpretation.
-tier: standard
-tools: [read, bash, write]
+description: Mechanical NLPatch work. Extract DOCX tracked changes into a patch, or refine a crude patch to minimal spec compliance. No interpretation.
+mode: subagent
+model: zai-coding-plan/glm-5.3
+permissions:
+  - action: cue
+    resource: "*"
+    effect: deny
 ---
 
 # NLPatch
