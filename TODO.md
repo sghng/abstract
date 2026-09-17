@@ -123,6 +123,36 @@ Until the harness exists, the `bin/` launchers + file-mediated consult relay
 
 ## Canonical Decisions Log
 
+- **Prompt audit round; `abstract context` (2026-09-17)**: the audit became an
+  instrument -- `abstract context [role] [--json]` (src/context.ts) prints each
+  agent's assembly (kernel, movements with sizes, skills index, subagent
+  catalog, tool surface), mirroring the plugin's own assembly; static-first,
+  live-enriched, never boots the server. Graduations per the hierarchy rules:
+  the engineering skill graduated wholesale into `movement/engineer.md` and was
+  deleted (sole single-role audience, near-certain invocation); its
+  supervisor-era verification protocol, pre-work checklist, kernel
+  restatements, and its positive-framing section (which contradicted the
+  movement's "report facts fully; framing happens downstream") died in the
+  merge, while the data-discipline core survived. Literature split along the
+  doctrine/ops line: the claim-verification standard graduated into
+  `movement/librarian.md`; the Zotero/Perplexity operations manual stays a
+  skill. writing-craft's Proposal section demoted into the grants skill
+  (episodic artifact type; fills what was an empty stub). manuscript/review.md
+  deleted as superseded by the nlpatch skill. Dedup: orchestrator.md stopped
+  restating story-keeping's update cadence and review passes; librarian.md
+  stopped restating the kernel's consultations-are-ephemeral rule; logistics
+  defers layout/naming to the kernel (the engineering-skill pattern) and the
+  report template gained the Discovery Zone section two prompts referenced but
+  no template had. docs/prompt-hierarchy.md rewritten to the real mechanism
+  (kernel auto-load, score assembly, skills index, subagent prompts) with two
+  new rules: context is equipment (over-presentation invites a role to exercise
+  what it should delegate; tool and MCP scoping follow), and compaction
+  mechanics (system prompt rebuilt per request, never compacted; skill bodies
+  read into history are). The migration commit was rewritten (with owner
+  approval; force-pushed) to include the 25 retirement deletions its message
+  claimed but its tree lacked; docs/stylometer.md tracked. Open: deny
+  `repertoire` to non-writing roles via agent frontmatter permissions (pi-era
+  HARNESS_ROLE gate), and MCP scoping (zotero was librarian-only in pi).
 - **NLPatch bundled as a subagent; source-first patch derivation (2026-09-10)**:
   `movement/nlpatch.md` was a dead movement (in no score) while the skill and
   orchestrator prompt referenced an `nlpatch` subagent name that resolved to
@@ -312,7 +342,7 @@ Until the harness exists, the `bin/` launchers + file-mediated consult relay
   dynamic assembly become concrete.
 - **Score and movements**: prompt assembly is data, not code -- `src/score.ts`
   maps each role to an ordered list of movement stems; each movement is a
-  Markdown file in `movement/`, general --> specific (motif, doctrine, role). A
+  Markdown file in `movement/`, general --> specific (shared doctrine, role). A
   movement is always-on iff needed in most turns of the role or forgetting is
   silent and costly; everything else stays an on-demand skill. Graduating a
   skill to always-on means extracting its body into a movement (no frontmatter)

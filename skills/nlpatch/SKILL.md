@@ -145,5 +145,5 @@ flow; hand composition is for foreign manuscripts.
 
 ## Synchronization
 
-The operative spec is mirrored, condensed, in `subagents/nlpatch.md` so the
+The operative spec is mirrored, condensed, in `lab/agents/nlpatch.md` so the
 blind subagent is self-contained. Keep the two in sync.

@@ -1,8 +1,8 @@
 # Writing Workflow
 
 How the lab produces publishable artifacts -- grants, proposals, manuscripts,
-and similar deliverables. This doc is dev-facing; invariants live in
-`movement/invariants.md` and role behavior lives in `movement/writer.md` and
+and similar deliverables. This doc is dev-facing; invariants live in the team
+kernel (`lab/AGENTS.md`) and role behavior lives in `movement/writer.md` and
 `movement/editor.md`.
 
 ## Roles

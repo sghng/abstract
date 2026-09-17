@@ -1,53 +1,81 @@
 # Prompt Hierarchy
 
-How the lab's prompts are layered, and the rules for where a line of prompt text
-lives. Think of it as onboarding employees.
+How the lab's prompts are layered, and the rules for where a line of prompt
+text lives. Think of it as onboarding employees. `abstract context [role]`
+prints every role's actual assembly; keep it honest.
 
-## The Three Layers
+## The Layers
 
-1. **The all-hands meeting (shared movements).** Everyone hears everyone's role,
-   so each agent knows both its own job and what it can ask of peers.
-   `invariants` (roster, layout, never-forget rules) for all; `prose-standard`
-   for the two roles that judge prose. A standard earns sharing precisely
-   because a standard with one holder is not a standard.
+The system prompt is reassembled on every model request (kernel auto-load,
+plugin score assembly, skills index), so it survives compaction by
+construction; what compaction takes is message history. Order per request:
+OpenCode base prompt, then the layers below, then tool schemas.
 
-2. **The one-on-one (role movements).** Specific expectations for one role,
-   always-on in that role's context: doctrine, craft, workflow. Single- function
-   roles (writer, editor) inline everything they always need; a probabilistic
-   gate on content with a near-certain invocation rate is pure overhead and pure
-   risk.
+1. **The kernel (`lab/AGENTS.md`, auto-loaded).** Invariants plus the
+   delegation doctrine, for every session: the five roles and every
+   subagent alike. Membership test: forgetting it would be silent and
+   costly.
 
-3. **The reference manual (skills).** Episodic, task-matched procedures: docx
-   handling, journal review, presentations, literature search, Typst syntax. The
-   agent is pointed at their existence and loads one when its description
-   matches the task. Uncertainty is acceptable here because invocation is
+2. **Shared movements (the all-hands meeting).** Doctrine two roles must
+   reason about together earns a movement listed in both scores:
+   `prose-standard` (writer + editor; a standard with one holder is not a
+   standard), `story-doctrine` (orchestrator maintains the story, writer
+   instantiates it).
+
+3. **Role movements (the one-on-one).** One role's always-on doctrine,
+   craft, workflow. Single-function roles (writer, engineer, librarian)
+   inline what they always need; a probabilistic gate on content with a
+   near-certain invocation rate is pure overhead and pure risk.
+
+4. **The skills index (the reference shelf).** Episodic, task-matched
+   procedures: one line of description per skill, always present; the body
+   is read on demand. Uncertainty is acceptable here because invocation is
    genuinely occasional.
+
+5. **Subagent prompts (`lab/agents/*.md`).** Born blind, self-contained:
+   kernel plus their own prompt, no movements, no cue. Named agents cover
+   recurring task shapes; model pins live in their frontmatter.
+
+`src/score.ts` is the single source for which movements a role assembles,
+in order (general --> specific); do not duplicate the mapping anywhere.
 
 ## The Rules
 
-- **Always-on membership test** (score.ts): a line is always-on iff it is needed
-  in most turns of the role, or forgetting it is silent and costly.
-- **The test is role-relative.** The same content can be a movement for one role
-  and a skill (or nothing) for another. Doctrine graduates into exactly the
-  scores that always need it.
+- **Always-on membership test** (score.ts): a line is always-on iff it is
+  needed in most turns of the role, or forgetting it is silent and costly.
+- **The test is role-relative.** The same content can be a movement for one
+  role and a skill (or nothing) for another. Doctrine graduates into exactly
+  the scores that always need it; a single-role skill with near-certain
+  invocation graduates wholesale (engineering, authoring precedents), and
+  the skill is then deleted, not kept as a husk.
 - **Ownership places doctrine.** A line of doctrine lives with the role that
   owns the artifact the doctrine governs: story keeping in `story-keeping`
   (orchestrator, owner of `notes/story.md`), writing craft in `writing-craft`
   (writer, owner of `draft/`). When two roles must reason about the same
-  doctrine, it becomes a shared movement: `prose-standard` (writer + editor),
-  `story-doctrine` (orchestrator maintains the story, the writer instantiates
-  it). Consumers of an artifact read the artifact; roles that shape it share the
-  doctrine.
+  doctrine, it becomes a shared movement. Consumers of an artifact read the
+  artifact; roles that shape it share the doctrine.
 - **Duplication rule.** Never repeat a statement within one agent's context.
   Repetition across different agents' contexts is acceptable and sometimes
   intended (the prose standard shared by writer and editor; the editor's
   checklist restating the writer's detail at recognition grain). When the same
-  fact serves two roles, give each the grain it needs: generative detail for the
-  producer, checkable items for the judge.
-- **Asymmetric detail protects independence.** The editor gets a checklist, not
-  the writer's full rationale; an editor inside the writer's frame shares the
-  writer's blind spots.
-- **Pointer discipline.** Movements may point to skills for episodic procedures
-  ("read the logistics skill when creating reports"). Never put always-on
-  doctrine behind a skill pointer: a two-hop dependency fails silently when the
-  hop is skipped.
+  fact serves two roles, give each the grain it needs: generative detail for
+  the producer, checkable items for the judge.
+- **Asymmetric detail protects independence.** The editor gets a checklist,
+  not the writer's full rationale; an editor inside the writer's frame shares
+  the writer's blind spots.
+- **Context is equipment.** A role that holds a capability will use it:
+  over-presenting invites the role to exercise itself what it should have
+  delegated, and the lab's performance degrades quietly. Load only what the
+  role itself should exercise; everything else reaches it through a peer cue
+  or a subagent brief. The tool surface follows the same rule (a corpus
+  style tool belongs to the writing roles; a reference manager to the
+  librarian), as does MCP scoping.
+- **Compaction mechanics.** The system prompt is rebuilt from disk each
+  request and is never compacted away; a skill body read into message
+  history is. A "read skill X" pointer therefore survives compaction, but
+  the knowledge it pointed at does not -- hence the re-read-after-compaction
+  lines and the next rule.
+- **Pointer discipline.** Movements may point to skills for episodic
+  procedures ("read the logistics skill when creating reports"). Never put
+  always-on doctrine behind a skill pointer: a two-hop dependency fails
+  silently when the hop is skipped.

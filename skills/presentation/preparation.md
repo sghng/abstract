@@ -11,11 +11,9 @@ explore task using a subagent to get relevant info in the working dir.
 
 Before preparing presentation content:
 
-- Review `story.md` in `notes/narrative/`
+- Review `notes/story.md` (the orchestrator owns its format)
 - Understand the audience and occasion
 - Clarify the key message (usually 1-3 take-home points)
-
-**Read `notes/story.md` itself; its format is owned by the orchestrator.**
 
 ## The Story Document
 
