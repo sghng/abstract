@@ -1,54 +1,26 @@
 ---
 name: logistics
 description:
-  Project organization standards -- repository layout, ticket and report
-  templates, file naming, wiki-links, workflow. Use when creating tickets,
+  Project organization procedures -- where notes go, ticket/report/memo
+  templates, wiki-link resolution, workflow. Use when creating tickets,
   reports, or notes, or when unsure where a file belongs.
 ---
 
 # Logistics
 
-How research projects are organized, structured, and executed. This module
-covers file naming, repository structure, ticket conventions, wiki-links, and
-the workflow from story to deliverables.
+How research projects are organized, structured, and executed: note placement,
+the ticket/report/memo templates, wiki-link resolution, and the workflow from
+story to deliverables.
+
+The invariant layer -- the project layout tree, kebab-case naming, ticket and
+report numbering, no dates, the wiki-link form, notes-merge-vs-artifacts-
+version -- lives in the team kernel (`AGENTS.md`, always loaded, never
+compacted away). This skill holds the procedures on top of those invariants
+and does not restate them.
 
 ---
 
-## Repository Structure
-
-A typical research project follows this layout:
-
-```
-project-root/
-+-- notes/                  # Research notes (often symlink to Obsidian vault)
-|   +-- index.md            # Note on notes - entry point to the vault
-|   +-- story.md            # Central narrative - the north star
-|   +-- tickets/            # Active work assignments (required)
-|   +-- reports/            # Completed reports to orchestrator (required)
-|   +-- dev/                # Implementation notes, work-in-progress (required)
-|   `-- ...                 # Other themed dirs optional, emerge as needed
-+-- src/                   # Core reusable code
-+-- scripts/               # One-off utility scripts
-+-- data/                  # Data files reused across experiments
-+-- experiments/           # Individual experiment directories
-|   +-- 01-name/
-|   `-- 02-name/
-`-- draft/                 # Publications, presentations, proposals (artifacts)
-```
-
-### Key Conventions
-
-- **notes/** is typically a symlink to an Obsidian vault. Use `-L` with `find`
-  to follow symlinks.
-- **story.md** lives at `notes/story.md` -- inside notes, at the vault root
-- **index.md** lives at `notes/index.md` -- the "note on notes", entry point
-- **tickets/**, **reports/**, **dev/** are the only required subdirectories
-- Other themed directories (methodology/, literature/, publications/, etc.) are
-  created organically when the volume of notes justifies them
-- **experiments/** are numbered sequentially
-- **src/** contains reusable code, **scripts/** contains one-offs
-
-### Where Do Notes Go?
+## Where Do Notes Go?
 
 | Note type                             | Location                            |
 | ------------------------------------- | ----------------------------------- |
@@ -105,49 +77,12 @@ Short description of the project and what it's about.
 
 ## File Naming
 
-All files use **kebab-case** (lowercase with hyphens):
+Kebab-case, the `NNN` numbering, and the no-dates rule are kernel invariants;
+the patterns are `ticket-NNN-name.md` and `report-NNN-name.md`. The name itself
+is two to five descriptive words.
 
-```
-GOOD: ticket-001-data-analysis.md
-GOOD: report-003-final-results.md
-GOOD: proposal-v2-revised.md
-
-BAD: ticket_001_data_analysis.md
-BAD: Report003FinalResults.md
-BAD: proposal_v2.md
-```
-
-### Ticket Naming
-
-Tickets use the format:
-
-```
-ticket-NNN-short-descriptive-name.md
-```
-
-- **NNN**: Sequential number (001, 002, etc.)
-- **name**: 2-5 words describing the work
-- **No dates** in ticket filenames
-- Tickets are atomic static artifacts
-
-Examples:
-
-- `ticket-001-data-analysis.md`
-- `ticket-002-proposal-prep.md`
-- `ticket-003-story-reframe.md`
-
-### Report Naming
-
-Reports use the format:
-
-```
-report-NNN-short-descriptive-name.md
-```
-
-Examples:
-
-- `report-001-data-analysis.md`
-- `report-002-proposal-draft.md`
+- `ticket-001-data-analysis.md`, `ticket-002-proposal-prep.md`
+- `report-001-data-analysis.md`, `report-002-proposal-draft.md`
 
 ---
 
@@ -381,6 +316,14 @@ How do these results support or complicate the story?
 ## Risk Assessment
 
 What could go wrong? What are the limitations?
+
+---
+
+## Discovery Zone
+
+Unexpected findings, patterns suggesting new hypotheses, serendipitous
+discoveries that might redirect the narrative. Also: what was added beyond the
+requested tasks, and why.
 
 ---
 

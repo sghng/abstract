@@ -2,8 +2,8 @@
 
 Invariants loaded into every session (they survive compaction) plus the
 delegation doctrine. It contains **only invariants**: rules whose forgetting is
-silent and costly. Procedures and templates live in skills; project state lives
-in `notes/`.
+silent and costly. Episodic procedures and templates live in skills; project
+state lives in `notes/`.
 
 ## The Team
 

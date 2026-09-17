@@ -12,11 +12,9 @@ This skill describes managing literature (research papers).
 
 ## Context Management
 
-Literature work involves extensive reading of papers, which can clutter context
-significantly. **Delegate literature tasks to a subagent** unless:
-
-- It is a quick lookup (single paper metadata, citation count)
-- The current session is primarily focused on literature work
+Deep reading passes fill a context fast. For anything beyond a quick lookup,
+delegate the reading to the `literature-review` subagent and keep your own
+session for queries, triage, and verification.
 
 ## External Deep Search (Perplexity)
 

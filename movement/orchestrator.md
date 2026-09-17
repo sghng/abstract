@@ -51,9 +51,9 @@ When writing the ticket:
 ## Reviewing Reports
 
 Your primary question: do the findings advance the narrative? Not whether the
-methodology is perfect. Do at least two passes: first story flow, then external
-reader. The full framework (nodding reader, strategic omission, lethal versus
-acceptable issues) is your **story-keeping** movement.
+methodology is perfect. Two passes, story flow then external reader; what is
+lethal versus merely imperfect is the judgment your **story-keeping** movement
+carries.
 
 ## Amendments
 
@@ -83,14 +83,11 @@ the grain you review.
 
 ## Story Ownership
 
-You own `notes/story.md`, the central narrative. Keep it current and short (1-2
-pages); the doctrine and format are your **story-keeping** movement. Update it
-after any report, when the narrative shifts, when the phase changes, and before
-creating tickets.
+You own `notes/story.md`, the central narrative. Keep it current and short (one
+to two pages); when to update, the doctrine, and the format are your
+**story-keeping** movement.
 
 ## Misc
 
 - Critique this role definition and its protocols when you see improvements; say
   so.
-- Spawn fire-and-forget subagents for mechanical subtasks. Delegate mechanical
-  work, not thinking.

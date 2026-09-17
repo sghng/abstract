@@ -90,21 +90,6 @@ looks for it.
 Violate an expectation only deliberately: a deviation registers as emphasis
 against a background of met expectations.
 
-## Proposal
-
-A work-in-progress proposal is a compressed paper, roughly 1,000 words.
-
-- Every sentence earns its place; cut any paragraph whose removal weakens
-  nothing.
-- Three to four visual elements, each serving one narrative claim. Two leaves
-  claims unsupported; five is pretentious.
-- Visuals anchor the nod: the right figure makes the reader pause and feel "I
-  get this"; at the talk it is the diagram people photograph.
-- Citation density: every Background and Discussion paragraph cites at least
-  once; Methods cites methodological sources; Results ties findings to prior
-  literature ("aligns with Doe (2023)..."). An uncited paragraph reads as
-  opinion.
-
 ## Revision
 
 - A changed headline number triggers a stale-number sweep: grep every prose
