@@ -50,7 +50,12 @@ entitlement; never proxied), one family per browser profile.
 
 ### jem (Wiley, onlinelibrary zone)
 
-- Listing: Crossref, both ISSNs union, dedup by DOI; `list.ts`.
+- Listing: Crossref, both ISSNs union, dedup by DOI; `list.ts`. Scope bound is
+  decision D8 (vol 33, 1996+). Closed 2026-09-17: Crossref holds 985
+  journal-articles 1963-1995 (vols 1-32) with registered DOIs, but the content
+  is not open access and is unreachable even via institutional subscription
+  (owner-verified against the lab's library entitlements). Pre-1996 JEM is
+  unobtainable; 842 is the full accessible universe.
 - Routes: PDF all eras via `/doi/pdfdirect/`; JATS XML via `/doi/full-xml/`;
   HTML full text exists ALL eras (page-nav capture pre-2005, in-page fetch
   2005+; the request API 403s old content, so nav-first pre-2005).
@@ -99,6 +104,18 @@ entitlement; never proxied), one family per browser profile.
 - Metadata: OAI-PMH `set=stat` harvest (150,806 records; `src/oai-harvest.ts` +
   `src/reparse-metadata.ts` + `src/make-papers.ts`), categories kept intact
   primary-first; FILTERING HAPPENS AFTER FETCH, never at fetch time.
+- Preprint QC shape (2026-09-17 census over `metadata.jsonl` authors): 150,783
+  papers with authors, 88.1% multi-author, 45,265 unique first authors (key:
+  lastname+initial). Distribution: 47.8% of first authors have exactly 1
+  preprint, holding 14.4% of papers; 21+ preprints: 1.6% of authors, 16.0% of
+  papers. A first-author >= 2 filter would drop 21,657 papers (14.4%); >= 3
+  drops 25.2%. Any-author variants are useless (>= 2 keeps 98.9%; every paper
+  has a prolific co-author). Adopted rule (owner, 2026-09-17): drop each first
+  author's earliest preprint. Effect: 150,806 -> 105,541 kept (45,265 dropped,
+  30.0%); one-timers vanish entirely, everyone else decrements by one; the
+  dropped set carries 97.8 GB of the 338.5 GB arxiv raw. Filter application
+  belongs to training-set assembly, as a papers-table flag, never a fetch-layer
+  deletion.
 - Fetch: e-print source (`/e-print/<id>`, gzip tarball -> .tex artifact); on
   withheld-source 403, PDF fallback (manifest carries `via: pdf-fallback`).
   Final mix: 140,191 tex (93.5%), 9,814 pdf (6.5%); 801 papers metadata-only
