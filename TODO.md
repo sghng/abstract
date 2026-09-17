@@ -123,6 +123,46 @@ Until the harness exists, the `bin/` launchers + file-mediated consult relay
 
 ## Canonical Decisions Log
 
+- **Prompt audit round 2: fresh eyes; directory reshape; punctuation bans
+  (2026-09-17)**: three subagent audits (cross-reference, cold-reader role
+  simulation, rules-compliance) found seam failures, not machinery failures:
+  kernel contradictions (Date fields in the logistics templates, a versioned
+  ticket example), dangling pointers (three `../typst.md`, an undefined
+  `references/` dir, bare Zotero tool names kept deliberately for observation),
+  coinages without homes ("the +2 beyond the 10", "keyword questions" outside
+  the editor's score, "known risk" with no landing spot, "the grain you
+  review"), and routing gaps (the adversarial round had no trigger,
+  citation-check was routed by nobody, the writer was taught to hand-run the
+  sweep a subagent owns). Reshapes: `lab/` --> `config/`, `movement/` -->
+  `prompts/`, skills de-symlinked into `config/skills/`, named subagents nested
+  under `config/agents/subagents/` (IDs carry the prefix; doctor and prose
+  updated), `$HARNESS_DIR/reference` prose replaced by the OpenCode `references`
+  feature (`lab-reference` alias in config/opencode.json), project `references/`
+  added to the kernel layout for source PDFs. Punctuation: deliverable prose now
+  bans colons, semicolons, and dashes (prose-standard); agent-facing prompt text
+  bans `--` in any form (generation shift; swept corpus-wide,
+  frontmatter/flags/tables are syntax and stay). Workflow closures: writer cues
+  the editor after each revision and both rounds gate externalization along with
+  a citation-check the editor now owns as an aspect; "known risks" land in
+  story.md (template gained a Known Risks section); the key-results registry
+  `notes/results.md` is engineer-owned, orchestrator-arbitrated, and the
+  stale-number-sweep's first source; memos completed into the kernel layout, the
+  naming rules, and a logistics template (with the frontmatter-date exception to
+  the no-dates rule). Skills: logistics slimmed 550 --> 215 lines (templates +
+  placement + wiki-links + amendments only); literature rebuilt sans Perplexity
+  (search via tavily/web, import relayed through the orchestrator, verification
+  standard deferred to the librarian prompt); manuscript dissolved (docx.md -->
+  nlpatch skill, journal-review.md --> own skill); typst package policy routes
+  through the orchestrator; presentation's peer-subagent choreography rewritten
+  flat (stale skill, full rewrite pending; the role question was answered
+  piggyback: talks are the writer's artifacts with editor review, no sixth
+  role). Model pins: orchestrator + engineer on Kimi K3, librarian on MiniMax
+  M3, writer + editor on GLM 5.3; server default stays MiniMax M3 for cheap
+  scratch instances. Deliberately deferred: repertoire gating and MCP scoping
+  (observe first; the rulebook records scope-by-observation), Zotero tool name
+  unification (observe), story-keeping template size (watch). Process rule added
+  to AGENTS.md: post-surgery grep of descriptions, siblings, and dev docs after
+  every graduation round.
 - **Prompt audit round; `abstract context` (2026-09-17)**: the audit became an
   instrument -- `abstract context [role] [--json]` (src/context.ts) prints each
   agent's assembly (kernel, movements with sizes, skills index, subagent
@@ -130,29 +170,29 @@ Until the harness exists, the `bin/` launchers + file-mediated consult relay
   live-enriched, never boots the server. Graduations per the hierarchy rules:
   the engineering skill graduated wholesale into `movement/engineer.md` and was
   deleted (sole single-role audience, near-certain invocation); its
-  supervisor-era verification protocol, pre-work checklist, kernel
-  restatements, and its positive-framing section (which contradicted the
-  movement's "report facts fully; framing happens downstream") died in the
-  merge, while the data-discipline core survived. Literature split along the
-  doctrine/ops line: the claim-verification standard graduated into
-  `movement/librarian.md`; the Zotero/Perplexity operations manual stays a
-  skill. writing-craft's Proposal section demoted into the grants skill
-  (episodic artifact type; fills what was an empty stub). manuscript/review.md
-  deleted as superseded by the nlpatch skill. Dedup: orchestrator.md stopped
-  restating story-keeping's update cadence and review passes; librarian.md
-  stopped restating the kernel's consultations-are-ephemeral rule; logistics
-  defers layout/naming to the kernel (the engineering-skill pattern) and the
-  report template gained the Discovery Zone section two prompts referenced but
-  no template had. docs/prompt-hierarchy.md rewritten to the real mechanism
-  (kernel auto-load, score assembly, skills index, subagent prompts) with two
-  new rules: context is equipment (over-presentation invites a role to exercise
-  what it should delegate; tool and MCP scoping follow), and compaction
-  mechanics (system prompt rebuilt per request, never compacted; skill bodies
-  read into history are). The migration commit was rewritten (with owner
-  approval; force-pushed) to include the 25 retirement deletions its message
-  claimed but its tree lacked; docs/stylometer.md tracked. Open: deny
-  `repertoire` to non-writing roles via agent frontmatter permissions (pi-era
-  HARNESS_ROLE gate), and MCP scoping (zotero was librarian-only in pi).
+  supervisor-era verification protocol, pre-work checklist, kernel restatements,
+  and its positive-framing section (which contradicted the movement's "report
+  facts fully; framing happens downstream") died in the merge, while the
+  data-discipline core survived. Literature split along the doctrine/ops line:
+  the claim-verification standard graduated into `movement/librarian.md`; the
+  Zotero/Perplexity operations manual stays a skill. writing-craft's Proposal
+  section demoted into the grants skill (episodic artifact type; fills what was
+  an empty stub). manuscript/review.md deleted as superseded by the nlpatch
+  skill. Dedup: orchestrator.md stopped restating story-keeping's update cadence
+  and review passes; librarian.md stopped restating the kernel's
+  consultations-are-ephemeral rule; logistics defers layout/naming to the kernel
+  (the engineering-skill pattern) and the report template gained the Discovery
+  Zone section two prompts referenced but no template had.
+  docs/prompt-hierarchy.md rewritten to the real mechanism (kernel auto-load,
+  score assembly, skills index, subagent prompts) with two new rules: context is
+  equipment (over-presentation invites a role to exercise what it should
+  delegate; tool and MCP scoping follow), and compaction mechanics (system
+  prompt rebuilt per request, never compacted; skill bodies read into history
+  are). The migration commit was rewritten (with owner approval; force-pushed)
+  to include the 25 retirement deletions its message claimed but its tree
+  lacked; docs/stylometer.md tracked. Open: deny `repertoire` to non-writing
+  roles via agent frontmatter permissions (pi-era HARNESS_ROLE gate), and MCP
+  scoping (zotero was librarian-only in pi).
 - **NLPatch bundled as a subagent; source-first patch derivation (2026-09-10)**:
   `movement/nlpatch.md` was a dead movement (in no score) while the skill and
   orchestrator prompt referenced an `nlpatch` subagent name that resolved to
@@ -406,68 +446,64 @@ repertoire-html / repertoire-md; sync-r2.ts is checkpointed and resumable.
 ## 2026-09-16: repertoire expansion fetch round (phases 0-1)
 
 Outcome of the audit (2026-09-14) plus the expansion plan
-(repertoire-rebuild-expansion.md, D1-D10). Durable state and recipes
-documented in docs/repertoire-fetch.md; this entry records the
-decisions made executing it.
+(repertoire-rebuild-expansion.md, D1-D10). Durable state and recipes documented
+in docs/repertoire-fetch.md; this entry records the decisions made executing it.
 
-- Family set grew to six: BJMSP 1965+ joined the four planned
-  expansions mid-round (owner). All five journal families complete
-  end-to-end (fetch -> R2 raw/ -> D1 papers+sources -> spot-verify);
-  arxiv stat set on the 7-host fleet, one fetcher per host, wave-based
-  centralization.
-- Content additions beyond the plan: full-text HTML backfill for every
-  Wiley paper lacking JATS XML (era + per-paper gaps; the plan's D2
-  source-form doctrine extended to html-as-raw). EPUB skipped
-  (derivative). JSTOR permanently parked (SAGE covers JEBS). PsyArXiv
-  .docx primaries (699) skipped pending an owner format-contract call.
-- arXiv doctrine held: fetch EVERYTHING with metadata intact (cats
-  primary-first from OAI), filter later, never at fetch time.
-  Withheld-source 403s fall back to PDF (via:pdf-fallback in the
-  manifest). Observed mix ~91% tex.
-- Storage decisions: raw/<doi_id>.<fmt> flat (D6) confirmed at scale
-  (~132k arxiv objects, ~160GB projected; R2 limits are nowhere near
-  binding). D1 gotcha: 100KB statement cap means 50-row insert batches;
-  a 1,000-row batch fails SQLITE_TOOBIG with an easily-missed error.
-  Old D1 rows get an explicit reset on refetch (state, parse_source,
-  local_path, sha256) so stale parse pointers cannot mask fresh bytes.
-- Transport (D7): per-object npx wrangler spawns (~2 obj/s) replaced by
-  the Cloudflare REST API with the existing CF_API_TOKEN
-  (probe-verified R2 read/write; no new credentials needed).
+- Family set grew to six: BJMSP 1965+ joined the four planned expansions
+  mid-round (owner). All five journal families complete end-to-end (fetch -> R2
+  raw/ -> D1 papers+sources -> spot-verify); arxiv stat set on the 7-host fleet,
+  one fetcher per host, wave-based centralization.
+- Content additions beyond the plan: full-text HTML backfill for every Wiley
+  paper lacking JATS XML (era + per-paper gaps; the plan's D2 source-form
+  doctrine extended to html-as-raw). EPUB skipped (derivative). JSTOR
+  permanently parked (SAGE covers JEBS). PsyArXiv .docx primaries (699) skipped
+  pending an owner format-contract call.
+- arXiv doctrine held: fetch EVERYTHING with metadata intact (cats primary-first
+  from OAI), filter later, never at fetch time. Withheld-source 403s fall back
+  to PDF (via:pdf-fallback in the manifest). Observed mix ~91% tex.
+- Storage decisions: raw/<doi_id>.<fmt> flat (D6) confirmed at scale (~132k
+  arxiv objects, ~160GB projected; R2 limits are nowhere near binding). D1
+  gotcha: 100KB statement cap means 50-row insert batches; a 1,000-row batch
+  fails SQLITE_TOOBIG with an easily-missed error. Old D1 rows get an explicit
+  reset on refetch (state, parse_source, local_path, sha256) so stale parse
+  pointers cannot mask fresh bytes.
+- Transport (D7): per-object npx wrangler spawns (~2 obj/s) replaced by the
+  Cloudflare REST API with the existing CF_API_TOKEN (probe-verified R2
+  read/write; no new credentials needed).
 - Code/state split enforced: durable fetchers in repertoire/src/families/
-  (copied from run dirs; originals stay as run state in .cache/bulk/),
-  ML/pilot artifacts moved to repertoire/legacy/, run-tail scripts
-  deleted. Phase 0 closed.
-- Fetcher armor lessons now convention: AbortController inside in-page
-  fetches (silent-wedge fix), block-page detection -> clean stop,
-  year-aware validator floors, structural (not size) validation,
-  profile-per-family with clone-to-parallelize, absolute bun paths in
-  nohup'd gates, and no pkill -f on family prefixes (bulk/psy once
-  killed bulk/psyarxiv).
+  (copied from run dirs; originals stay as run state in .cache/bulk/), ML/pilot
+  artifacts moved to repertoire/legacy/, run-tail scripts deleted. Phase 0
+  closed.
+- Fetcher armor lessons now convention: AbortController inside in-page fetches
+  (silent-wedge fix), block-page detection -> clean stop, year-aware validator
+  floors, structural (not size) validation, profile-per-family with
+  clone-to-parallelize, absolute bun paths in nohup'd gates, and no pkill -f on
+  family prefixes (bulk/psy once killed bulk/psyarxiv).
 - Open (owner): md/ prefix for derived markdown + lean-html demoted to
   local-only + arxiv uploads both tex and pdf
   (docs/repertoire-layout-2026-09-15.md); PsyArXiv docx format question.
 
-- Owner layout decisions (2026-09-16, final): derived md under md/
-  prefix; pipeline intermediates local-only (revises D6's keep-in-bucket);
-  arxiv one artifact per item (no second-format pass); psyarxiv .docx
-  primaries join the format contract (sources check extended, live
-  table rebuilt pre-arxiv-apply); local copy mandatory (raw-new/ is the
-  canonical flat mirror, manifests verbatim-valid forever). Next design
-  pass: whole-storage layout discussion (owner-flagged).
+- Owner layout decisions (2026-09-16, final): derived md under md/ prefix;
+  pipeline intermediates local-only (revises D6's keep-in-bucket); arxiv one
+  artifact per item (no second-format pass); psyarxiv .docx primaries join the
+  format contract (sources check extended, live table rebuilt pre-arxiv-apply);
+  local copy mandatory (raw-new/ is the canonical flat mirror, manifests
+  verbatim-valid forever). Next design pass: whole-storage layout discussion
+  (owner-flagged).
 
 ## 2026-09-16: docs reorganization; VitePress manual (owner decision)
 
-- Corpus docs concentrate under `docs/repertoire/` as the manual:
-  index (spec), fetch, parse, storage, hostfleet, plus dated decision
-  records (audit, rebuild-decisions). Manual standard (owner): explains
+- Corpus docs concentrate under `docs/repertoire/` as the manual: index (spec),
+  fetch, parse, storage, hostfleet, plus dated decision records (audit,
+  rebuild-decisions). Manual standard (owner): explains
   what/how/options-compared so anyone can rebuild from zero.
-- Manual vs memo split (owner): ephemeral logistics state is NOT docs;
-  working memos live on local disk at `repertoire/.cache/notes/`
-  (first residents: the expansion plan, the fetch spike note).
+- Manual vs memo split (owner): ephemeral logistics state is NOT docs; working
+  memos live on local disk at `repertoire/.cache/notes/` (first residents: the
+  expansion plan, the fetch spike note).
 - Served as a local VitePress site (`bun run docs:dev`; never deployed):
-  `docs/.vitepress/config.ts`. `markdown.html: false` because the docs
-  are GFM-only with bare `<family>`/`<doi_id>` tokens in prose that the
-  Vue compiler would parse as HTML.
+  `docs/.vitepress/config.ts`. `markdown.html: false` because the docs are
+  GFM-only with bare `<family>`/`<doi_id>` tokens in prose that the Vue compiler
+  would parse as HTML.
 
 ## 2026-09-17: harness migrated to OpenCode v2 (supersedes 2026-09-05 shelving)
 
@@ -483,18 +519,18 @@ Shape of the new harness:
 - One central per-host server (`abstract` lifecycle, port 4319, own
   config/state/DB under `~/.local/share/abstract` + `~/.local/state/abstract`);
   credentials synced from the daily install's DB on every launch (fresh DBs
-  baseline migrations without running them, so auth.json never imports; the
-  sync is one sqlite copy).
+  baseline migrations without running them, so auth.json never imports; the sync
+  is one sqlite copy).
 - Five persistent role sessions per project (`metadata.role`, created once by
   `abstract`); one attached TUI with a tab per session (`--server`, no tmux).
-- Cues are pure HTTP: plugin tool --> `session.prompt` with
-  `delivery: "queue"`; SQLite is the record. The fs inbox is gone.
-- Prompts: kernel (old invariants + delegation) lives in `lab/AGENTS.md`;
-  the plugin's `session.hook("context")` appends each role's movements from
+- Cues are pure HTTP: plugin tool --> `session.prompt` with `delivery: "queue"`;
+  SQLite is the record. The fs inbox is gone.
+- Prompts: kernel (old invariants + delegation) lives in `lab/AGENTS.md`; the
+  plugin's `session.hook("context")` appends each role's movements from
   `src/score.ts`, re-reading `movement/` from disk per request.
 - Subagents: native `task` tool; catalog ported to `lab/agents/*.md` with
-  per-file model pins (tiers dissolved); reviewer panels are named
-  per-lineage agents (`reviewer-zai|deepseek|kimi|minimax`).
+  per-file model pins (tiers dissolved); reviewer panels are named per-lineage
+  agents (`reviewer-zai|deepseek|kimi|minimax`).
 - Default model is MiniMax-M3 (test posture; cheap). `abstract doctor` is the
   contract test over every surface the lab stands on; upgrades go through it.
 

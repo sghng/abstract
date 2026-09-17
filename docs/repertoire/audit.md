@@ -141,11 +141,11 @@ Issues, severity order:
   path trips this on first run.
 - **No vector count verification** after insert despite the documented wrangler
   silent-drop incident (~17K lost once). Smoke checks 8 matches, not census.
-- **Two query clients, one contract:** `src/query.ts` and
-  `extensions/repertoire/index.ts` reimplement the contract with drift
-  (string-interpolated SQL vs bound params; the extension's search pulls all
-  chunks for matched papers, unfiltered by `chunk_no`; duplicated `SECTION_MAP`
-  between chunk.ts and embed.ts). Extract one shared module.
+- **Two query clients, one contract:** `src/query.ts` and the plugin's
+  repertoire tool (config/plugin/harness.ts) reimplement the contract with drift
+  (string-interpolated SQL vs bound params; the tool's search pulls all chunks
+  for matched papers, unfiltered by `chunk_no`; duplicated `SECTION_MAP` between
+  chunk.ts and embed.ts). Extract one shared module.
 - **md is not self-contained:** `](tabNN)` refs resolve only through D1
   (`attachment_key`), and no serving path ever resolves them; attachments are
   stored but unreachable through the tool. Fine for prose imitation; flag as a
