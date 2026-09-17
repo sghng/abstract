@@ -12,6 +12,9 @@
  *   abstract              ensure runtime, server, credentials, and the five
  *                         role sessions for the current project; attach the
  *                         TUI (one tab per role session)
+ *   abstract context [role] [--json]
+ *                         print what each agent receives: context pieces,
+ *                         skills, subagents, tools (static; live when up)
  *   abstract doctor       contract smoke test against the pinned runtime
  *   abstract stop         stop the lab server
  *   abstract upgrade [v]  bump the pinned @opencode/cli version, then doctor
@@ -27,6 +30,7 @@ import { basename, dirname, join, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 import { OpenCode } from "@opencode/client";
 import { ROLES } from "./score.ts";
+import { buildReport, renderReport } from "./context.ts";
 
 const CLI_PATH = resolve(fileURLToPath(import.meta.url));
 const HARNESS_DIR = resolve(CLI_PATH, "..", "..");
@@ -497,6 +501,62 @@ async function doctor(): Promise<void> {
   console.log("abstract: all checks passed");
 }
 
+/* -- context -------------------------------------------------------------- */
+
+/**
+ * abstract context [role] [--json]
+ *
+ * Prints what each agent receives: the always-on context (kernel +
+ * movements, exactly as the plugin assembles it), the on-demand skills
+ * index, the subagent catalog, and the tool surface. Static from disk;
+ * enriched with live registry/status data when the server is reachable.
+ * Read-only: never boots the server.
+ */
+async function contextCmd(role?: string, json = false): Promise<void> {
+  if (role && !ROLES.includes(role as never)) fail(`unknown role: ${role} (one of ${ROLES.join(", ")})`);
+  let live: Parameters<typeof buildReport>[0] | undefined;
+  const version = await healthy();
+  if (version) {
+    try {
+      const api = client();
+      const [a, m, s0] = await Promise.all([api.agent.list(), api.mcp.list(), api.skill.list()]);
+      // Fresh-boot discovery is async: an empty skill list means "not ready
+      // yet", not "nothing discovered". Poll briefly before flagging.
+      let skills = new Set(s0.data.map((x: any) => x.name ?? x.id));
+      for (let i = 0; i < 10 && skills.size === 0; i++) {
+        await new Promise((r) => setTimeout(r, 500));
+        skills = new Set((await api.skill.list()).data.map((x: any) => x.name ?? x.id));
+      }
+      const agents = new Map(
+        a.data.map((x: any) => [
+          x.id,
+          {
+            model: typeof x.model === "string" ? x.model : (x.model?.id ?? x.model?.modelID),
+            description: x.description,
+            denied: (x.permissions ?? [])
+              .filter((p: any) => p.effect === "deny")
+              .map((p: any) => p.action),
+          },
+        ]),
+      );
+      const mcp = new Map(
+        m.data.map((x: any) => {
+          const st = x?.status;
+          return [x.name, typeof st === "string" ? st : st?.status] as [string, string | undefined];
+        }),
+      );
+      live = { version, agents, mcp, skills };
+    } catch {}
+  }
+  const report = buildReport(live);
+  if (role) {
+    report.roles = report.roles.filter((r) => r.role === role);
+    report.subagents = report.roles[0]?.subagents ?? report.subagents;
+  }
+  if (json) console.log(JSON.stringify(report, null, 2));
+  else console.log(renderReport(report, role));
+}
+
 /* -- main ---------------------------------------------------------------- */
 
 async function main(): Promise<void> {
@@ -504,6 +564,12 @@ async function main(): Promise<void> {
   switch (cmd) {
     case undefined:
       await launch();
+      return;
+    case "context":
+      await contextCmd(
+        rest.find((a) => !a.startsWith("--")),
+        rest.includes("--json"),
+      );
       return;
     case "doctor":
       await doctor();
@@ -517,6 +583,8 @@ async function main(): Promise<void> {
     case "--help":
     case "-h":
       console.log("usage: abstract          ensure runtime/server/sessions for the current project, attach the TUI");
+      console.log("       abstract context [role] [--json]");
+      console.log("                     print each agent's context, skills, subagents, tools");
       console.log("       abstract doctor   contract smoke test against the pinned runtime");
       console.log("       abstract stop     stop the lab server");
       console.log("       abstract upgrade [v]  pin a new @opencode/cli version");

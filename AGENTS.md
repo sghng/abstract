@@ -29,8 +29,10 @@ developing this repository. The lab agents' shared invariants live in
   `~/.local/share/abstract` and `~/.local/state/abstract`, credentials synced
   from the daily install), and the five role sessions per project
   (`metadata.role`, created once); then attaches one TUI
-  (`--server`, `--session`). Also `abstract doctor` (contract smoke test),
-  `abstract stop`, `abstract upgrade [v]`
+  (`--server`, `--session`). Also `abstract context [role] [--json]`
+  (print what each agent receives: context pieces, skills, subagents,
+  tools), `abstract doctor` (contract smoke test), `abstract stop`,
+  `abstract upgrade [v]`
 - `skills/` -- OpenCode skills: procedures and standards, one directory per
   skill, self-contained (re-enterable cold after compaction)
 - `reference/` -- reference material agents read on request; reaches agents
