@@ -23,7 +23,16 @@
  * long-running thing, and it is rebuildable from the DB.
  */
 import { spawn, spawnSync } from "node:child_process";
-import { chmodSync, closeSync, existsSync, mkdirSync, openSync, readFileSync, renameSync, writeFileSync } from "node:fs";
+import {
+  chmodSync,
+  closeSync,
+  existsSync,
+  mkdirSync,
+  openSync,
+  readFileSync,
+  renameSync,
+  writeFileSync,
+} from "node:fs";
 import { randomBytes } from "node:crypto";
 import { homedir } from "node:os";
 import { basename, dirname, join, resolve } from "node:path";
@@ -34,16 +43,19 @@ import { buildReport, renderReport } from "./context.ts";
 
 const CLI_PATH = resolve(fileURLToPath(import.meta.url));
 const HARNESS_DIR = resolve(CLI_PATH, "..", "..");
-const LAB_DIR = join(HARNESS_DIR, "lab");
+const CONFIG_DIR = join(HARNESS_DIR, "config");
 
-const PIN_FILE = join(LAB_DIR, "runtime.json");
-const PIN = (JSON.parse(readFileSync(PIN_FILE, "utf8")) as { version: string }).version;
+const PIN_FILE = join(CONFIG_DIR, "runtime.json");
+const PIN = (JSON.parse(readFileSync(PIN_FILE, "utf8")) as { version: string })
+  .version;
 
-const ABSTRACT_HOME = process.env.ABSTRACT_HOME ?? join(homedir(), ".local", "share", "abstract");
+const ABSTRACT_HOME =
+  process.env.ABSTRACT_HOME ?? join(homedir(), ".local", "share", "abstract");
 const RUNTIME_DIR = join(ABSTRACT_HOME, "runtime");
 const BIN = join(RUNTIME_DIR, "node_modules", ".bin", "opencode");
 const DB_PATH = join(ABSTRACT_HOME, "lab.db");
-const STATE_HOME = process.env.ABSTRACT_STATE ?? join(homedir(), ".local", "state", "abstract");
+const STATE_HOME =
+  process.env.ABSTRACT_STATE ?? join(homedir(), ".local", "state", "abstract");
 const LOGS_DIR = join(ABSTRACT_HOME, "logs");
 const SERVER_LOG = join(LOGS_DIR, "server.log");
 const PID_FILE = join(ABSTRACT_HOME, "server.pid");
@@ -67,13 +79,17 @@ function fail(message: string): never {
 function loadSecrets(): Record<string, string> {
   const env: Record<string, string> = {};
   try {
-    for (const line of readFileSync(join(HARNESS_DIR, ".env"), "utf8").split("\n")) {
+    for (const line of readFileSync(join(HARNESS_DIR, ".env"), "utf8").split(
+      "\n",
+    )) {
       const m = line.match(/^(\w+)=(.*)$/);
       if (m && !(m[1] in process.env)) env[m[1]] = m[2].trim();
     }
   } catch {}
   try {
-    const secrets = JSON.parse(readFileSync(join(HARNESS_DIR, "mcp.secrets.json"), "utf8"));
+    const secrets = JSON.parse(
+      readFileSync(join(HARNESS_DIR, "mcp.secrets.json"), "utf8"),
+    );
     for (const [k, v] of Object.entries(secrets as Record<string, string>))
       if (!(k in process.env)) env[k] = v;
   } catch {}
@@ -84,20 +100,21 @@ function serverEnv(): Record<string, string> {
   const pw = readFileSync(PW_FILE, "utf8").trim();
   return {
     ...loadSecrets(),
-    OPENCODE_CONFIG_DIR: LAB_DIR,
+    OPENCODE_CONFIG_DIR: CONFIG_DIR,
     OPENCODE_DISABLE_PROJECT_CONFIG: "1",
     XDG_STATE_HOME: STATE_HOME,
     OPENCODE_DB: DB_PATH,
     OPENCODE_DISABLE_AUTOUPDATE: "1",
     OPENCODE_PASSWORD: pw,
     ABSTRACT_SERVER_URL: URL,
-    HARNESS_DIR,
   };
 }
 
 function client() {
   const pw = readFileSync(PW_FILE, "utf8").trim();
-  const headers = { Authorization: "Basic " + Buffer.from(`opencode:${pw}`).toString("base64") };
+  const headers = {
+    Authorization: "Basic " + Buffer.from(`opencode:${pw}`).toString("base64"),
+  };
   return OpenCode.make({ baseUrl: URL, headers });
 }
 
@@ -106,14 +123,17 @@ function client() {
 function ensureRuntime(): void {
   mkdirSync(RUNTIME_DIR, { recursive: true });
   const pkg = join(RUNTIME_DIR, "package.json");
-  if (!existsSync(pkg)) writeFileSync(pkg, '{"name":"abstract-runtime","private":true}\n');
+  if (!existsSync(pkg))
+    writeFileSync(pkg, '{"name":"abstract-runtime","private":true}\n');
   const installed = existsSync(BIN);
   let version = "";
   if (installed) {
     version = spawnSync(BIN, ["--version"], { encoding: "utf8" }).stdout.trim();
   }
   if (!installed || !version.includes(PIN)) {
-    console.log(`abstract: installing @opencode/cli@${PIN} into ${RUNTIME_DIR}`);
+    console.log(
+      `abstract: installing @opencode/cli@${PIN} into ${RUNTIME_DIR}`,
+    );
     const out = spawnSync("bun", ["add", "-E", `@opencode/cli@${PIN}`], {
       cwd: RUNTIME_DIR,
       encoding: "utf8",
@@ -153,11 +173,15 @@ async function ensureServer(): Promise<void> {
     } catch {}
   }
   const logFd = openSync(SERVER_LOG, "a");
-  const child = spawn(BIN, ["serve", "--hostname", "127.0.0.1", "--port", String(PORT)], {
-    env: { ...process.env, ...serverEnv() },
-    stdio: ["ignore", logFd, logFd],
-    detached: true,
-  });
+  const child = spawn(
+    BIN,
+    ["serve", "--hostname", "127.0.0.1", "--port", String(PORT)],
+    {
+      env: { ...process.env, ...serverEnv() },
+      stdio: ["ignore", logFd, logFd],
+      detached: true,
+    },
+  );
   writeFileSync(PID_FILE, String(child.pid));
   child.unref();
   closeSync(logFd);
@@ -201,7 +225,8 @@ function syncCredentials(): void {
     "INSERT OR REPLACE INTO credential SELECT * FROM daily.credential;" +
     "DETACH daily;";
   const out = spawnSync("sqlite3", [DB_PATH, sql], { encoding: "utf8" });
-  if (out.status !== 0 && out.stderr) console.error(`abstract: credential sync: ${out.stderr.trim()}`);
+  if (out.status !== 0 && out.stderr)
+    console.error(`abstract: credential sync: ${out.stderr.trim()}`);
 }
 
 /* -- sessions ----------------------------------------------------------- */
@@ -218,7 +243,13 @@ function seedTabs(dir: string, byRole: Map<string, Session>): void {
   mkdirSync(dirname(TUI_TABS_FILE), { recursive: true });
   let file: {
     global?: unknown;
-    cwd?: Record<string, { tabs?: { sessionID: string; title?: string }[]; unread?: Record<string, unknown> }>;
+    cwd?: Record<
+      string,
+      {
+        tabs?: { sessionID: string; title?: string }[];
+        unread?: Record<string, unknown>;
+      }
+    >;
   } = {};
   try {
     file = JSON.parse(readFileSync(TUI_TABS_FILE, "utf8"));
@@ -237,7 +268,10 @@ function seedTabs(dir: string, byRole: Map<string, Session>): void {
 }
 
 async function roleSessions(dir: string): Promise<Map<string, Session>> {
-  const listed = await client().session.list({ directory: dir, parentID: null });
+  const listed = await client().session.list({
+    directory: dir,
+    parentID: null,
+  });
   const byRole = new Map<string, Session>();
   for (const s of listed.data) {
     const role = (s.metadata as Record<string, unknown> | undefined)?.role;
@@ -319,7 +353,9 @@ async function upgrade(version?: string): Promise<void> {
 function withTimeout<T>(p: Promise<T>, ms: number, label: string): Promise<T> {
   return Promise.race([
     p,
-    new Promise<T>((_, reject) => setTimeout(() => reject(new Error(`${label} timed out`)), ms)),
+    new Promise<T>((_, reject) =>
+      setTimeout(() => reject(new Error(`${label} timed out`)), ms),
+    ),
   ]);
 }
 
@@ -339,7 +375,9 @@ async function doctor(): Promise<void> {
       console.log(`pass  ${name}  ${detail}`);
     } catch (e) {
       failures++;
-      console.log(`FAIL  ${name}  ${e instanceof Error ? e.message : String(e)}`);
+      console.log(
+        `FAIL  ${name}  ${e instanceof Error ? e.message : String(e)}`,
+      );
     }
   };
   const assert = (cond: unknown, message: string): void => {
@@ -358,7 +396,7 @@ async function doctor(): Promise<void> {
   });
   await check("config dir read (model default)", async () => {
     const m = await api.model.default();
-    assert(m.data, "no default model (lab/opencode.json not read?)");
+    assert(m.data, "no default model (config/opencode.json not read?)");
     return `${m.data!.providerID}/${m.data!.id}`;
   });
   await check("role agents present", async () => {
@@ -371,8 +409,19 @@ async function doctor(): Promise<void> {
   await check("subagent catalog present", async () => {
     const a = await api.agent.list();
     const ids = new Set(a.data.map((x: any) => x.id));
-    const want = ["scout", "citation-check", "literature-review", "nlpatch", "stale-number-sweep", "style-check",
-      "reviewer-zai", "reviewer-deepseek", "reviewer-kimi", "reviewer-minimax"];
+    // Nested under config/agents/subagents/, so each ID carries the prefix.
+    const want = [
+      "subagents/scout",
+      "subagents/citation-check",
+      "subagents/literature-review",
+      "subagents/nlpatch",
+      "subagents/stale-number-sweep",
+      "subagents/style-check",
+      "subagents/reviewer-zai",
+      "subagents/reviewer-deepseek",
+      "subagents/reviewer-kimi",
+      "subagents/reviewer-minimax",
+    ];
     const missing = want.filter((r) => !ids.has(r));
     assert(!missing.length, `missing: ${missing.join(", ")}`);
     return `${want.length} agents`;
@@ -380,19 +429,26 @@ async function doctor(): Promise<void> {
   await check("skills discovered", async () => {
     const s = await api.skill.list();
     const names = s.data.map((x: any) => x.name ?? x.id);
-    assert(names.includes("logistics"), `logistics missing; found: ${names.join(",")}`);
+    assert(
+      names.includes("logistics"),
+      `logistics missing; found: ${names.join(",")}`,
+    );
     return `${names.length} skills`;
   });
   await check("credentials synced (providers live)", async () => {
     const m = await api.model.list();
     const providers = new Set(m.data.map((x: any) => x.providerID));
-    assert(providers.has("minimax-cn-coding-plan"), "minimax provider missing (credential sync failed?)");
+    assert(
+      providers.has("minimax-cn-coding-plan"),
+      "minimax provider missing (credential sync failed?)",
+    );
     return [...providers].join(",");
   });
   await check("mcp servers connected", async () => {
     const m = await api.mcp.list();
     const names = m.data.map((x: any) => x.name);
-    for (const want of ["web", "context7", "zotero"]) assert(names.includes(want), `mcp ${want} missing (${names.join(",")})`);
+    for (const want of ["web", "context7", "zotero"])
+      assert(names.includes(want), `mcp ${want} missing (${names.join(",")})`);
     return names.join(",");
   });
   await check("harness plugin loaded", async () => {
@@ -418,7 +474,10 @@ async function doctor(): Promise<void> {
     seedTabs(scratch, new Map([["orchestrator", s]]));
     const file = JSON.parse(readFileSync(TUI_TABS_FILE, "utf8"));
     const tabs = file.cwd?.[scratch]?.tabs ?? [];
-    assert(tabs.some((t: any) => t.sessionID === s.id), "seeded tab missing from tabs.json");
+    assert(
+      tabs.some((t: any) => t.sessionID === s.id),
+      "seeded tab missing from tabs.json",
+    );
     delete file.cwd[scratch]; // doctor leaves no scratch scopes behind
     writeFileSync(TUI_TABS_FILE, JSON.stringify(file));
     return "role tabs land in the persisted tab bar";
@@ -440,10 +499,22 @@ async function doctor(): Promise<void> {
       15_000,
       "prompt",
     );
-    await withTimeout(api.session.wait({ sessionID: s.id }), 90_000, "model turn");
-    const messages = await api.message.list({ sessionID: s.id, order: "desc", limit: 5, type: "assistant" });
+    await withTimeout(
+      api.session.wait({ sessionID: s.id }),
+      90_000,
+      "model turn",
+    );
+    const messages = await api.message.list({
+      sessionID: s.id,
+      order: "desc",
+      limit: 5,
+      type: "assistant",
+    });
     const text = JSON.stringify(messages);
-    assert(text.toLowerCase().includes("ok"), `unexpected reply: ${text.slice(0, 160)}`);
+    assert(
+      text.toLowerCase().includes("ok"),
+      `unexpected reply: ${text.slice(0, 160)}`,
+    );
     return "model replied";
   });
 
@@ -474,18 +545,31 @@ async function doctor(): Promise<void> {
       15_000,
       "prompt",
     );
-    await withTimeout(api.session.wait({ sessionID: a.id }), 120_000, "orchestrator turn");
+    await withTimeout(
+      api.session.wait({ sessionID: a.id }),
+      120_000,
+      "orchestrator turn",
+    );
     const ma = await api.message.list({ sessionID: a.id, order: "asc" });
     const ta = JSON.stringify(ma);
     const toolResults = ma.data
-      .flatMap((m: any) => (m.content ?? []).filter((p: any) => p.type === "tool"))
-      .map((p: any) => `${p.name}: ${JSON.stringify(p.state?.content ?? p.state ?? {}).slice(0, 200)}`)
+      .flatMap((m: any) =>
+        (m.content ?? []).filter((p: any) => p.type === "tool"),
+      )
+      .map(
+        (p: any) =>
+          `${p.name}: ${JSON.stringify(p.state?.content ?? p.state ?? {}).slice(0, 200)}`,
+      )
       .join(" ;; ");
     assert(
       ta.includes("cue sent to engineer"),
       `cue tool did not succeed; results: ${toolResults || "no tool calls"}`,
     );
-    await withTimeout(api.session.wait({ sessionID: b.id }), 120_000, "engineer cue turn");
+    await withTimeout(
+      api.session.wait({ sessionID: b.id }),
+      120_000,
+      "engineer cue turn",
+    );
     const messages = await api.message.list({ sessionID: b.id, order: "asc" });
     const text = JSON.stringify(messages);
     assert(
@@ -495,7 +579,8 @@ async function doctor(): Promise<void> {
     return "cue delivered";
   });
 
-  for (const id of ephemeral) await api.session.remove({ sessionID: id }).catch(() => {});
+  for (const id of ephemeral)
+    await api.session.remove({ sessionID: id }).catch(() => {});
 
   if (failures) fail(`${failures} check(s) failed`);
   console.log("abstract: all checks passed");
@@ -507,31 +592,41 @@ async function doctor(): Promise<void> {
  * abstract context [role] [--json]
  *
  * Prints what each agent receives: the always-on context (kernel +
- * movements, exactly as the plugin assembles it), the on-demand skills
+ * prompts, exactly as the plugin assembles it), the on-demand skills
  * index, the subagent catalog, and the tool surface. Static from disk;
  * enriched with live registry/status data when the server is reachable.
  * Read-only: never boots the server.
  */
 async function contextCmd(role?: string, json = false): Promise<void> {
-  if (role && !ROLES.includes(role as never)) fail(`unknown role: ${role} (one of ${ROLES.join(", ")})`);
+  if (role && !ROLES.includes(role as never))
+    fail(`unknown role: ${role} (one of ${ROLES.join(", ")})`);
   let live: Parameters<typeof buildReport>[0] | undefined;
   const version = await healthy();
   if (version) {
     try {
       const api = client();
-      const [a, m, s0] = await Promise.all([api.agent.list(), api.mcp.list(), api.skill.list()]);
+      const [a, m, s0] = await Promise.all([
+        api.agent.list(),
+        api.mcp.list(),
+        api.skill.list(),
+      ]);
       // Fresh-boot discovery is async: an empty skill list means "not ready
       // yet", not "nothing discovered". Poll briefly before flagging.
       let skills = new Set(s0.data.map((x: any) => x.name ?? x.id));
       for (let i = 0; i < 10 && skills.size === 0; i++) {
         await new Promise((r) => setTimeout(r, 500));
-        skills = new Set((await api.skill.list()).data.map((x: any) => x.name ?? x.id));
+        skills = new Set(
+          (await api.skill.list()).data.map((x: any) => x.name ?? x.id),
+        );
       }
       const agents = new Map(
         a.data.map((x: any) => [
           x.id,
           {
-            model: typeof x.model === "string" ? x.model : (x.model?.id ?? x.model?.modelID),
+            model:
+              typeof x.model === "string"
+                ? x.model
+                : (x.model?.id ?? x.model?.modelID),
             description: x.description,
             denied: (x.permissions ?? [])
               .filter((p: any) => p.effect === "deny")
@@ -542,7 +637,10 @@ async function contextCmd(role?: string, json = false): Promise<void> {
       const mcp = new Map(
         m.data.map((x: any) => {
           const st = x?.status;
-          return [x.name, typeof st === "string" ? st : st?.status] as [string, string | undefined];
+          return [x.name, typeof st === "string" ? st : st?.status] as [
+            string,
+            string | undefined,
+          ];
         }),
       );
       live = { version, agents, mcp, skills };
@@ -582,12 +680,20 @@ async function main(): Promise<void> {
       return;
     case "--help":
     case "-h":
-      console.log("usage: abstract          ensure runtime/server/sessions for the current project, attach the TUI");
+      console.log(
+        "usage: abstract          ensure runtime/server/sessions for the current project, attach the TUI",
+      );
       console.log("       abstract context [role] [--json]");
-      console.log("                     print each agent's context, skills, subagents, tools");
-      console.log("       abstract doctor   contract smoke test against the pinned runtime");
+      console.log(
+        "                     print each agent's context, skills, subagents, tools",
+      );
+      console.log(
+        "       abstract doctor   contract smoke test against the pinned runtime",
+      );
       console.log("       abstract stop     stop the lab server");
-      console.log("       abstract upgrade [v]  pin a new @opencode/cli version");
+      console.log(
+        "       abstract upgrade [v]  pin a new @opencode/cli version",
+      );
       return;
     default:
       fail(`unknown argument: ${cmd} (try --help)`);

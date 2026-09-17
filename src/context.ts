@@ -1,7 +1,7 @@
 /**
  * The context report: what each lab agent receives, assembled the same way
- * the harness plugin assembles it (src/score.ts --> lab/AGENTS.md +
- * movement/*.md, read from disk), plus the on-demand tier (skills index),
+ * the harness plugin assembles it (src/score.ts --> config/AGENTS.md +
+ * prompts/*.md, read from disk), plus the on-demand tier (skills index),
  * the delegation tier (subagent catalog), and the tool surface.
  *
  * Static by design: works with the server down, because the prompt
@@ -13,15 +13,15 @@ import * as path from "node:path";
 import { SCORE, ROLES, type Role } from "./score.ts";
 
 const REPO = path.resolve(import.meta.dir, "..");
-const LAB = path.join(REPO, "lab");
-const KERNEL = path.join(LAB, "AGENTS.md");
-const MOVEMENT_DIR = path.join(REPO, "movement");
-const AGENTS_DIR = path.join(LAB, "agents");
-const SKILLS_DIR = path.join(REPO, "skills");
-const CONFIG = path.join(LAB, "opencode.json");
+const CONFIG = path.join(REPO, "config");
+const KERNEL = path.join(CONFIG, "AGENTS.md");
+const PROMPTS_DIR = path.join(REPO, "prompts");
+const AGENTS_DIR = path.join(CONFIG, "agents");
+const SKILLS_DIR = path.join(CONFIG, "skills");
+const OPENCODE_JSON = path.join(CONFIG, "opencode.json");
 
 /**
- * Plugin tool names. Keep in sync with lab/plugin/harness.ts (tools.add).
+ * Plugin tool names. Keep in sync with config/plugin/harness.ts (tools.add).
  * The builtin set belongs to the pinned binary and is only summarized.
  */
 const PLUGIN_TOOLS = ["cue", "repertoire"];
@@ -29,17 +29,22 @@ const BUILTIN_TOOLS_NOTE =
   "read bash edit write glob grep ls patch task webfetch (curated from the pinned binary)";
 
 export type Piece = {
-  kind: "kernel" | "movement" | "prompt";
+  kind: "kernel" | "prompt";
   stem: string;
   file: string; // repo-relative
   lines: number;
   tokens: number; // estimate: chars / 4
   heading: string; // first markdown heading
   missing: boolean;
-  alsoIn: Role[]; // for shared movements: the other roles whose score lists them
+  alsoIn: Role[]; // for shared prompts: the other roles whose score lists them
 };
 
-export type SkillEntry = { name: string; description: string; lines: number; discovered?: boolean };
+export type SkillEntry = {
+  name: string;
+  description: string;
+  lines: number;
+  discovered?: boolean;
+};
 
 export type SubagentEntry = {
   name: string;
@@ -51,11 +56,15 @@ export type SubagentEntry = {
 
 export type RoleReport = {
   role: Role;
-  pieces: Piece[]; // kernel + movements, assembly order
+  pieces: Piece[]; // kernel + prompts, assembly order
   totalTokens: number;
   skills: SkillEntry[];
   subagents: SubagentEntry[];
-  tools: { builtin: string; plugin: string[]; mcp: Array<{ name: string; status?: string }> };
+  tools: {
+    builtin: string;
+    plugin: string[];
+    mcp: Array<{ name: string; status?: string }>;
+  };
   denied: string[];
 };
 
@@ -127,7 +136,7 @@ export function loadSkills(): SkillEntry[] {
   const out: SkillEntry[] = [];
   if (!fs.existsSync(SKILLS_DIR)) return out;
   for (const dir of fs.readdirSync(SKILLS_DIR).sort()) {
-    const raw = read(path.join("skills", dir, "SKILL.md"));
+    const raw = read(path.join("config", "skills", dir, "SKILL.md"));
     if (!raw) continue;
     const { fm, body } = splitFrontmatter(raw);
     out.push({
@@ -139,26 +148,47 @@ export function loadSkills(): SkillEntry[] {
   return out;
 }
 
-export function loadSubagents(liveAgents?: Map<string, { model?: string; description?: string; denied?: string[] }>): SubagentEntry[] {
+export function loadSubagents(
+  liveAgents?: Map<
+    string,
+    { model?: string; description?: string; denied?: string[] }
+  >,
+): SubagentEntry[] {
   const out: SubagentEntry[] = [];
   if (!fs.existsSync(AGENTS_DIR)) return out;
-  for (const f of fs.readdirSync(AGENTS_DIR).sort()) {
-    if (!f.endsWith(".md")) continue;
-    const raw = read(path.join("lab", "agents", f));
+  // Walk config/agents/ one level deep (roles at top level, named subagents
+  // under subagents/); the agent ID is the path without .md, so nested files
+  // carry the subagents/ prefix, matching OpenCode's discovery.
+  const files: string[] = [];
+  for (const entry of fs
+    .readdirSync(AGENTS_DIR, { withFileTypes: true })
+    .sort((a, b) => a.name.localeCompare(b.name))) {
+    if (entry.isFile() && entry.name.endsWith(".md")) files.push(entry.name);
+    else if (entry.isDirectory())
+      for (const f of fs
+        .readdirSync(path.join(AGENTS_DIR, entry.name))
+        .sort()) {
+        if (f.endsWith(".md")) files.push(`${entry.name}/${f}`);
+      }
+  }
+  for (const rel of files) {
+    const raw = read(path.join("config", "agents", rel));
     if (!raw) continue;
     const { fm, body } = splitFrontmatter(raw);
     if (fmValue(fm, "mode") !== "subagent") continue;
-    const name = f.replace(/\.md$/, "");
+    const name = rel.replace(/\.md$/, "");
     const s = stat(body);
     out.push({
       name,
-      description: oneLine(liveAgents?.get(name)?.description ?? fmValue(fm, "description") ?? ""),
+      description: oneLine(
+        liveAgents?.get(name)?.description ?? fmValue(fm, "description") ?? "",
+      ),
       model: liveAgents?.get(name)?.model ?? fmValue(fm, "model"),
       denied: liveAgents?.get(name)?.denied ?? deniedTools(fm),
       prompt: {
         kind: "prompt",
         stem: name,
-        file: `lab/agents/${f}`,
+        file: `config/agents/${rel}`,
         lines: s.lines,
         tokens: s.tokens,
         heading: firstHeading(body),
@@ -172,8 +202,10 @@ export function loadSubagents(liveAgents?: Map<string, { model?: string; descrip
 
 function loadMcp(): Array<{ name: string; status?: string }> {
   try {
-    const cfg = JSON.parse(fs.readFileSync(CONFIG, "utf8"));
-    return Object.keys(cfg.mcp?.servers ?? {}).sort().map((name) => ({ name }));
+    const cfg = JSON.parse(fs.readFileSync(OPENCODE_JSON, "utf8"));
+    return Object.keys(cfg.mcp?.servers ?? {})
+      .sort()
+      .map((name) => ({ name }));
   } catch {
     return [];
   }
@@ -183,22 +215,36 @@ function loadMcp(): Array<{ name: string; status?: string }> {
 
 export function buildReport(live?: {
   version: string;
-  agents: Map<string, { model?: string; description?: string; denied?: string[] }>;
+  agents: Map<
+    string,
+    { model?: string; description?: string; denied?: string[] }
+  >;
   mcp: Map<string, string | undefined>;
   skills: Set<string>;
 }): ContextReport {
   const skills = loadSkills().map((s) => ({
     ...s,
-    discovered: live ? (live.skills.size === 0 ? undefined : live.skills.has(s.name)) : undefined,
+    discovered: live
+      ? live.skills.size === 0
+        ? undefined
+        : live.skills.has(s.name)
+      : undefined,
   }));
   const subagents = loadSubagents(live?.agents);
   const mcp = loadMcp().map((s) => ({ ...s, status: live?.mcp.get(s.name) }));
 
-  // reverse map: which roles share each movement
+  // reverse map: which roles share each prompt
   const shared = new Map<string, Role[]>();
-  for (const role of ROLES) for (const stem of SCORE[role]) shared.set(stem, [...(shared.get(stem) ?? []), role]);
+  for (const role of ROLES)
+    for (const stem of SCORE[role])
+      shared.set(stem, [...(shared.get(stem) ?? []), role]);
 
-  const pieceFor = (role: Role, stem: string, file: string, kind: Piece["kind"]): Piece => {
+  const pieceFor = (
+    role: Role,
+    stem: string,
+    file: string,
+    kind: Piece["kind"],
+  ): Piece => {
     const raw = read(file);
     const s = raw ? stat(raw) : { lines: 0, tokens: 0 };
     return {
@@ -207,16 +253,23 @@ export function buildReport(live?: {
       file,
       lines: s.lines,
       tokens: s.tokens,
-      heading: raw ? firstHeading(raw) : "(file missing; the plugin skips it silently)",
+      heading: raw
+        ? firstHeading(raw)
+        : "(file missing; the plugin skips it silently)",
       missing: !raw,
-      alsoIn: kind === "movement" ? (shared.get(stem) ?? []).filter((r) => r !== role) : [],
+      alsoIn:
+        kind === "prompt"
+          ? (shared.get(stem) ?? []).filter((r) => r !== role)
+          : [],
     };
   };
 
   const roles: RoleReport[] = ROLES.map((role) => {
     const pieces: Piece[] = [
-      pieceFor(role, "kernel", "lab/AGENTS.md", "kernel"),
-      ...SCORE[role].map((stem) => pieceFor(role, stem, `movement/${stem}.md`, "movement")),
+      pieceFor(role, "kernel", "config/AGENTS.md", "kernel"),
+      ...SCORE[role].map((stem) =>
+        pieceFor(role, stem, `prompts/${stem}.md`, "prompt"),
+      ),
     ];
     return {
       role,
@@ -234,8 +287,8 @@ export function buildReport(live?: {
     roles,
     subagents,
     subagentNote:
-      "Subagents are born blind: kernel + own prompt + skills index; no movements, no cue. " +
-      "Denied tools come from lab/agents frontmatter permissions.",
+      "Subagents are born blind: kernel + own prompt + skills index; no role prompts, no cue. " +
+      "Denied tools come from config/agents/subagents frontmatter permissions.",
   };
 }
 
@@ -261,12 +314,22 @@ export function renderReport(r: ContextReport, only?: string): string {
   // (no role scoping). Print them once; fall back to per-role if they
   // ever diverge.
   const sameSkills = r.roles.every((x) => sameNames(x.skills, first.skills));
-  const sameSubagents = r.roles.every((x) => sameNames(x.subagents, first.subagents));
+  const sameSubagents = r.roles.every((x) =>
+    sameNames(x.subagents, first.subagents),
+  );
   const sameTools =
     r.roles.every((x) => x.tools.plugin.join() === first.tools.plugin.join()) &&
-    r.roles.every((x) => x.tools.mcp.map((m) => m.name).join() === first.tools.mcp.map((m) => m.name).join());
+    r.roles.every(
+      (x) =>
+        x.tools.mcp.map((m) => m.name).join() ===
+        first.tools.mcp.map((m) => m.name).join(),
+    );
 
-  const printSkills = (label: string, skills: SkillEntry[], indent = "    ") => {
+  const printSkills = (
+    label: string,
+    skills: SkillEntry[],
+    indent = "    ",
+  ) => {
     out.push(`${label}`);
     for (const s of skills)
       out.push(
@@ -274,15 +337,21 @@ export function renderReport(r: ContextReport, only?: string): string {
           (s.discovered === false ? "  [NOT discovered by server]" : ""),
       );
   };
-  const printSubagents = (label: string, subs: SubagentEntry[], indent = "    ") => {
+  const printSubagents = (
+    label: string,
+    subs: SubagentEntry[],
+    indent = "    ",
+  ) => {
     out.push(`${label}`);
     for (const s of subs)
       out.push(
-        `${indent}${s.name.padEnd(20)}[${s.model ?? "?"}]  ${s.description}  denied: ${s.denied.join(",") || "none"}`,
+        `${indent}${s.name.padEnd(30)}[${s.model ?? "?"}]  ${s.description}  denied: ${s.denied.join(",") || "none"}`,
       );
   };
   const printTools = (label: string, tools: RoleReport["tools"]) => {
-    const mcp = tools.mcp.map((m) => (m.status ? `${m.name} (${m.status})` : m.name)).join(", ");
+    const mcp = tools.mcp
+      .map((m) => (m.status ? `${m.name} (${m.status})` : m.name))
+      .join(", ");
     out.push(`${label}`);
     out.push(`    builtin  ${tools.builtin}`);
     out.push(`    plugin   ${tools.plugin.join(", ")}`);
@@ -291,8 +360,14 @@ export function renderReport(r: ContextReport, only?: string): string {
 
   const k = first.pieces[0];
   out.push("common to every role");
-  out.push(`  kernel      ${k.file}  ${k.lines} ln  ${tok(k.tokens)}  # ${k.heading}`);
-  if (sameSkills) printSkills("  skills      index always present; bodies on demand, lost to compaction", first.skills);
+  out.push(
+    `  kernel      ${k.file}  ${k.lines} ln  ${tok(k.tokens)}  # ${k.heading}`,
+  );
+  if (sameSkills)
+    printSkills(
+      "  skills      index always present; bodies on demand, lost to compaction",
+      first.skills,
+    );
   if (sameSubagents) printSubagents("  subagents   task tool", first.subagents);
   if (sameTools) printTools("  tools", first.tools);
   out.push("");
@@ -300,15 +375,15 @@ export function renderReport(r: ContextReport, only?: string): string {
   for (const role of roles) {
     out.push(role.role);
     for (const p of role.pieces) {
-      if (p.kind !== "movement") continue;
+      if (p.kind !== "prompt") continue;
       const also = p.alsoIn.length ? `  [also: ${p.alsoIn.join(", ")}]` : "";
       out.push(
         `  ${p.stem.padEnd(16)}${p.file.padEnd(28)}${String(p.lines).padStart(5)} ln  ${tok(p.tokens).padStart(9)}  # ${p.heading}${also}`,
       );
     }
-    const movements = role.totalTokens - k.tokens;
+    const prompts = role.totalTokens - k.tokens;
     out.push(
-      `  always-on total ${tok(role.totalTokens)} = kernel ${tok(k.tokens)} + movements ${tok(movements)}` +
+      `  always-on total ${tok(role.totalTokens)} = kernel ${tok(k.tokens)} + prompts ${tok(prompts)}` +
         " (excludes the OpenCode base prompt, skills index, and tool schemas)",
     );
     if (!sameSkills) printSkills("  skills", role.skills, "    ");
@@ -319,10 +394,12 @@ export function renderReport(r: ContextReport, only?: string): string {
   }
 
   if (!only) {
-    out.push("subagent contexts (born blind: kernel + own prompt; no movements, no cue)");
+    out.push(
+      "subagent contexts (born blind: kernel + own prompt; no role prompts, no cue)",
+    );
     for (const s of r.subagents) {
       out.push(
-        `  ${s.name.padEnd(20)}prompt ${String(s.prompt.lines).padStart(4)} ln ${tok(s.prompt.tokens).padStart(9)}` +
+        `  ${s.name.padEnd(30)}prompt ${String(s.prompt.lines).padStart(4)} ln ${tok(s.prompt.tokens).padStart(9)}` +
           `${s.model ? `  [${s.model}]` : ""}  denied: ${s.denied.join(",") || "none"}`,
       );
     }
@@ -330,6 +407,9 @@ export function renderReport(r: ContextReport, only?: string): string {
   return out.join("\n");
 }
 
-function sameNames(a: Array<{ name: string }>, b: Array<{ name: string }>): boolean {
+function sameNames(
+  a: Array<{ name: string }>,
+  b: Array<{ name: string }>,
+): boolean {
   return a.length === b.length && a.every((x, i) => x.name === b[i].name);
 }
