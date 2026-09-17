@@ -29,6 +29,12 @@ transforms and `session.hook("context")`.
   basic (`opencode:<pw>`) or pass `OPENCODE_PASSWORD` env (TUI, `opencode api`).
 - **TUI attach**: `opencode <dir> --server <url> --session <id>`; sessions for
   the directory render as tabs.
+- **The tab bar is route-driven persisted state**, not a directory listing: a
+  tab appears when a client navigates to a session, and tabs persist under
+  `<state>/<channel>/tui/tabs.json` keyed by the TUI's process cwd. `abstract`
+  seeds that file with the five role tabs (merged, never overwritten) and
+  launches the TUI with the project dir as cwd. The TUI process also gets the
+  lab `XDG_STATE_HOME` so its local state never touches the daily install.
 - **Query serialization gotchas**: `parentID: null` serializes as the literal
   string "null" (omit instead); list filters like `directory` are flat keys,
   but `location`-style params go bracket-encoded (`location[directory]`).

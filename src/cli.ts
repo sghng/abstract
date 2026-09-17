@@ -20,10 +20,10 @@
  * long-running thing, and it is rebuildable from the DB.
  */
 import { spawn, spawnSync } from "node:child_process";
-import { chmodSync, closeSync, existsSync, mkdirSync, openSync, readFileSync, writeFileSync } from "node:fs";
+import { chmodSync, closeSync, existsSync, mkdirSync, openSync, readFileSync, renameSync, writeFileSync } from "node:fs";
 import { randomBytes } from "node:crypto";
 import { homedir } from "node:os";
-import { basename, join, resolve } from "node:path";
+import { basename, dirname, join, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 import { OpenCode } from "@opencode/client";
 import { ROLES } from "./score.ts";
@@ -48,6 +48,11 @@ const PW_FILE = join(ABSTRACT_HOME, "server.pw");
 const DAILY_DB = join(homedir(), ".local", "share", "opencode", "opencode.db");
 const PORT = Number(process.env.ABSTRACT_PORT ?? 4319);
 const URL = `http://127.0.0.1:${PORT}`;
+// The TUI persists its tab bar under <state>/<channel>/tui/tabs.json, scoped
+// per cwd. The channel is a build-time constant of the binary ("latest" for
+// npm releases); honor the same override env the binary does.
+const CHANNEL = process.env.OPENCODE_CHANNEL ?? "latest";
+const TUI_TABS_FILE = join(STATE_HOME, "opencode", CHANNEL, "tui", "tabs.json");
 
 function fail(message: string): never {
   console.error(`abstract: ${message}`);
@@ -199,6 +204,34 @@ function syncCredentials(): void {
 
 type Session = { id: string; metadata?: Record<string, unknown> | null };
 
+/**
+ * The TUI's tab bar is a persisted, route-driven set: a tab appears when a
+ * client navigates to a session, not when the session exists. `abstract`
+ * ensures the ensemble, so it seeds the lab TUI's tabs file with the five
+ * role sessions (merged, never overwritten; user-added tabs survive).
+ */
+function seedTabs(dir: string, byRole: Map<string, Session>): void {
+  mkdirSync(dirname(TUI_TABS_FILE), { recursive: true });
+  let file: {
+    global?: unknown;
+    cwd?: Record<string, { tabs?: { sessionID: string; title?: string }[]; unread?: Record<string, unknown> }>;
+  } = {};
+  try {
+    file = JSON.parse(readFileSync(TUI_TABS_FILE, "utf8"));
+  } catch {}
+  file.cwd ??= {};
+  const scope = (file.cwd[dir] ??= { tabs: [], unread: {} });
+  scope.tabs ??= [];
+  const ids = new Set(scope.tabs.map((t) => t.sessionID));
+  for (const role of ROLES) {
+    const s = byRole.get(role);
+    if (s && !ids.has(s.id)) scope.tabs.push({ sessionID: s.id, title: role });
+  }
+  const tmp = TUI_TABS_FILE + ".tmp";
+  writeFileSync(tmp, JSON.stringify(file));
+  renameSync(tmp, TUI_TABS_FILE);
+}
+
 async function roleSessions(dir: string): Promise<Map<string, Session>> {
   const listed = await client().session.list({ directory: dir, parentID: null });
   const byRole = new Map<string, Session>();
@@ -234,13 +267,21 @@ async function launch(): Promise<void> {
   await ensureServer();
   syncCredentials();
   const byRole = await ensureSessions(dir);
+  seedTabs(dir, byRole);
 
-  const env = { ...process.env, OPENCODE_PASSWORD: readFileSync(PW_FILE, "utf8").trim() };
+  // The TUI is a pure client of the lab server, but its local state (tabs,
+  // prompt history) must stay out of the daily install: same state root as
+  // the lab server. cwd pins the TUI's tab scope to the project directory.
+  const env = {
+    ...process.env,
+    OPENCODE_PASSWORD: readFileSync(PW_FILE, "utf8").trim(),
+    XDG_STATE_HOME: STATE_HOME,
+  };
   const orchestrator = byRole.get("orchestrator")!;
   const tui = spawnSync(
     BIN,
     [dir, "--server", URL, "--session", orchestrator.id],
-    { env, stdio: "inherit" },
+    { env, stdio: "inherit", cwd: dir },
   );
   if (tui.status && tui.status !== 0) fail(`tui exited with ${tui.status}`);
 }
@@ -356,13 +397,28 @@ async function doctor(): Promise<void> {
     assert(ids.includes("abstract-harness"), `abstract-harness missing`);
     return `${ids.length} plugins`;
   });
-
   // Live round trip: a queue-delivered prompt through a real model turn in a
   // throwaway role session. Exercises score assembly (context hook), prompt
   // admission, and wait/drain.
   const scratch = join(ABSTRACT_HOME, "doctor-scratch");
   mkdirSync(scratch, { recursive: true });
   const ephemeral: string[] = [];
+  await check("tui tab seeding", async () => {
+    const s = await api.session.create({
+      title: "doctor-tabs",
+      agent: "orchestrator",
+      location: { directory: scratch },
+      metadata: { role: "orchestrator", ephemeral: true },
+    });
+    ephemeral.push(s.id);
+    seedTabs(scratch, new Map([["orchestrator", s]]));
+    const file = JSON.parse(readFileSync(TUI_TABS_FILE, "utf8"));
+    const tabs = file.cwd?.[scratch]?.tabs ?? [];
+    assert(tabs.some((t: any) => t.sessionID === s.id), "seeded tab missing from tabs.json");
+    delete file.cwd[scratch]; // doctor leaves no scratch scopes behind
+    writeFileSync(TUI_TABS_FILE, JSON.stringify(file));
+    return "role tabs land in the persisted tab bar";
+  });
   await check("score assembly + queue round trip", async () => {
     const s = await api.session.create({
       title: "doctor",
