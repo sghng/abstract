@@ -1,21 +1,25 @@
 # abstract
 
-A [pi](https://github.com/badlogic/pi-mono) agent directory that turns the pi
-CLI into a small academic research lab: long-running **orchestrator**,
-**engineer**, and **librarian** agents with persistent sessions, communicating
-through files (tickets, reports, memos).
+An OpenCode v2 agent directory that turns the CLI into a small academic research
+lab: persistent, context-isolated role sessions (orchestrator, engineer,
+statistician, librarian, writer, editor) that collaborate through files
+(tickets, reports, memos, models) and cues.
 
 Status: early. See `TODO.md` for the design rationale and roadmap, and
 `manifesto.md` for the philosophy.
 
 ## Layout
 
-- `AGENTS.md` -- team kernel: invariants loaded into every session
-- `agents/` -- role system prompts (consumed by the CLI)
-- `src/cli.ts` -- the `abstract` SDK harness CLI
-- `SYSTEM.md` -- lab system prompt (replaces pi's default)
-- `skills/` -- pi skills: procedures and standards, one directory per skill
-- `manifesto.md` -- human-facing philosophy
+- `config/` -- the lab's OpenCode config root (`OPENCODE_CONFIG_DIR`): the
+  kernel `AGENTS.md`, `agents/` (role personas and the subagent catalog),
+  `plugin/harness.ts` (the cue and repertoire tools), `skills/`,
+  `opencode.json`, and the pinned `runtime.json`
+- `prompts/` -- role doctrine assembled into the system prompt by the score
+  (transitional; retiring into the agent bodies, see `TODO.md`)
+- `src/` -- the `abstract` CLI, the score, and the context report
+- `docs/` -- dev-facing design documents; `repertoire/` is the writer's
+  convention corpus (see `docs/repertoire/`)
+- `manifesto.md` -- the philosophy behind the project
 
 ## Usage
 
@@ -25,13 +29,16 @@ Install and link once:
 cd /path/to/abstract && bun install && bun link
 ```
 
-Then run the ensemble inside a research project directory:
+Then, inside a research project directory:
 
 ```sh
-abstract
+abstract              # ensure runtime, server, and role sessions; attach the TUI
+abstract context      # what each agent receives: context, skills, subagents, tools
+abstract doctor       # contract smoke test against the pinned runtime
+abstract stop         # stop the lab server
+abstract upgrade <v>  # bump the pinned @opencode/cli version
 ```
 
-This opens (or reattaches) a tmux session `abs-<project-basename>` with three
-panes -- orchestrator, engineer, librarian -- each a peer pi process using this
-repository as its agent directory, resuming the role's persistent session at
-`.pi/sessions/<role>.jsonl` inside the project.
+The lab runs on a per-host OpenCode server at port 4319 with its own config,
+state, and database under `~/.local/share/abstract` and
+`~/.local/state/abstract`. Files are memory; sessions are a cache.

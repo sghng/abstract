@@ -48,13 +48,10 @@ agents developing this repository. The lab agents' shared invariants live in
   plugin. See `docs/repertoire/` (the corpus manual)
 - `docs/` -- design documents, dev-facing, not loaded by lab agents.
   `docs/multi-agent.md` and `docs/harness.md` describe the RETIRED pi-era
-  harness (fs inbox, tmux ensemble); keep for history. Harness docs now live in
-  MIGRATION.md until it is deleted at cleanup
+  harness (fs inbox, tmux ensemble); keep for history
 - `TODO.md` -- design rationale, roadmap, and decisions log; read before
   changing the architecture
 - `manifesto.md` -- human-facing philosophy behind the project
-- `MIGRATION.md` -- the pi --> OpenCode v2 migration roadmap (temporary; deleted
-  once the migration is fully landed)
 
 ## Working Conventions
 

@@ -516,8 +516,8 @@ The lab now runs on OpenCode v2 (`@opencode/cli`, exact pin in
 `lab/runtime.json`) instead of the pi SDK. What changed the calculus since the
 shelved spike: daily-driver satisfaction with the v2 TUI, native subagents with
 continuation, robust background execution, and builtin plugins/MCP/skills --
-most of what this harness handmade in pi now ships upstream. Full roadmap and
-implementation findings: `MIGRATION.md` (temporary; deleted at cleanup).
+most of what this harness handmade in pi now ships upstream. The durable 2.0.5
+implementation findings are salvaged below.
 
 Shape of the new harness:
 
@@ -538,6 +538,29 @@ Shape of the new harness:
   agents (`reviewer-zai|deepseek|kimi|minimax`).
 - Default model is MiniMax-M3 (test posture; cheap). `abstract doctor` is the
   contract test over every surface the lab stands on; upgrades go through it.
+
+2.0.5 findings (salvaged from the retired MIGRATION.md):
+
+- Plugin API is `Plugin.define({id, setup})` with domain transforms; tools
+  register via `ctx.tool.transform((tools) => tools.add({...}))` (zod input
+  accepted), score assembly via `ctx.session.hook("context", ...)`.
+- `codemode` matters: a tool without `options: {codemode: false}` is reachable
+  only through the codemode wrapper, and a direct model call fails. Both lab
+  tools set it.
+- Config uses `{env:VAR}` substitution (not `${VAR}`); `skills` is an array of
+  paths; agents come from `{agent,agents}/**/*.md`, plugins from
+  `{plugin,plugins}/`, and `<configdir>/AGENTS.md` auto-loads.
+- Fresh-boot discovery is async: agent/skill/plugin lists race a just-started
+  server, so `abstract` polls until the role agents surface.
+- Query serialization: `parentID: null` serializes as the string "null" (omit
+  it); list filters are flat keys, but `location` params are bracket-encoded.
+- TUI attach is `opencode <dir> --server <url> --session <id>`; the tab bar is
+  route-driven persisted state at `<state>/<channel>/tui/tabs.json`, keyed by
+  the TUI's cwd, which `abstract` seeds with the role tabs.
+- Server auth is `OPENCODE_PASSWORD` (HTTP basic); credentials live in the DB
+  and are synced from the daily install on every launch.
+- Models at migration time: `minimax-cn-coding-plan/MiniMax-M3` (default),
+  `zai-coding-plan/glm-5.3`, `deepseek/deepseek-v4-pro`, `kimi-for-coding/k3`.
 
 Retired: `extensions/` (cue, subagents, mcp, repertoire-port), `SYSTEM.md`,
 `settings.json`, `subagents/`, `tools.json`, pi symlinks. Git history is the

@@ -2,8 +2,8 @@
 
 How the lab produces publishable artifacts -- grants, proposals, manuscripts,
 and similar deliverables. This doc is dev-facing; invariants live in the team
-kernel (`lab/AGENTS.md`) and role behavior lives in `movement/writer.md` and
-`movement/editor.md`.
+kernel (`config/AGENTS.md`) and role behavior lives in `config/agents/writer.md`
+and `config/agents/editor.md`.
 
 ## Roles
 
@@ -84,8 +84,8 @@ orchestrator when the work is complete.
 keeps one current working file per artifact. Internal editor rounds edit that
 file in place; external feedback is what drives version increments.
 
-| File                                  | Meaning                                                  |
-| ------------------------------------- | -------------------------------------------------------- |
+| File                                   | Meaning                                                  |
+| -------------------------------------- | -------------------------------------------------------- |
 | `draft/artifact-v0.md`                 | current working draft; all internal editing happens here |
 | `draft/artifact-v0-advisor_edit.docx`  | external feedback on v0 from advisor (tracked changes)   |
 | `draft/artifact-v0-advisor_edit.patch` | the parsed NLPatch of that feedback                      |
@@ -98,8 +98,8 @@ Rules:
 - When the artifact is sent externally, no rename or snapshot is made.
 - External feedback returns as `draft/artifact-vN-<name>_edit.docx`; the
   underscore marks foreign provenance. Its parsed form is
-  `draft/artifact-vN-<name>_edit.patch`. The **nlpatch** skill governs the
-  round trip.
+  `draft/artifact-vN-<name>_edit.patch`. The **nlpatch** skill governs the round
+  trip.
 - After incorporating external feedback, advance to `draft/artifact-v(N+1).md`.
 - Internal review memos live in `notes/memos/`, not in `draft/`.
 - `notes/reviews/` is reserved for future external-review tracking; it is not
@@ -160,9 +160,9 @@ is `draft/proposal-v1.md`, then `v1` is what leaves the lab.
 7. Writer cues orchestrator: proposal ready for externalization.
 8. Orchestrator approves; the user sends `draft/nsf-iis-proposal-v0.md` to the
    NSF.
-9. External feedback returns as `draft/nsf-iis-proposal-v0-po_edit.docx`;
-   the writer parses it to `draft/nsf-iis-proposal-v0-po_edit.patch` and
-   agrees dispositions with the orchestrator.
+9. External feedback returns as `draft/nsf-iis-proposal-v0-po_edit.docx`; the
+   writer parses it to `draft/nsf-iis-proposal-v0-po_edit.patch` and agrees
+   dispositions with the orchestrator.
 10. Writer incorporates the agreed comments and advances to
     `draft/nsf-iis-proposal-v1.md`.
 
@@ -185,7 +185,7 @@ is `draft/proposal-v1.md`, then `v1` is what leaves the lab.
 
 - The writing conventions live in the **prose-standard** and **writing-craft**
   movements (shared standard, then writer craft); venue-specific modules stay
-  skills (**grants**, **manuscript**).
+  skills (**grants**, **journal-review**).
 - Should the editor ever be engaged for non-draft artifacts (e.g., polishing an
   engineer report)? The harness does not forbid it, but the convention is that
   the editor is the writer's right-hand.
