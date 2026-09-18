@@ -7,16 +7,19 @@ state lives in `notes/`.
 
 ## The Team
 
-| Role         | Owns                                                         | Consulted for                                          |
-| ------------ | ------------------------------------------------------------ | ------------------------------------------------------ |
-| Orchestrator | strategy, `notes/story.md`, tickets, user contact            | (none)                                                 |
-| Engineer     | `src/`, `experiments/`, `notes/reports/`, `notes/results.md` | feasibility, technical approach                        |
-| Librarian    | `notes/literature.md`, reference library, memos              | background, claims, literature                         |
-| Writer       | `draft/`                                                     | manuscripts, proposals, grants, publishing conventions |
-| Editor       | review memos (`notes/memos/`)                                | writing quality, review panels, story coherence        |
+| Role         | Owns                                              | Consulted for                                          |
+| ------------ | ------------------------------------------------- | ------------------------------------------------------ |
+| Orchestrator | strategy, `notes/story.md`, tickets, user contact | (none)                                                 |
+| Engineer     | `src/`, `experiments/`, `notes/results.md`        | feasibility, technical approach                        |
+| Statistician | `model/`                                          | analysis design, model choice, estimation, derivations |
+| Librarian    | `notes/literature.md`, reference library, memos   | background, claims, literature                         |
+| Writer       | `draft/`                                          | manuscripts, proposals, grants, publishing conventions |
+| Editor       | review memos (`notes/memos/`)                     | writing quality, review panels, story coherence        |
 
 Ownership means the owner writes and curates; everyone else reads and routes
-changes through the owner.
+changes through the owner. `notes/reports/` is the one shared artifact type: the
+engineer and the statistician each write their own `report-NNN-name.md`, in one
+numbering sequence.
 
 Protocol: **converge --> compile --> execute --> synthesize**. Consult the
 peers, write the ticket, execute it in isolation, synthesize the findings into a
@@ -46,6 +49,7 @@ project-root/
 +-- scripts/                # One-off utility scripts
 +-- data/                   # Data files reused across experiments
 +-- experiments/            # One numbered directory per experiment: 01-name, 02-name, ...
++-- model/                  # Statistical models: NN-name/ with main.typ + checks/ (statistician-owned)
 +-- references/             # Source PDFs for cited papers (foreign files; never rename)
 `-- draft/                  # Deliverables: publications, presentations, proposals
 ```
@@ -57,7 +61,7 @@ project-root/
   marks foreign provenance (e.g. `*_edit.docx` from a collaborator); never
   rename such a file to kebab-case. `notes/tickets/ticket-NNN-name.md`,
   `notes/reports/report-NNN-name.md`, `notes/memos/memo-NNN-slug.md`,
-  `experiments/NN-name/`.
+  `experiments/NN-name/`, `model/NN-name/`.
 - **No dates in filenames, no timelines.** A note carries at most a `date:`
   field in frontmatter; use sequence, priority, and dependencies instead.
 - **Wiki links** `[[name]]`: filename only, no paths, no extensions. Resolve a

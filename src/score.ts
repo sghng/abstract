@@ -15,15 +15,31 @@
  * else stays on-demand as a skill. Doctrine graduates per role: a single-
  * function role (writer, editor) inlines what it always needs; skills keep
  * episodic, task-matched procedures.
+ *
+ * The statistician is deliberately absent: its doctrine lives in its agent
+ * body (`config/agents/statistician.md`), the OpenCode-native home, where the
+ * body is the system prompt. `prompts/` and this score are transitional; the
+ * plan is to move every role to its agent body (tracked in TODO.md).
  */
-export const SCORE = {
+export const SCORE: Partial<Record<Role, readonly string[]>> = {
   orchestrator: ["story-doctrine", "story-keeping", "orchestrator"],
   engineer: ["engineer"],
   librarian: ["librarian"],
   writer: ["prose-standard", "story-doctrine", "writing-craft", "writer"],
   editor: ["prose-standard", "editor"],
-} as const;
+};
 
-export type Role = keyof typeof SCORE;
+/**
+ * Every role the lab runs: each gets a session, a TUI tab, and a doctor check.
+ * A role may be absent from `SCORE` when its doctrine lives elsewhere.
+ */
+export const ROLES = [
+  "orchestrator",
+  "engineer",
+  "librarian",
+  "writer",
+  "editor",
+  "statistician",
+] as const;
 
-export const ROLES = Object.keys(SCORE) as Role[];
+export type Role = (typeof ROLES)[number];

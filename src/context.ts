@@ -1,8 +1,9 @@
 /**
  * The context report: what each lab agent receives, assembled the same way
- * the harness plugin assembles it (src/score.ts --> config/AGENTS.md +
- * prompts/*.md, read from disk), plus the on-demand tier (skills index),
- * the delegation tier (subagent catalog), and the tool surface.
+ * the harness plugin assembles it (config/AGENTS.md + src/score.ts -->
+ * prompts/*.md, read from disk) plus the OpenCode-native agent body, the
+ * on-demand tier (skills index), the delegation tier (subagent catalog), and
+ * the tool surface.
  *
  * Static by design: works with the server down, because the prompt
  * assembly itself is static (files + score). Live data (agent registry,
@@ -29,7 +30,7 @@ const BUILTIN_TOOLS_NOTE =
   "read bash edit write glob grep ls patch task webfetch (curated from the pinned binary)";
 
 export type Piece = {
-  kind: "kernel" | "prompt";
+  kind: "kernel" | "prompt" | "agent";
   stem: string;
   file: string; // repo-relative
   lines: number;
@@ -236,7 +237,7 @@ export function buildReport(live?: {
   // reverse map: which roles share each prompt
   const shared = new Map<string, Role[]>();
   for (const role of ROLES)
-    for (const stem of SCORE[role])
+    for (const stem of SCORE[role] ?? [])
       shared.set(stem, [...(shared.get(stem) ?? []), role]);
 
   const pieceFor = (
@@ -244,8 +245,9 @@ export function buildReport(live?: {
     stem: string,
     file: string,
     kind: Piece["kind"],
+    text?: string,
   ): Piece => {
-    const raw = read(file);
+    const raw = text ?? read(file);
     const s = raw ? stat(raw) : { lines: 0, tokens: 0 };
     return {
       kind,
@@ -267,10 +269,20 @@ export function buildReport(live?: {
   const roles: RoleReport[] = ROLES.map((role) => {
     const pieces: Piece[] = [
       pieceFor(role, "kernel", "config/AGENTS.md", "kernel"),
-      ...SCORE[role].map((stem) =>
+      ...(SCORE[role] ?? []).map((stem) =>
         pieceFor(role, stem, `prompts/${stem}.md`, "prompt"),
       ),
     ];
+    // OpenCode-native doctrine: a non-empty agent body is appended by the
+    // server itself, outside the score (statistician today; every role after
+    // the prompts retirement).
+    const agentFile = `config/agents/${role}.md`;
+    const agent = read(agentFile);
+    if (agent) {
+      const { body } = splitFrontmatter(agent);
+      if (body.trim())
+        pieces.push(pieceFor(role, "agent-body", agentFile, "agent", body));
+    }
     return {
       role,
       pieces,
@@ -375,15 +387,15 @@ export function renderReport(r: ContextReport, only?: string): string {
   for (const role of roles) {
     out.push(role.role);
     for (const p of role.pieces) {
-      if (p.kind !== "prompt") continue;
+      if (p.kind === "kernel") continue;
       const also = p.alsoIn.length ? `  [also: ${p.alsoIn.join(", ")}]` : "";
       out.push(
         `  ${p.stem.padEnd(16)}${p.file.padEnd(28)}${String(p.lines).padStart(5)} ln  ${tok(p.tokens).padStart(9)}  # ${p.heading}${also}`,
       );
     }
-    const prompts = role.totalTokens - k.tokens;
+    const doctrine = role.totalTokens - k.tokens;
     out.push(
-      `  always-on total ${tok(role.totalTokens)} = kernel ${tok(k.tokens)} + prompts ${tok(prompts)}` +
+      `  always-on total ${tok(role.totalTokens)} = kernel ${tok(k.tokens)} + doctrine ${tok(doctrine)}` +
         " (excludes the OpenCode base prompt, skills index, and tool schemas)",
     );
     if (!sameSkills) printSkills("  skills", role.skills, "    ");

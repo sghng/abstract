@@ -1,16 +1,16 @@
 # abstract
 
 This repository is an OpenCode v2 agent directory: it defines a small academic
-research lab (orchestrator, engineer, librarian, writer, editor) running as
-persistent sessions on a lab-owned OpenCode server. This file is for agents
-developing this repository. The lab agents' shared invariants live in
+research lab (orchestrator, engineer, statistician, librarian, writer, editor)
+running as persistent sessions on a lab-owned OpenCode server. This file is for
+agents developing this repository. The lab agents' shared invariants live in
 `config/AGENTS.md`, not here.
 
 ## Repository Layout
 
 - `config/` -- the lab's OpenCode config root (`OPENCODE_CONFIG_DIR`): the
   kernel `AGENTS.md` (invariants + delegation, auto-loaded into every session),
-  `agents/` (the five role personas at top level; `agents/subagents/` holds the
+  `agents/` (the six role personas at top level; `agents/subagents/` holds the
   named subagent catalog and reviewer panel, whose IDs carry the `subagents/`
   prefix), `plugin/harness.ts` (the lab plugin: score assembly, cue,
   repertoire), `opencode.json` (default model, MCP servers, the `lab-reference`
@@ -18,17 +18,20 @@ developing this repository. The lab agents' shared invariants live in
   `runtime.json` (the pinned `@opencode/cli` version)
 - `prompts/` -- the prompt files (Markdown, one file each, descriptive names):
   shared doctrine (`prose-standard.md`, `story-doctrine.md`), role doctrine
-  (`story-keeping.md`, `writing-craft.md`), and one file per lab role.
-  Referenced by stem from the score; only file contents enter the context, so
-  names are dev-facing
+  (`story-keeping.md`, `writing-craft.md`), and one file per score-assembled
+  role. Referenced by stem from the score; only file contents enter the context,
+  so names are dev-facing. Transitional: the statistician's doctrine lives in
+  its agent body, and the directory's retirement is tracked in `TODO.md`
 - `src/score.ts` -- the score: which prompt files each role assembles, in order
-  (general --> specific). The plugin appends them to the system prompt per model
-  request, re-reading from disk
+  (general --> specific), plus `ROLES`, the full roster the CLI, doctor, and tab
+  seeding iterate. The plugin appends score stems to the system prompt per model
+  request, re-reading from disk; a role absent from the score (the statistician)
+  carries its doctrine in its agent body
 - `src/cli.ts` -- the `abstract` CLI (Bun, linked via `package.json` bin):
   ensures the pinned runtime at `~/.local/share/abstract/runtime/`, the central
   lab server (port 4319, own config/state/DB under `~/.local/share/abstract` and
   `~/.local/state/abstract`, credentials synced from the daily install), and the
-  five role sessions per project (`metadata.role`, created once); then attaches
+  six role sessions per project (`metadata.role`, created once); then attaches
   one TUI (`--server`, `--session`). Also `abstract context [role] [--json]`
   (print what each agent receives: context pieces, skills, subagents, tools),
   `abstract doctor` (contract smoke test), `abstract stop`,
