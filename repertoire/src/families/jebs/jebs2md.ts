@@ -68,8 +68,10 @@ import * as fs from "node:fs";
 
 const OUT = new URL(".", import.meta.url).pathname.replace(/\/$/, "");
 const REPO = fs.realpathSync(`${OUT}/../../../..`);
-const ROOT = `${REPO}/repertoire`;
-const PANDOC = "/opt/homebrew/bin/pandoc";
+const ROOT = process.env.REP_ROOT ?? `${REPO}/repertoire`;
+const PANDOC =
+  process.env.PANDOC ??
+  (fs.existsSync("/opt/homebrew/bin/pandoc") ? "/opt/homebrew/bin/pandoc" : "pandoc");
 const BASE = "https://journals.sagepub.com";
 
 const arg = (name: string, dflt: string) => {
@@ -83,8 +85,21 @@ const DOWNLOADS = arg("downloads", `${ROOT}/.cache/jebs-xml-downloads.jsonl`);
 const SKIPPED = arg("skipped", `${ROOT}/.cache/jebs-skipped.jsonl`);
 const ONLY = process.argv.includes("--only") ? arg("only", "") : null;
 
-type Asset = { doi: string; doi_id: string; asset_id: string; kind: string; url: string | null; caption: string };
-type Download = { doi: string; doi_id: string; asset_id: string; kind: string; href: string };
+type Asset = {
+  doi: string;
+  doi_id: string;
+  asset_id: string;
+  kind: string;
+  url: string | null;
+  caption: string;
+};
+type Download = {
+  doi: string;
+  doi_id: string;
+  asset_id: string;
+  kind: string;
+  href: string;
+};
 const norm = (s: string) => s.replace(/\s+/g, " ").trim();
 /** Front-matter titles, parity with jem2md/jemxml2md */
 const FRONT_MATTER =
@@ -107,7 +122,8 @@ const pandoc = (html: string): string => {
     ],
     { stdout: "pipe", stderr: "pipe" },
   );
-  if (p.exitCode !== 0) throw new Error(`pandoc: ${p.stderr.toString().slice(0, 200)}`);
+  if (p.exitCode !== 0)
+    throw new Error(`pandoc: ${p.stderr.toString().slice(0, 200)}`);
   return p.stdout.toString();
 };
 
@@ -133,18 +149,31 @@ const post = (md: string): string =>
     .join("");
 
 /** serialize fragment -> pandoc -> post-process -> restore asset tokens */
-const finish = ($: cheerio.CheerioAPI, root: any, tokens: Map<string, string>): string => {
+const finish = (
+  $: cheerio.CheerioAPI,
+  root: any,
+  tokens: Map<string, string>,
+): string => {
   const fragment = root
     .contents()
     .toArray()
-    .map((n: any) => (n.type === "text" ? n.data ?? "" : $.html(n)))
+    .map((n: any) => (n.type === "text" ? (n.data ?? "") : $.html(n)))
     .join("");
   let md = post(pandoc(fragment));
   for (const [t, body] of tokens) md = md.split(t).join(body);
-  return md.replace(/\n{3,}/g, "\n\n").replace(/^\n+/, "").replace(/\n+$/, "") + "\n";
+  return (
+    md
+      .replace(/\n{3,}/g, "\n\n")
+      .replace(/^\n+/, "")
+      .replace(/\n+$/, "") + "\n"
+  );
 };
 
-function convertHtml(doi: string, doiId: string, html: string): { md: string; assets: Asset[]; downloads: Download[] } {
+function convertHtml(
+  doi: string,
+  doiId: string,
+  html: string,
+): { md: string; assets: Asset[]; downloads: Download[] } {
   const $ = cheerio.load(html);
   const assets: Asset[] = [];
   const article = $("article").first();
@@ -157,7 +186,9 @@ function convertHtml(doi: string, doiId: string, html: string): { md: string; as
   if (!bodyRoot.length) throw new Error("no body root (no #bodymatter)");
 
   const title =
-    norm(article.find("header h1").first().text()) || $('meta[name="citation_title"]').attr("content") || "";
+    norm(article.find("header h1").first().text()) ||
+    $('meta[name="citation_title"]').attr("content") ||
+    "";
 
   const root = $("<div></div>");
   root.append(`<h1>${title.replace(/[<>]/g, "")}</h1>`);
@@ -173,7 +204,11 @@ function convertHtml(doi: string, doiId: string, html: string): { md: string; as
 
   // STRIP per mandate, globally (era variance: #orcid sits in bodymatter in
   // 2020-21 files): bibliography list, bios, ORCID, supplementary links
-  root.find("#bibliography, [role=doc-bibliography], .core-biographies, .core-orcid, .core-supplementary-materials").remove();
+  root
+    .find(
+      "#bibliography, [role=doc-bibliography], .core-biographies, .core-orcid, .core-supplementary-materials",
+    )
+    .remove();
 
   // asset refs are token-protected from pandoc (it escapes image syntax it
   // cannot resolve); restored after conversion
@@ -189,12 +224,23 @@ function convertHtml(doi: string, doiId: string, html: string): { md: string; as
   root.find("figure.graphic").each((_, el) => {
     const $el = $(el);
     const capDiv = $el.find("figcaption .caption").first();
-    const caption = norm(capDiv.length ? capDiv.text() : $el.find("figcaption").first().text());
+    const caption = norm(
+      capDiv.length ? capDiv.text() : $el.find("figcaption").first().text(),
+    );
     const notes = norm($el.find("figcaption .notes").first().text());
     const src = $el.find("img").first().attr("src") ?? "";
     const id = `fig${String(++figSeq).padStart(2, "0")}`;
-    assets.push({ doi, doi_id: doiId, asset_id: id, kind: "figure", url: src ? BASE + src : null, caption: notes ? `${caption} ${notes}` : caption });
-    $el.replaceWith(`<p>${tok(`![${caption.replace(/[[\]]/g, "")}](${id})`)}</p>`);
+    assets.push({
+      doi,
+      doi_id: doiId,
+      asset_id: id,
+      kind: "figure",
+      url: src ? BASE + src : null,
+      caption: notes ? `${caption} ${notes}` : caption,
+    });
+    $el.replaceWith(
+      `<p>${tok(`![${caption.replace(/[[\]]/g, "")}](${id})`)}</p>`,
+    );
   });
 
   root.find("figure.table").each((_, el) => {
@@ -204,7 +250,14 @@ function convertHtml(doi: string, doiId: string, html: string): { md: string; as
     const cap = caption.replace(/[[\]]/g, "");
     if (table.find("[colspan], [rowspan]").length > 0 || !table.length) {
       const id = `tab${String(++tabSeq).padStart(2, "0")}`;
-      assets.push({ doi, doi_id: doiId, asset_id: id, kind: "table", url: null, caption });
+      assets.push({
+        doi,
+        doi_id: doiId,
+        asset_id: id,
+        kind: "table",
+        url: null,
+        caption,
+      });
       $el.replaceWith(`<p>${tok(`![${cap}](${id})`)}</p>`);
     } else {
       // NB: cheerio replaceWith(descendant) drops the node -- marker, then
@@ -225,39 +278,74 @@ function convertHtml(doi: string, doiId: string, html: string): { md: string; as
       math.attr("display", "block");
       $el.empty().append(math);
     }
-    if (label) $el.append(`<p>${label.startsWith("(") ? label : `(${label})`}</p>`);
+    if (label)
+      $el.append(`<p>${label.startsWith("(") ? label : `(${label})`}</p>`);
   });
 
   // inline math: unwrap span[role=math] so pandoc emits bare $..$
-  root.find("span[role=math]").each((_, el) => $(el).replaceWith($(el).children().length ? $(el).children() : $(el).text()));
+  root
+    .find("span[role=math]")
+    .each((_, el) =>
+      $(el).replaceWith(
+        $(el).children().length ? $(el).children() : $(el).text(),
+      ),
+    );
   // spans carry only styling hooks; strip attrs so pandoc emits plain text
   root.find("span").each((_, el) => {
-    if (el.attribs) for (const k of Object.keys(el.attribs)) $(el).removeAttr(k);
+    if (el.attribs)
+      for (const k of Object.keys(el.attribs)) $(el).removeAttr(k);
   });
   // internal fragment links (citations, section nav) -> bare text
   root.find('a[href^="#"]').each((_, el) => $(el).replaceWith($(el).text()));
-  root.find("script, style, svg, .core-xlink-crossref, .external-links, button").remove();
+  root
+    .find("script, style, svg, .core-xlink-crossref, .external-links, button")
+    .remove();
 
   // prose divs -> <p>: a div whose children are all inline-level
-  const BLOCK = new Set(["div", "section", "figure", "table", "ul", "ol", "h1", "h2", "h3", "h4", "h5", "h6", "p", "blockquote", "pre"]);
+  const BLOCK = new Set([
+    "div",
+    "section",
+    "figure",
+    "table",
+    "ul",
+    "ol",
+    "h1",
+    "h2",
+    "h3",
+    "h4",
+    "h5",
+    "h6",
+    "p",
+    "blockquote",
+    "pre",
+  ]);
   const divToP = () => {
     root.find("div").each((_, el) => {
       const kids = $(el).contents().toArray();
-      const hasBlock = kids.some((k: any) => k.type === "tag" && BLOCK.has(k.tagName));
-      if (!hasBlock && norm($(el).text())) $(el).replaceWith(`<p>${$.html($(el).contents())}</p>`);
+      const hasBlock = kids.some(
+        (k: any) => k.type === "tag" && BLOCK.has(k.tagName),
+      );
+      if (!hasBlock && norm($(el).text()))
+        $(el).replaceWith(`<p>${$.html($(el).contents())}</p>`);
     });
   };
   divToP();
 
   // unwrap remaining structural wrappers; serialize contents (a wrapping
   // div would come back as raw html from pandoc)
-  const unwrap = (sel: string) => root.find(sel).each((_, el) => $(el).replaceWith($(el).contents()));
+  const unwrap = (sel: string) =>
+    root.find(sel).each((_, el) => $(el).replaceWith($(el).contents()));
   unwrap("div.core-container");
   unwrap("section");
   unwrap("div");
   divToP();
 
-  return { md: finish($, root, tokens), assets, downloads: [], skip: null as string | null };
+  return {
+    md: finish($, root, tokens),
+    assets,
+    downloads: [],
+    skip: null as string | null,
+  };
 }
 
 // ---------------------------------------------------------------- xml route
@@ -283,12 +371,32 @@ const tokOf = (ctx: XmlCtx, body: string) => {
 
 /** asset without image bytes on disk: row + download-list entry (only when
  * an image href exists -- some complex tables have no graphic alternative) */
-const xmlAsset = (ctx: XmlCtx, doi: string, doiId: string, kind: "figure" | "table" | "equation", href: string, caption: string) => {
+const xmlAsset = (
+  ctx: XmlCtx,
+  doi: string,
+  doiId: string,
+  kind: "figure" | "table" | "equation",
+  href: string,
+  caption: string,
+) => {
   const prefix = kind === "equation" ? "eq" : kind === "table" ? "tab" : "fig";
-  const seq = kind === "equation" ? ++ctx.eqSeq : kind === "table" ? ++ctx.tabSeq : ++ctx.figSeq;
+  const seq =
+    kind === "equation"
+      ? ++ctx.eqSeq
+      : kind === "table"
+        ? ++ctx.tabSeq
+        : ++ctx.figSeq;
   const id = `${prefix}${String(seq).padStart(kind === "equation" ? 4 : 2, "0")}`;
-  ctx.assets.push({ doi, doi_id: doiId, asset_id: id, kind, url: null, caption });
-  if (href) ctx.downloads.push({ doi, doi_id: doiId, asset_id: id, kind, href });
+  ctx.assets.push({
+    doi,
+    doi_id: doiId,
+    asset_id: id,
+    kind,
+    url: null,
+    caption,
+  });
+  if (href)
+    ctx.downloads.push({ doi, doi_id: doiId, asset_id: id, kind, href });
   return id;
 };
 
@@ -301,7 +409,13 @@ const send = (ctx: XmlCtx, xmlNode: any, wrap?: string) => {
 };
 
 /** walk a body/back container (sec, app, body, back, fn-group, ack) */
-const walkBlock = (ctx: XmlCtx, el: any, depth: number, doi: string, doiId: string) => {
+const walkBlock = (
+  ctx: XmlCtx,
+  el: any,
+  depth: number,
+  doi: string,
+  doiId: string,
+) => {
   const { $, root } = ctx;
   const kids = (el.children ?? []).filter((c: any) => c.type === "tag");
   for (let i = 0; i < kids.length; i++) {
@@ -312,7 +426,9 @@ const walkBlock = (ctx: XmlCtx, el: any, depth: number, doi: string, doiId: stri
       case "app":
       case "app-group": {
         const title = norm($c.children("title").first().text());
-        root.append(`<h${Math.min(depth + 2, 6)}>${title.replace(/[<>]/g, "")}</h${Math.min(depth + 2, 6)}>\n\n`);
+        root.append(
+          `<h${Math.min(depth + 2, 6)}>${title.replace(/[<>]/g, "")}</h${Math.min(depth + 2, 6)}>\n\n`,
+        );
         walkBlock(ctx, child, depth + 1, doi, doiId);
         break;
       }
@@ -323,7 +439,9 @@ const walkBlock = (ctx: XmlCtx, el: any, depth: number, doi: string, doiId: stri
         // <monospace> line (R/BUGS appendix blocks): group and fence them
         const codeLine = (e: any) => {
           const tags = (e.children ?? []).filter((c: any) => c.type === "tag");
-          return e.name === "p" && tags.length === 1 && tags[0].name === "monospace";
+          return (
+            e.name === "p" && tags.length === 1 && tags[0].name === "monospace"
+          );
         };
         if (codeLine(child)) {
           const lines: string[] = [norm($c.text())];
@@ -332,7 +450,11 @@ const walkBlock = (ctx: XmlCtx, el: any, depth: number, doi: string, doiId: stri
             lines.push(norm($(kids[j]).text()));
             j++;
           }
-          const esc = lines.join("\n").replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+          const esc = lines
+            .join("\n")
+            .replace(/&/g, "&amp;")
+            .replace(/</g, "&lt;")
+            .replace(/>/g, "&gt;");
           root.append(`<pre><code>${esc}</code></pre>\n\n`);
           i = j - 1;
           break;
@@ -353,8 +475,13 @@ const walkBlock = (ctx: XmlCtx, el: any, depth: number, doi: string, doiId: stri
           math.attr("display", "block");
           root.append(`<p>${$.html(math)}</p>\n\n`);
         } else {
-          const href = $c.find("graphic, inline-graphic").first().attr("xlink:href") ?? $c.find("graphic, inline-graphic").first().attr("href") ?? "";
-          const id = href ? xmlAsset(ctx, doi, doiId, "equation", href, "") : null;
+          const href =
+            $c.find("graphic, inline-graphic").first().attr("xlink:href") ??
+            $c.find("graphic, inline-graphic").first().attr("href") ??
+            "";
+          const id = href
+            ? xmlAsset(ctx, doi, doiId, "equation", href, "")
+            : null;
           if (id) root.append(`<p>${tokOf(ctx, `@@${id}@@`)}</p>\n\n`);
         }
         if (label) root.append(`<p>(${label.replace(/[()]/g, "")})</p>\n\n`);
@@ -364,8 +491,17 @@ const walkBlock = (ctx: XmlCtx, el: any, depth: number, doi: string, doiId: stri
         const label = norm($c.children("label").first().text());
         const caption = norm($c.find("caption").first().text());
         const href = $c.find("graphic").first().attr("xlink:href") ?? "";
-        const id = xmlAsset(ctx, doi, doiId, "figure", href, `${label} ${caption}`.trim());
-        root.append(`<p>${tokOf(ctx, `![${(`${label} ${caption}`).replace(/[[\]]/g, "")}](${id})`)}</p>\n\n`);
+        const id = xmlAsset(
+          ctx,
+          doi,
+          doiId,
+          "figure",
+          href,
+          `${label} ${caption}`.trim(),
+        );
+        root.append(
+          `<p>${tokOf(ctx, `![${`${label} ${caption}`.replace(/[[\]]/g, "")}](${id})`)}</p>\n\n`,
+        );
         break;
       }
       case "table-wrap": {
@@ -376,10 +512,14 @@ const walkBlock = (ctx: XmlCtx, el: any, depth: number, doi: string, doiId: stri
         const href = $c.find("graphic").first().attr("xlink:href") ?? "";
         if (!table.length || table.find("[colspan], [rowspan]").length > 0) {
           const id = xmlAsset(ctx, doi, doiId, "table", href, cap);
-          root.append(`<p>${tokOf(ctx, `![${cap.replace(/[[\]]/g, "")}](${id})`)}</p>\n\n`);
+          root.append(
+            `<p>${tokOf(ctx, `![${cap.replace(/[[\]]/g, "")}](${id})`)}</p>\n\n`,
+          );
         } else {
           ++ctx.tabSeq;
-          root.append(`<p>${tokOf(ctx, `**${cap.replace(/[[\]]/g, "")}**`)}</p>\n\n`);
+          root.append(
+            `<p>${tokOf(ctx, `**${cap.replace(/[[\]]/g, "")}**`)}</p>\n\n`,
+          );
           root.append(ctx.$.html(table.get(0)));
           root.append("\n\n");
         }
@@ -397,14 +537,29 @@ const walkBlock = (ctx: XmlCtx, el: any, depth: number, doi: string, doiId: stri
 
 /** review/front-matter detection for the xml route */
 const xmlSkipReason = ($: cheerio.CheerioAPI): string | null => {
-  const subjects = $("article-categories subj-group subject").toArray().map((e: any) => $(e).text().trim());
+  const subjects = $("article-categories subj-group subject")
+    .toArray()
+    .map((e: any) => $(e).text().trim());
   if (subjects.some((s) => /^book reviews?$/i.test(s))) return "book-review";
-  const title = $("article-meta title-group article-title").first().text().trim();
+  const title = $("article-meta title-group article-title")
+    .first()
+    .text()
+    .trim();
   if (FRONT_MATTER.test(title)) return "front-matter";
   return null;
 };
 
-function convertXml(doi: string, doiId: string, xml: string): { md: string; assets: Asset[]; downloads: Download[]; skip: string | null; title: string } {
+function convertXml(
+  doi: string,
+  doiId: string,
+  xml: string,
+): {
+  md: string;
+  assets: Asset[];
+  downloads: Download[];
+  skip: string | null;
+  title: string;
+} {
   const $ = cheerio.load(xml, { xml: true });
   const assets: Asset[] = [];
   const downloads: Download[] = [];
@@ -420,13 +575,25 @@ function convertXml(doi: string, doiId: string, xml: string): { md: string; asse
     }
   });
 
-  const title = norm($("article-meta title-group article-title").first().text());
+  const title = norm(
+    $("article-meta title-group article-title").first().text(),
+  );
   const skip = xmlSkipReason($);
   if (skip) return { md: "", assets, downloads, skip, title };
 
   const h = cheerio.load("<div id=jebsxml></div>");
   const root = h("#jebsxml");
-  const ctx: XmlCtx = { $, h, root, tokens: new Map(), assets, downloads, eqSeq: 0, figSeq: 0, tabSeq: 0 };
+  const ctx: XmlCtx = {
+    $,
+    h,
+    root,
+    tokens: new Map(),
+    assets,
+    downloads,
+    eqSeq: 0,
+    figSeq: 0,
+    tabSeq: 0,
+  };
 
   root.append(`<h1>${title.replace(/[<>]/g, "")}</h1>\n\n`);
 
@@ -449,28 +616,45 @@ function convertXml(doi: string, doiId: string, xml: string): { md: string; asse
     for (const child of container.children ?? []) {
       if (child.type !== "tag") continue;
       const name = child.name;
-      if (name === "ref-list" || name === "bio" || name === "author-notes") continue;
+      if (name === "ref-list" || name === "bio" || name === "author-notes")
+        continue;
       if (name === "notes") {
         renderBackContainer(child);
       } else if (name === "fn-group") {
-        root.append(`<h2>${norm($(child).children("title").first().text()) || "Footnotes"}</h2>\n\n`);
-        $(child).find("fn").each((_, fn: any) => {
-          const lbl = norm($(fn).children("label").first().text());
-          $(fn).find("p").each((_, p: any) => {
-            let text = norm($(p).text());
-            // mandate: ORCID/e-mail footnotes never enter (author chrome)
-            if (/^ORCID\s/i.test(text) || /https?:\/\/orcid\.org\//.test(text)) return;
-            text = text.replace(/\b[\w.+-]+@[\w-]+\.[\w.]+\b/g, "");
-            if (!text) return;
-            root.append(`<p>${lbl ? `${lbl} ` : ""}${text.replace(/[<>]/g, "")}</p>\n\n`);
+        root.append(
+          `<h2>${norm($(child).children("title").first().text()) || "Footnotes"}</h2>\n\n`,
+        );
+        $(child)
+          .find("fn")
+          .each((_, fn: any) => {
+            const lbl = norm($(fn).children("label").first().text());
+            $(fn)
+              .find("p")
+              .each((_, p: any) => {
+                let text = norm($(p).text());
+                // mandate: ORCID/e-mail footnotes never enter (author chrome)
+                if (
+                  /^ORCID\s/i.test(text) ||
+                  /https?:\/\/orcid\.org\//.test(text)
+                )
+                  return;
+                text = text.replace(/\b[\w.+-]+@[\w-]+\.[\w.]+\b/g, "");
+                if (!text) return;
+                root.append(
+                  `<p>${lbl ? `${lbl} ` : ""}${text.replace(/[<>]/g, "")}</p>\n\n`,
+                );
+              });
           });
-        });
       } else if (name === "ack") {
-        root.append(`<h2>${norm($(child).children("title").first().text()) || "Acknowledgments"}</h2>\n\n`);
-        $(child).find("p").each((_, p: any) => {
-          send(ctx, p, "p");
-          root.append("\n\n");
-        });
+        root.append(
+          `<h2>${norm($(child).children("title").first().text()) || "Acknowledgments"}</h2>\n\n`,
+        );
+        $(child)
+          .find("p")
+          .each((_, p: any) => {
+            send(ctx, p, "p");
+            root.append("\n\n");
+          });
       } else {
         walkBlock(ctx, child, 0, doi, doiId);
       }
@@ -481,8 +665,16 @@ function convertXml(doi: string, doiId: string, xml: string): { md: string; asse
 
   // inline formulae already carry <math>; unwrap their wrappers so the
   // html parser sees inline math, and drop citation xref wrappers
-  root.find("inline-formula").each((_, el: any) => h(el).replaceWith(h(el).children().length ? h(el).children() : h(el).text()));
-  root.find("xref, ext-link").each((_, el: any) => h(el).replaceWith(h(el).text()));
+  root
+    .find("inline-formula")
+    .each((_, el: any) =>
+      h(el).replaceWith(
+        h(el).children().length ? h(el).children() : h(el).text(),
+      ),
+    );
+  root
+    .find("xref, ext-link")
+    .each((_, el: any) => h(el).replaceWith(h(el).text()));
 
   // monospace = code, on the fragment side (element construction on the
   // xml-loaded instance corrupts serialization there): multi-line chunks
@@ -498,7 +690,13 @@ function convertXml(doi: string, doiId: string, xml: string): { md: string; asse
     }
   });
 
-  return { md: finish(h, root, ctx.tokens), assets, downloads, skip: null, title };
+  return {
+    md: finish(h, root, ctx.tokens),
+    assets,
+    downloads,
+    skip: null,
+    title,
+  };
 }
 
 const main = () => {
@@ -508,7 +706,11 @@ const main = () => {
     .trim()
     .split("\n")
     .map(JSON.parse)
-    .filter((r: any) => (r.format === "html" || r.format === "xml") && (!ONLY || r.doi_id === ONLY));
+    .filter(
+      (r: any) =>
+        (r.format === "html" || r.format === "xml") &&
+        (!ONLY || r.doi_id === ONLY),
+    );
   // FORMAT PRECEDENCE: html > xml per doi (html MathML converts to TeX and
   // its figure urls resolve; xml image bytes are not on disk)
   const pick = new Map<string, any>();
@@ -528,10 +730,24 @@ const main = () => {
   let dlRows = 0;
   for (const r of pick.values()) {
     try {
-      const src = fs.readFileSync(`${ROOT}/${r.file}`, "utf8");
-      const res = r.format === "html" ? convertHtml(r.doi, r.doi_id, src) : convertXml(r.doi, r.doi_id, src);
+      const src = fs.readFileSync(
+        r.file.startsWith("/") ? r.file : `${ROOT}/${r.file}`,
+        "utf8",
+      );
+      const res =
+        r.format === "html"
+          ? convertHtml(r.doi, r.doi_id, src)
+          : convertXml(r.doi, r.doi_id, src);
       if (res.skip) {
-        fs.writeSync(skp, JSON.stringify({ doi_id: r.doi_id, format: r.format, reason: res.skip, title: res.title }) + "\n");
+        fs.writeSync(
+          skp,
+          JSON.stringify({
+            doi_id: r.doi_id,
+            format: r.format,
+            reason: res.skip,
+            title: res.title,
+          }) + "\n",
+        );
         skips++;
         continue;
       }
@@ -552,7 +768,8 @@ const main = () => {
   fs.closeSync(skp);
   if (ONLY) {
     // probe leaves no state
-    for (const f of [ASSETS_ND, DOWNLOADS, SKIPPED]) if (fs.existsSync(f)) fs.unlinkSync(f);
+    for (const f of [ASSETS_ND, DOWNLOADS, SKIPPED])
+      if (fs.existsSync(f)) fs.unlinkSync(f);
   }
   try {
     fs.unlinkSync(TMP);

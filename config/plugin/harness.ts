@@ -5,8 +5,9 @@
  *                    prompt files (src/score.ts --> prompts/*.md, read from
  *                    disk on every request, so edits go live next turn)
  *   cue              tool: brokerless message exchange between role sessions
- *                    on this server (session.prompt, delivery "queue"; the
- *                    recipient reads it at its next turn boundary)
+ *                    on this server (session.synthetic, delivery "steer";
+ *                    wakes an idle recipient, lands mid-turn at the next
+ *                    step boundary of a busy one)
  *   repertoire       tool: the writing-style corpus as a tool
  *                    (see docs/repertoire/index.md for the contract)
  *
@@ -86,8 +87,8 @@ export default Plugin.define({
         name: "cue",
         description:
           "Send a short message (cue) to another lab role in this project. " +
-          "Any role can cue any role except itself. The cue lands at the " +
-          "recipient's next turn boundary.",
+          "Any role can cue any role except itself. It wakes an idle " +
+          "recipient; a busy one gets it mid-turn at its next step boundary.",
         options: { codemode: false },
         input: z.object({
           target: z.enum(ROLES as [Role, ...Role[]]).describe("recipient role"),
@@ -118,12 +119,14 @@ export default Plugin.define({
             return {
               content: `no ${target} session in this project; it is created by \`abstract\` in the project directory`,
             };
-          await api.session.prompt({
+          await api.session.synthetic({
             sessionID: hit.id,
             text:
               `[cue from ${from}] ${message}\n\n` +
               `If ${from} would benefit from a reply, do so via cue(target="${from}", message="...").`,
-            delivery: "queue",
+            description: `cue from ${from}`,
+            metadata: { from, to: target },
+            delivery: "steer",
           });
           return { content: `cue sent to ${target}:\n\n${message}` };
         },

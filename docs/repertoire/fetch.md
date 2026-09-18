@@ -111,16 +111,24 @@ entitlement; never proxied), one family per browser profile.
   papers. A first-author >= 2 filter would drop 21,657 papers (14.4%); >= 3
   drops 25.2%. Any-author variants are useless (>= 2 keeps 98.9%; every paper
   has a prolific co-author). Adopted rule (owner, 2026-09-17): drop each first
-  author's earliest preprint. Effect: 150,806 -> 105,541 kept (45,265 dropped,
-  30.0%); one-timers vanish entirely, everyone else decrements by one; the
-  dropped set carries 97.8 GB of the 338.5 GB arxiv raw. Filter application
-  belongs to training-set assembly, as a papers-table flag, never a fetch-layer
-  deletion.
+  author's earliest preprint. One-timers vanish entirely, everyone else
+  decrements by one. Filter application belongs to training-set assembly, as a
+  papers-table flag (papers.train_include), never a fetch-layer deletion.
+  Census of record (pinned 2026-09-18, src/arxiv-firstauthor-qc.ts owns the
+  normalization; supersedes the ad-hoc 2026-09-17 numbers): 150,806 ->
+  103,488 kept (47,318 dropped, 31.4%); 47,318 unique first-author keys,
+  52.8% of them one-timers; 23 no-author rows kept. Applied to D1
+  papers.train_include 2026-09-18 and count-verified per family.
 - Fetch: e-print source (`/e-print/<id>`, gzip tarball -> .tex artifact); on
   withheld-source 403, PDF fallback (manifest carries `via: pdf-fallback`).
   Final mix: 140,191 tex (93.5%), 9,814 pdf (6.5%); 801 papers metadata-only
   (source withheld, no fallback obtainable). Sizes: tex p50 416KB / p90 3.9MB /
   max 79MB; pdf p50 503KB. Final: 150,005 objects.
+  Papers-table repair (2026-09-18, found by the parse-queue build): 697
+  psyarxiv docx papers existed in manifest/sources/R2 but had no papers row
+  (docx listing path and papers.jsonl diverged; the fetch audit reconciled
+  sources, never papers-vs-sources). Inserted from manifest truth; papers
+  163,654 -> 164,351, now identical to the parse-queue universe.
 - Distribution: 7-host fleet (5 lab nodes + 1 fast Linux box + this Mac), one
   fetcher per host, partitions ~18.8k items. See `docs/repertoire/hostfleet.md`
   (access, deployment, gotchas) and `repertoire/.cache/bulk/arxiv/README.md`

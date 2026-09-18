@@ -120,6 +120,11 @@ Until the harness exists, the `bin/` launchers + file-mediated consult relay
   open interactively.
 - **Parallel workstreams**: multiple in-flight tickets with per-artifact
   ownership; revisit after the single-workstream protocol is solid.
+- **Prompts retirement**: `prompts/` + `src/score.ts` + the plugin's assembly
+  hook are transitional. Move every role's doctrine into its
+  `config/agents/<role>.md` body, absorb the shared stems at audience grain, and
+  update `abstract context`/`doctor`; the statistician is the first role born
+  native. Tracked as issue #38.
 
 ## Canonical Decisions Log
 
@@ -523,8 +528,8 @@ Shape of the new harness:
   is one sqlite copy).
 - Five persistent role sessions per project (`metadata.role`, created once by
   `abstract`); one attached TUI with a tab per session (`--server`, no tmux).
-- Cues are pure HTTP: plugin tool --> `session.prompt` with `delivery: "queue"`;
-  SQLite is the record. The fs inbox is gone.
+- Cues are pure HTTP: plugin tool --> `session.synthetic` with
+  `delivery: "steer"`; SQLite is the record. The fs inbox is gone.
 - Prompts: kernel (old invariants + delegation) lives in `lab/AGENTS.md`; the
   plugin's `session.hook("context")` appends each role's movements from
   `src/score.ts`, re-reading `movement/` from disk per request.
@@ -537,3 +542,98 @@ Shape of the new harness:
 Retired: `extensions/` (cue, subagents, mcp, repertoire-port), `SYSTEM.md`,
 `settings.json`, `subagents/`, `tools.json`, pi symlinks. Git history is the
 rollback. Sessions did not migrate: files are memory, sessions were cache.
+
+## 2026-09-17: cues steer as synthetic messages (supersedes never-steer)
+
+The pi-era doctrine "cues are always follow-ups; agents never steer each other"
+rested on a misreading of steer vs queue carried out of pi. The need was never
+ordering; it was timely delivery: roles drift when new information reaches them
+late, and queue waits out the recipient's whole current turn. The cue tool now
+sends `session.synthetic` with `delivery: "steer"`. Steer injects at the
+recipient's next step boundary: the current tool call or generation segment
+completes, then the cue joins the ongoing turn and the model adjusts mid-run. No
+work is aborted (abort is the separate interrupt path). An idle recipient wakes
+at once. Verified live on 2.0.5: a steer sent mid-turn landed between the
+recipient's parallel read batch and its next text segment, same turn, and the
+model acted on it.
+
+Synthetic rather than `session.prompt` fixes a second problem the transcript
+made visible: peer cues were forging user messages, indistinguishable from the
+principal. The protocol's message types are a closed union (user, synthetic,
+system, skill, shell, assistant; no custom or role-named types are possible),
+and synthetic is the designated type for injected non-user input. The transcript
+now records `type: "synthetic"` with description `cue from <role>` and metadata
+`{from, to}`; the `[cue from <role>]` text prefix stays as the model-facing
+identity marker, since description and metadata are transcript fields the model
+does not read.
+
+`abstract doctor` pins the contract: the cue bus check asserts the delivered cue
+appears as a synthetic message.
+
+## 2026-09-18: statistician joins the roster (sixth role)
+
+A methodologist role, hybrid by design: consulted for analysis design (turning
+unknown unknowns into known unknowns) and executing model-development tickets.
+Implementation stays with the engineer, cut by the audience rule: code whose
+audience is the math (checks) is the statistician's in `model/`; code whose
+audience is the story (findings, citable numbers) is the engineer's in
+`experiments/`, including the scale-up simulation the statistician designs.
+
+- **`model/`**: one directory per model, `model/NN-name/`, the experiments
+  pattern transposed: `main.typ` grows in place (model, assumptions,
+  derivations, estimator, evaluation plan, status); `checks/` and `figures/`
+  beside it. In-place evolution, no version numbers; a superseded model gets a
+  status line; Typst source is the artifact, PDFs are build products.
+- **Check discipline**: a major claim is not done until a check runs in seconds
+  on the project `.venv`, names its claim and pass criterion, and has been seen
+  to fail (kill test: corrupt the math, watch it go red, restore). Cheapest
+  killing check first: special-case reduction --> SymPy symbolic --> derivative
+  cross-examination --> score at truth --> parameter recovery --> asymptotic
+  probes. A check that outgrows seconds is an experiment and moves to the
+  engineer. numpy/scipy plus SymPy now, autodiff on first need; Python via `uv`.
+- **Home**: `config/agents/statistician.md`, doctrine in the agent body (the
+  OpenCode-native system prompt). No score entry, no `prompts/` file. The five
+  existing roles stay on the score untouched this round.
+- **Wiring**: the kernel roster routes consultation; no workflow is mandated,
+  roster plus cue makes the collaboration. `notes/reports/` becomes the one
+  shared artifact type (engineer and statistician, one numbering sequence, each
+  owns their own files). `notes/results.md` stays engineer-owned,
+  orchestrator-arbitrated; the statistician cues citable numbers in. No new
+  subagents.
+- **Watch**: a statistician read of methods sections before externalization,
+  adopted only if a wrong-math-in-draft failure appears (Open Questions).
+- **Pin**: kimi-for-coding/k3, green, matching the engineer's executing hybrid;
+  the first real model-development ticket settles it.
+
+## Decisions
+
+- 2026-09-18: first-author QC pinned as committed script; D1
+  papers.train_include carries the decision; parse converts everything.
+- 2026-09-18: cluster staging pulls from R2 via REST (paced); S3 API upgrade
+  stays open.
+- 2026-09-18: R2 REST ceiling CORRECTED. The API 429s above the documented 1,200
+  requests / 5 min (~4 req/s) account-wide (a 500-request burst at concurrency
+  16 is clean, which is why "uncapped" was briefly believed; a 68-task x 4-conn
+  fleet collapsed into backoff and crawled). Pacing is now fleet-wide:
+  pull-slice one paced connection per task, `qsub -tc` caps concurrent array
+  tasks (tex 3, arpdf 2, journal 2500ms). The 163k objects therefore need ~11h
+  of pull wall time; S3 credentials + rclone is the only path to faster bulk
+  staging and needs a dashboard-minted token.
+- 2026-09-18: olmOCR venv is pinned by REPAIRING the bake-off venv (repoint
+  pyvenv.cfg and the bin/python symlinks at the current uv CPython). uv
+  auto-upgraded its 3.12 base (3.12.13 to 3.12.14), which is what broke the
+  venv; a fresh `uv venv`/install loses torch, vllm, and the patched
+  pipeline.py. The OCR job carries the full bake-off ops set: cuda/13.2.1
+  module + CUDA_HOME, venv nvidia/cu13/lib on LD_LIBRARY_PATH, and an offline
+  predownloaded FP8 model.
+- 2026-09-18: staging switched to the R2 S3 API (rclone, jurisdiction endpoint)
+  once the owner minted keys; measured ~34 objects/s from one client and a
+  310-PDF slice in under 45 s, versus the ~4 req/s REST ceiling.
+  `pull-slice-rclone.sh` is selected automatically whenever `CF_S3_KEY_ID` is
+  present in `.env`; the paced REST puller stays as the fallback. Run knobs
+  (`TC_TEX`, `TC_ARPDF`, `S3_TRANSFERS`) live in `.env`.
+- 2026-09-18: canonical scripts carry no version suffix; `src/cluster-parse/` is
+  the single latest kit (v1/ deleted, `v2/` flattened, `job-*-2.sh` renamed).
+  PENDING after the current run's retry sweep finishes: sync the cluster tree to
+  the flattened layout and restart the heartbeat looper, whose generated loop
+  file still names the old path.

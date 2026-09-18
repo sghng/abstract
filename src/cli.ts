@@ -519,7 +519,8 @@ async function doctor(): Promise<void> {
   });
 
   // Cue bus end to end: a real role session calls the cue tool; the peer
-  // session's transcript must contain the delivered cue.
+  // session's transcript must contain the delivered cue as a synthetic
+  // message (steer delivery: an idle recipient wakes on it).
   await check("cue bus end to end", async () => {
     const a = await api.session.create({
       title: "doctor-a",
@@ -571,12 +572,16 @@ async function doctor(): Promise<void> {
       "engineer cue turn",
     );
     const messages = await api.message.list({ sessionID: b.id, order: "asc" });
-    const text = JSON.stringify(messages);
-    assert(
-      text.includes("[cue from orchestrator] doctor ping"),
-      `no cue in engineer transcript: ${text.slice(0, 160)}`,
+    const cue = messages.data.find(
+      (m: any) =>
+        m.type === "synthetic" &&
+        (m.text ?? "").includes("[cue from orchestrator] doctor ping"),
     );
-    return "cue delivered";
+    assert(
+      cue,
+      `no synthetic cue in engineer transcript: ${JSON.stringify(messages.data).slice(0, 160)}`,
+    );
+    return "cue delivered (synthetic, steer)";
   });
 
   for (const id of ephemeral)

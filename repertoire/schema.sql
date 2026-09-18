@@ -58,3 +58,10 @@ create table if not exists assets (
   caption text,
   primary key (doi, handle)
 );
+
+-- Training-set inclusion decision (adopted owner rule 2026-09-17, pinned
+-- 2026-09-18): drop each first author's earliest arXiv preprint. 0 = exclude
+-- from training assembly. Emitted by repertoire/src/arxiv-firstauthor-qc.ts,
+-- the census of record (150,806 arXiv rows -> 47,318 excluded / 103,488
+-- included; journal families unaffected, default 1).
+alter table papers add column train_include integer default 1;

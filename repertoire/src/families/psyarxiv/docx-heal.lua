@@ -238,7 +238,8 @@ local function heal(doc)
     cands[#cands + 1] = s
     if not first_bold_long and tlen(s) >= 25
       and not s:find('[%.%!]%s*$') -- titles may be questions
-      and not match_any(s, P_LEX) and not match_any(s, P_KW) then
+      and not match_any(s, P_LEX) and not match_any(s, P_KW)
+      and not match_any(s, P_BACK) then
       first_bold_long = s
     end
   end
@@ -255,12 +256,17 @@ local function heal(doc)
     if i > 4 then break end
     if match_any(s, P_CANON) then canon_idx = i break end
   end
+  -- title veto (cluster test 2026-09-18): a declarations/acknowledgement/
+  -- author-note heading is never the paper title, wherever it sits.
+  local function title_ok(s)
+    return s ~= nil and s ~= '' and not match_any(s, P_BACK)
+  end
   local title
   if doc.meta.title and doc.meta.title.t then title = clean(pandoc.utils.stringify(doc.meta.title)) end
-  if (not title or title == '') and blocks[1] and blocks[1].t == 'Header' then
+  if not title_ok(title) and blocks[1] and blocks[1].t == 'Header' then
     title = clean(pandoc.utils.stringify(blocks[1])) -- leading native header
   end
-  if not title or title == '' then title = first_bold_long end
+  if not title_ok(title) then title = first_bold_long end
   if not title or title == '' then
     for _, b in ipairs(blocks) do
       if b.t == 'Para' or b.t == 'Plain' then

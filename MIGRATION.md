@@ -1,30 +1,30 @@
 # MIGRATION -- Pi to OpenCode v2
 
-Status: IMPLEMENTED 2026-09-17. `abstract doctor` passes all 13 checks
-against pin 2.0.5 (config, agents, skills, MCP, credentials, plugin, live
-model round trip, cue bus end to end). Remaining before deleting this file:
-one real-work session on the current research project (step 6) and any tuning
-it surfaces. The decision is recorded in TODO.md (supersedes 2026-09-05).
+Status: IMPLEMENTED 2026-09-17. `abstract doctor` passes all 13 checks against
+pin 2.0.5 (config, agents, skills, MCP, credentials, plugin, live model round
+trip, cue bus end to end). Remaining before deleting this file: one real-work
+session on the current research project (step 6) and any tuning it surfaces. The
+decision is recorded in TODO.md (supersedes 2026-09-05).
 
-Ground truth is the published binary (`@opencode/cli`, currently 2.0.5), not
-the `../opencode` checkout, which lags it. This bit us once: the checkout's
-dev branch showed a v1-shaped plugin API (`experimental.chat.system.transform`)
-that does not exist at 2.0.5; the published API is `Plugin.define` with domain
+Ground truth is the published binary (`@opencode/cli`, currently 2.0.5), not the
+`../opencode` checkout, which lags it. This bit us once: the checkout's dev
+branch showed a v1-shaped plugin API (`experimental.chat.system.transform`) that
+does not exist at 2.0.5; the published API is `Plugin.define` with domain
 transforms and `session.hook("context")`.
 
 ## Implementation findings (2.0.5 specifics, beyond the plan)
 
-- **Plugin API**: `Plugin.define({id, setup})` from `@opencode/plugin`;
-  tools register via `ctx.tool.transform((tools) => tools.add({...}))` with
-  zod inputs (Standard Schema accepted); score assembly is
+- **Plugin API**: `Plugin.define({id, setup})` from `@opencode/plugin`; tools
+  register via `ctx.tool.transform((tools) => tools.add({...}))` with zod inputs
+  (Standard Schema accepted); score assembly is
   `ctx.session.hook("context", (e) => e.system.push({type:"text", text}))`.
 - **`codemode` matters**: tools without `options: {codemode: false}` are only
   reachable through the codemode `execute` wrapper; a direct model call fails
   with "No tool named X is currently available". Both lab tools set it.
 - **Credentials live in the DB**, and a fresh DB baselines migrations without
-  running them, so legacy auth.json never imports. `abstract` copies
-  credential rows from the daily DB (`~/.local/share/opencode/opencode.db`)
-  into the lab DB on every launch; daily stays canonical.
+  running them, so legacy auth.json never imports. `abstract` copies credential
+  rows from the daily DB (`~/.local/share/opencode/opencode.db`) into the lab DB
+  on every launch; daily stays canonical.
 - **Server auth**: set `OPENCODE_PASSWORD` on the server; clients send HTTP
   basic (`opencode:<pw>`) or pass `OPENCODE_PASSWORD` env (TUI, `opencode api`).
 - **TUI attach**: `opencode <dir> --server <url> --session <id>`; sessions for
@@ -36,18 +36,17 @@ transforms and `session.hook("context")`.
   launches the TUI with the project dir as cwd. The TUI process also gets the
   lab `XDG_STATE_HOME` so its local state never touches the daily install.
 - **Query serialization gotchas**: `parentID: null` serializes as the literal
-  string "null" (omit instead); list filters like `directory` are flat keys,
-  but `location`-style params go bracket-encoded (`location[directory]`).
+  string "null" (omit instead); list filters like `directory` are flat keys, but
+  `location`-style params go bracket-encoded (`location[directory]`).
 - **Config**: `{env:VAR}` (not `${VAR}`) substitution; `skills` is an array of
   paths; agents discovered from `{agent,agents}/**/*.md` under the config dir;
   plugins from `{plugin,plugins}/`; `<configdir>/AGENTS.md` auto-loads.
-- **Fresh-boot discovery is async**: agent/skill/plugin lists race a just-started
-  server; `abstract` polls until the role agents surface.
+- **Fresh-boot discovery is async**: agent/skill/plugin lists race a
+  just-started server; `abstract` polls until the role agents surface.
 - **Models**: `minimax-cn-coding-plan/MiniMax-M3` (default, test posture),
   `zai-coding-plan/glm-5.3`, `deepseek/deepseek-v4-pro`, `kimi-for-coding/k3`.
 - Queued prompts (`delivery: "queue"`) auto-start processing in inactive
   sessions: fire-and-forget cues wake the recipient without any view attached.
-
 
 ## Target Architecture
 
@@ -69,30 +68,33 @@ transforms and `session.hook("context")`.
   - `OPENCODE_EXPERIMENTAL_BACKGROUND_SUBAGENTS=1` (fire-and-forget fan-out)
   - `HARNESS_DIR=<harness>` (keeps `$HARNESS_DIR/reference/` pointers in the
     kernel valid)
-  - Credentials are shared with the daily install by NOT overriding the data
-    dir (spike 4 confirms where auth resolves under a config-dir override).
+  - Credentials are shared with the daily install by NOT overriding the data dir
+    (spike 4 confirms where auth resolves under a config-dir override).
 - **Project footprint**: none. No `.opencode/` in research projects, ever. If
   file state is ever needed project-side, mint `.abstract/` -- entirely ours,
   upstream never reads it, collision-free by construction.
 - **Roles**: five persistent sessions per project (orchestrator, engineer,
-  librarian, writer, editor), created once by `abstract` with
-  `metadata.role` and the project directory, rediscovered via `session.list`
-  on every launch. Personas are `lab/agent/<role>.md` (`mode: primary`). Role
-  identity comes from the session's agent and metadata; `HARNESS_ROLE` dies.
-- **Cues**: plugin tool `cue(target, message)` resolves the target session
-  (same project directory, `metadata.role` match) and sends
-  `promptAsync("[cue from <role>] ...", delivery: "queue")`. Queue delivery =
-  the never-steer doctrine (lands at the next turn boundary). Fire-and-forget;
-  no file inbox; SQLite is the record. Panes/views are disposable; server down
-  is the only failure mode and restart resumes from the DB.
+  librarian, writer, editor), created once by `abstract` with `metadata.role`
+  and the project directory, rediscovered via `session.list` on every launch.
+  Personas are `lab/agent/<role>.md` (`mode: primary`). Role identity comes from
+  the session's agent and metadata; `HARNESS_ROLE` dies.
+- **Cues**: plugin tool `cue(target, message)` resolves the target session (same
+  project directory, `metadata.role` match) and sends a synthetic message
+  (`[cue from <role>] ...`, delivery: "steer"): an idle recipient wakes at once,
+  a busy one gets the cue mid-turn at its next step boundary, without aborting
+  in-flight work (never-steer retired, see the 2026-09-17 decisions entry in
+  `TODO.md`). Synthetic so peer cues are not forged user messages.
+  Fire-and-forget; no file inbox; SQLite is the record. Panes/views are
+  disposable; server down is the only failure mode and restart resumes from the
+  DB.
 - **Score assembly**: `movement/` + `src/score.ts` stay the single source. The
   kernel (invariants + delegation, currently in every score) moves to
   `lab/AGENTS.md` (auto-loaded, survives compaction); the two stems leave the
-  score. A plugin hook (`experimental.chat.system.transform`) appends the
-  role's remaining movements per turn, reading `movement/*.md` from disk each
-  time -- edits go live next turn, `/reload` semantics for free. `SYSTEM.md`
-  dies; OpenCode's default system prompt already carries the tool-behavior
-  identity it existed to preserve.
+  score. A plugin hook (`experimental.chat.system.transform`) appends the role's
+  remaining movements per turn, reading `movement/*.md` from disk each time --
+  edits go live next turn, `/reload` semantics for free. `SYSTEM.md` dies;
+  OpenCode's default system prompt already carries the tool-behavior identity it
+  existed to preserve.
 - **Subagents**: the native `task` tool replaces `extensions/subagents`
   entirely. The catalog ports to `lab/agent/<name>.md` (`mode: subagent`);
   `tier` + `tiers.json` dissolve into pinned `model` fields. Bespoke briefs
@@ -114,18 +116,18 @@ transforms and `session.hook("context")`.
   when they were process lifelines; sessions now outlive views, so detach is
   "close the TUI, re-run `abstract`". The `core`/`writing` window split
   dissolves into tab order. Traded away: simultaneous transcripts (canon
-  detection) -- mitigated by tab activity indicators if 2.0.5 has them
-  (spike 2); pressure valve if it bites: a second tmux pane attaching to one
-  more role session, no architecture change.
+  detection) -- mitigated by tab activity indicators if 2.0.5 has them (spike
+  2); pressure valve if it bites: a second tmux pane attaching to one more role
+  session, no architecture change.
 - **Not migrated**: the ledger (`docs/ledger.md`) stays unbuilt; observability
-  later = a hook, SQL over the central DB, or the auditor. The auditor, when
-  it comes, is centralized and dev-side (launched manually against the
-  Abstract server), never a resident in lab sessions.
-- **`abstract` CLI**: shrinks to server lifecycle (spawn pinned binary with
-  the env above, health check, port bookkeeping), session bootstrap
+  later = a hook, SQL over the central DB, or the auditor. The auditor, when it
+  comes, is centralized and dev-side (launched manually against the Abstract
+  server), never a resident in lab sessions.
+- **`abstract` CLI**: shrinks to server lifecycle (spawn pinned binary with the
+  env above, health check, port bookkeeping), session bootstrap
   (create-if-missing per role per project), TUI launch, `abstract doctor`
-  (contract smoke test), and pin bump/update helpers. `__run <role>` dies
-  (panes are attaches, not SDK processes).
+  (contract smoke test), and pin bump/update helpers. `__run <role>` dies (panes
+  are attaches, not SDK processes).
 
 ## Repo Changes
 
@@ -146,8 +148,8 @@ plus a pin file (`lab/runtime.json`: `{"version": "2.0.5"}` or similar).
 
 Dies: `extensions/` (cue, subagents, mcp; repertoire is ported first),
 `SYSTEM.md`, `settings.json` (subsumed by `lab/opencode.json`),
-`subagents/tiers.json`, tmux code in `src/cli.ts` (rewritten in place).
-`.pi/` directories in projects become read-only archives.
+`subagents/tiers.json`, tmux code in `src/cli.ts` (rewritten in place). `.pi/`
+directories in projects become read-only archives.
 
 ## Upgrade Ritual
 
@@ -157,7 +159,8 @@ Dies: `extensions/` (cue, subagents, mcp; repertoire is ported first),
    booted headless. Surfaces under contract:
    - `chat.system.transform` fires and rewrites the system array
    - plugin custom tools register and execute (cue, repertoire)
-   - `promptAsync` + `delivery: "queue"` semantics end to end
+   - prompt admission + `delivery` semantics end to end (queue for direct
+     prompts, synthetic steer for the cue bus)
    - `task` tool, `task_id` continuation, background flag
    - session create with `metadata.role` + list-by-metadata
    - skills/agents/plugin discovery from `OPENCODE_CONFIG_DIR`
@@ -188,10 +191,9 @@ Dies: `extensions/` (cue, subagents, mcp; repertoire is ported first),
 4. CLI rewrite: server, bootstrap, launch, `doctor`. DONE.
 5. Prompt content pass: kernel rewritten (named agents replace tiers),
    `editor.md` names the reviewer equipment. DONE.
-6. Cutover the current project: run `abstract` in the project directory
-   (fresh role sessions, one re-grounding turn each: read `notes/story.md`),
-   then real work. No session import: files are memory, sessions were cache.
-   OPEN.
-7. Retire pi: delete `extensions/`, `SYSTEM.md`, `settings.json`,
-   `subagents/`, `tools.json`, pi symlinks; DONE. Record the decision in
-   TODO.md; DONE. Delete this file after step 6 lands clean.
+6. Cutover the current project: run `abstract` in the project directory (fresh
+   role sessions, one re-grounding turn each: read `notes/story.md`), then real
+   work. No session import: files are memory, sessions were cache. OPEN.
+7. Retire pi: delete `extensions/`, `SYSTEM.md`, `settings.json`, `subagents/`,
+   `tools.json`, pi symlinks; DONE. Record the decision in TODO.md; DONE. Delete
+   this file after step 6 lands clean.

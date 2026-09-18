@@ -51,7 +51,7 @@ From the gated old corpus (md-reference) + mandate:
 | ----------------------------------- | ------- | ---------------------------- | ---------------------------------------------------------------------------------------------- |
 | arxiv tex (gz tarball)              | 140,191 | tex-extract + tex-convert    | GO: cluster-verified 2026-09-18 (2024 r0 ~10s; 1997 at r2)                                     |
 | arxiv pdf (fallback)                | 9,814   | docling wrap                 | GO: cluster-verified; heading fragmentation flagged                                            |
-| psychometrika pdf 1936-1960 (scans) | 872     | olmOCR (pending owner)       | bake-off 2026-09-18: olmOCR over nougat; see experiment log                                        |
+| psychometrika pdf 1936-1960 (scans) | 872     | olmOCR (pending owner)       | bake-off 2026-09-18: olmOCR over nougat; see experiment log                                    |
 | psychometrika pdf 1961-2011         | ~1-2k   | legacy/pdf2md.py + wrap      | attachment-heavy; footnote chrome + glyph maps in wrap                                         |
 | psychometrika pdf 2012+             | ~1k     | NONE (table-source only)     | merge-tables doctrine; no md route                                                             |
 | psyarxiv pdf                        | 4,908   | docling wrap                 | cluster-verified; de-chrome pass pending                                                       |
@@ -198,48 +198,46 @@ pathologies, jem 1996/2003, jebs 1987/2000), one SGE job per engine on the CRC
 gpu queue, judged against the on-cluster `pdftotext` publisher layer. Doctrine
 for this round: PROSE ONLY, faithful prose, graceful degradation on
 figures/equations, GFM-simple tables and trivially derivable math may survive.
-Full side-by-sides and per-paper evidence: `repertoire/.cache/cluster/bakeoff/report-detail.md`
-(mirrored at `~/ocr-bakeoff/` on the cluster with job logs).
+Full side-by-sides and per-paper evidence:
+`repertoire/.cache/cluster/bakeoff/report-detail.md` (mirrored at
+`~/ocr-bakeoff/` on the cluster with job logs).
 
-**Verdict: olmOCR, runner-up nougat.** olmOCR
-(`allenai/olmOCR-2-7B-1025-FP8` via vllm 0.29, python 3.12) is the only
-engine that simultaneously delivers clean prose (anchored 70-word windows at
-ratio 1.000 on readable publisher text), correct structured tables (jem-1996
-Table 1 reproduced value-perfect including the Greek row labels the publisher
-layer garbles), real display math with tags, watermark/head/page-number
-removal, and figure captions kept with the image dropped. nougat-ocr 0.1.17
-typesets the best display math but silently omitted an entire notation list on
-psychometrika-1952 and glued page numbers into text; treat its math as
-plausible rather than faithful. tesseract fixes the letter-spacing artifacts
-surprisingly well and is the honest CPU baseline (visible confusions such as
-VII for VIII, tables destroyed, all running heads and 2026 publisher download
-stamps retained). marker-pdf 2.0.0 never completed a single file on this
-cluster: its balanced VLM backend wants Docker for vllm (absent), the
-llama.cpp fallback runs at ~0.2 tokens/s on CPU until every request times
-out, the prebuilt CUDA llama-server needs glibc 2.38 (RHEL9 has 2.34), and
-fast mode's spawned servers time out the same way. Not a quality verdict, an
-operations one; revisit only with Docker available.
+**Verdict: olmOCR, runner-up nougat.** olmOCR (`allenai/olmOCR-2-7B-1025-FP8`
+via vllm 0.29, python 3.12) is the only engine that simultaneously delivers
+clean prose (anchored 70-word windows at ratio 1.000 on readable publisher
+text), correct structured tables (jem-1996 Table 1 reproduced value-perfect
+including the Greek row labels the publisher layer garbles), real display math
+with tags, watermark/head/page-number removal, and figure captions kept with the
+image dropped. nougat-ocr 0.1.17 typesets the best display math but silently
+omitted an entire notation list on psychometrika-1952 and glued page numbers
+into text; treat its math as plausible rather than faithful. tesseract fixes the
+letter-spacing artifacts surprisingly well and is the honest CPU baseline
+(visible confusions such as VII for VIII, tables destroyed, all running heads
+and 2026 publisher download stamps retained). marker-pdf 2.0.0 never completed a
+single file on this cluster: its balanced VLM backend wants Docker for vllm
+(absent), the llama.cpp fallback runs at ~0.2 tokens/s on CPU until every
+request times out, the prebuilt CUDA llama-server needs glibc 2.38 (RHEL9 has
+2.34), and fast mode's spawned servers time out the same way. Not a quality
+verdict, an operations one; revisit only with Docker available.
 
-**Numbers.** Whole sample wall clock including per-file model loads:
-olmOCR 430s (~2.4 GPU-s/page steady after ~150s vllm start on an A10; ~80
-concurrent page requests in 30-page groups), nougat 743s (6.5 s/page on an
-RTX 6000), tesseract 890s (7.7 s/page on one core), marker n/a. Scaling to
-the full scan slice (~26k pages: 872 psy, 363 jem, ~500 jebs) is roughly 17
-GPU-hours for olmOCR, 47 for nougat, 56 core-hours for tesseract. Repetition
-loops: none on any engine (olmocr's repeated lines are real repeated table
-cells).
+**Numbers.** Whole sample wall clock including per-file model loads: olmOCR 430s
+(~2.4 GPU-s/page steady after ~150s vllm start on an A10; ~80 concurrent page
+requests in 30-page groups), nougat 743s (6.5 s/page on an RTX 6000), tesseract
+890s (7.7 s/page on one core), marker n/a. Scaling to the full scan slice (~26k
+pages: 872 psy, 363 jem, ~500 jebs) is roughly 17 GPU-hours for olmOCR, 47 for
+nougat, 56 core-hours for tesseract. Repetition loops: none on any engine
+(olmocr's repeated lines are real repeated table cells).
 
-**Ops costs that the numbers hide.** olmOCR needs three fixes to run here:
-patch out the removed `--disable-log-requests` vllm flag from the installed
-`olmocr/pipeline.py`, expose nvcc (`module load cuda/13.2.1` plus
-`CUDA_HOME`) for vllm's JIT, and put the venv's `nvidia/cu13/lib` on
-`LD_LIBRARY_PATH` so NVRTC finds `libnvrtc-builtins.so.13.0`; budget ~5 min
-of first-start JIT (cached) and raise `--max_server_ready_timeout` past the
-600s default. The FP8 model is ~8G against the home quota. nougat only runs
-on python 3.9 with pins (albumentations 1.3.1, numpy<2, pypdfium2 4.30,
-transformers 4.33.1) and pulls its checkpoint from the 0.1.0-base GitHub
-release; compute nodes lack internet, so every weight must be predownloaded
-on the login node.
+**Ops costs that the numbers hide.** olmOCR needs three fixes to run here: patch
+out the removed `--disable-log-requests` vllm flag from the installed
+`olmocr/pipeline.py`, expose nvcc (`module load cuda/13.2.1` plus `CUDA_HOME`)
+for vllm's JIT, and put the venv's `nvidia/cu13/lib` on `LD_LIBRARY_PATH` so
+NVRTC finds `libnvrtc-builtins.so.13.0`; budget ~5 min of first-start JIT
+(cached) and raise `--max_server_ready_timeout` past the 600s default. The FP8
+model is ~8G against the home quota. nougat only runs on python 3.9 with pins
+(albumentations 1.3.1, numpy<2, pypdfium2 4.30, transformers 4.33.1) and pulls
+its checkpoint from the 0.1.0-base GitHub release; compute nodes lack internet,
+so every weight must be predownloaded on the login node.
 
 **Method notes.** The publisher layer is itself the garbled baseline on the
 psychometrika scans (0.68 agreement with olmOCR on psy-1947 prose), so
@@ -249,6 +247,42 @@ subscript divergence between olmOCR and nougat on psy-1952 stands unresolved;
 image reading was unavailable to the judge this round). Aggregate proxies
 (spaced-letter residue, longest repeated line, structural-noise line counts,
 word counts vs publisher) are tabulated per paper in the detailed report.
+
+### Production run (launched 2026-09-18, CRC)
+
+Everything converts on the cluster; the Mac never gates progress. Census (route
+queues, `src/parse-queue.ts`, universe = D1 papers 164,351):
+
+| route | papers  | converter                                                                            |
+| ----- | ------- | ------------------------------------------------------------------------------------ |
+| tex   | 140,191 | tex-extract + tex-convert (29 array tasks x 5,000)                                   |
+| pdf   | 19,253  | docling -> pdf-wrap (arxiv 32 array tasks x 310 + one smp-16 job per journal family) |
+| ocr   | 1,057   | olmOCR (psy pre-1961 scans + jem <=2004 twins, bake-off winner)                      |
+| html  | 884     | psy html2md (833) + jebs2md (51)                                                     |
+| xml   | 1,451   | jemxml2md (jem+bjmsp 882) + jebs2md (569)                                            |
+| docx  | 697     | docx2md + docx-heal.lua                                                              |
+| none  | 818     | 801 arxiv metadata-only + 16 psy table-source-only + 1 bjmsp                         |
+
+Mechanics (`src/cluster-parse/`): every SGE job self-pulls its slice from R2
+into node-local `$TMPDIR` (never touching the 100G home quota), converts there,
+ships only md to `~/parse-run/out/md`. The R2 REST API caps near 1,200 requests
+/ 5 min (~4 req/s) account-wide and 429s at high connection counts, so pacing is
+fleet-wide, not per task: `pull-slice.ts` runs one paced connection per task and
+concurrent array tasks are capped with `qsub -tc` (tex 3, arpdf 2; journal pulls
+2500ms), keeping roughly 12-16 connections in flight. Work is grouped by source:
+one smp-16 node per journal family, arXiv as thin arrays, one GPU job for OCR,
+one job for xml/html/docx. Entrypoint `submit-all.sh` builds slices, submits,
+waits, runs one retry sweep, prints per-route totals. Job scripts derive their
+slice from `SGE_TASK_ID` (qsub positional args are never variable-substituted)
+and export `REP_ROOT` (the cluster tree has no `repertoire/` level). Monitoring:
+`heartbeat.sh` prints one status block (md shipped vs queue universe, rate per
+minute, per-source census, queue census, miss ledger, per-route pull progress
+and crash census, flags STALL / DEAD / DISK); a nohup looper appends a beat
+every 15 min to `~/parse-run/logs/heartbeat.log` (crontab is banned on crcfe01).
+Per-item converter reports and missing-id ledgers land in out/report. Training
+inclusion rides the D1 papers.train_include flag (47,318 arxiv excluded, census
+of record `src/arxiv-firstauthor-qc.ts`) applied at training-set assembly -- the
+md corpus itself is complete (retrieval serves all papers).
 
 ## Contract rulings (2026-09-16, from P3 findings)
 

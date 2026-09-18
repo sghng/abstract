@@ -27,8 +27,8 @@ a lasting fact, it must land in `notes/` (a memo, a ticket's "Because", or
 `notes/literature.md`) before it is forgotten.
 
 Peers are reached with the `cue` tool: a short pointer or question, never a
-document. Cues land at the recipient's next turn boundary; anything urgent or
-interactive goes through the orchestrator.
+document. A cue wakes an idle recipient; a busy one gets it mid-turn at its next
+step boundary. Anything interactive goes through the orchestrator.
 
 ## Project Layout (Invariant)
 
