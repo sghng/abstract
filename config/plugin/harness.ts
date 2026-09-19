@@ -155,8 +155,12 @@ const MODEL = "voyage-context-4";
 const DIMS = 1024;
 const PREFER_BOOST = 0.03;
 
+/**
+ * The repo .env is the lab's live secret store; the server env is a
+ * boot-time snapshot of it (abstract's loadSecrets). Read the file first
+ * so a rotated key takes effect on the next call, no server restart.
+ */
 function envKey(name: string): string {
-  if (process.env[name]) return process.env[name]!;
   try {
     for (const line of fs
       .readFileSync(path.join(REPO, ".env"), "utf8")
@@ -165,7 +169,8 @@ function envKey(name: string): string {
       if (m && m[1] === name) return m[2].trim();
     }
   } catch {}
-  throw new Error(`${name} missing (process env or repo .env)`);
+  if (process.env[name]) return process.env[name]!;
+  throw new Error(`${name} missing (repo .env or process env)`);
 }
 
 async function embedQuery(text: string): Promise<number[]> {
