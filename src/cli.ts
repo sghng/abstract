@@ -120,7 +120,7 @@ function client() {
 
 /* -- runtime ------------------------------------------------------------ */
 
-function ensureRuntime(): void {
+function ensureRuntime(pin: string = PIN): void {
   mkdirSync(RUNTIME_DIR, { recursive: true });
   const pkg = join(RUNTIME_DIR, "package.json");
   if (!existsSync(pkg))
@@ -130,11 +130,11 @@ function ensureRuntime(): void {
   if (installed) {
     version = spawnSync(BIN, ["--version"], { encoding: "utf8" }).stdout.trim();
   }
-  if (!installed || !version.includes(PIN)) {
+  if (!installed || !version.includes(pin)) {
     console.log(
-      `abstract: installing @opencode/cli@${PIN} into ${RUNTIME_DIR}`,
+      `abstract: installing @opencode/cli@${pin} into ${RUNTIME_DIR}`,
     );
-    const out = spawnSync("bun", ["add", "-E", `@opencode/cli@${PIN}`], {
+    const out = spawnSync("bun", ["add", "-E", `@opencode/cli@${pin}`], {
       cwd: RUNTIME_DIR,
       encoding: "utf8",
     });
@@ -153,8 +153,8 @@ function ensurePassword(): void {
 
 async function healthy(): Promise<string> {
   try {
-    const status = await client().server.status();
-    return status.version;
+    const info = await client().server.info();
+    return info.version;
   } catch {
     return "";
   }
@@ -342,7 +342,7 @@ async function upgrade(version?: string): Promise<void> {
   const v = version ?? PIN;
   writeFileSync(PIN_FILE, `${JSON.stringify({ version: v }, null, 2)}\n`);
   console.log(`abstract: pin set to ${v}`);
-  ensureRuntime();
+  ensureRuntime(v); // PIN was captured at import; install the new pin now
   await stop();
   console.log("abstract: run `abstract doctor` against the new pin");
 }
@@ -390,7 +390,7 @@ async function doctor(): Promise<void> {
     return v;
   });
   await check("server healthy", async () => {
-    const s = await api.server.status();
+    const s = await api.server.info();
     assert(s.version.includes(PIN), `server ${s.version} != pin ${PIN}`);
     return s.version;
   });

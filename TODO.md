@@ -660,3 +660,13 @@ audience is the story (findings, citable numbers) is the engineer's in
   PENDING after the current run's retry sweep finishes: sync the cluster tree to
   the flattened layout and restart the heartbeat looper, whose generated loop
   file still names the old path.
+- 2026-09-19: runtime source stays npm (git-tag matching assessed and rejected).
+  npm and GitHub tags publish in lockstep and npm's `dev` dist-tag runs ahead of
+  tags, so tags buy no currency; a source build would also lose the CI-injected
+  version and channel constants that the doctor pin check and the TUI tabs path
+  depend on. The 2.0.5 --> 2.0.10 bump surfaced two harness fixes:
+  @opencode/client renamed server.status() to server.info() (doctor's health
+  probe failed while the server was fine; the SDK ships its own types, so
+  typecheck could not catch it), and `abstract upgrade` now installs the new pin
+  in-process (the PIN constant was captured at import, so upgrade silently
+  deferred the install to the next command).
