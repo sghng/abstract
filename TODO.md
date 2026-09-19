@@ -628,6 +628,34 @@ audience is the story (findings, citable numbers) is the engineer's in
 - **Pin**: kimi-for-coding/k3, green, matching the engineer's executing hybrid;
   the first real model-development ticket settles it.
 
+## 2026-09-19: expertise roster; memos shared; editor is the fresh eye
+
+The q-matrix R&R audit surfaced the cost of the 2026-09-05 curator shape: two
+days of orchestrator briefings (rulings, dispositions, expected end states)
+turned the editor into an internal intentional-state registry keeper, while the
+blinded reviewer arms were the only true fresh eyes. Inverted.
+
+- **Roster**: "Consulted for" became "Expertise" (who knows what, not a routing
+  protocol). The roster offers structure, not choreography; how the roles
+  combine expertise is theirs to invent. The editor owns nothing, its expertise
+  is a fresh eye on artifacts (bugs, inconsistencies, misalignment with venue,
+  audience, style).
+- **Editor contract**: reads artifacts cold, a journal editor who knows the
+  venue and the field, never the lab. Venue and audience are the whole context.
+  If the page alone cannot be followed, that is the finding, never a reason to
+  ask for context. The contract lives in the roster cell plus the editor's own
+  prompt, nowhere else. Aspects menu: standalone and numbers-as-read replace
+  story.md alignment and registry tracing; the editor's own cold read is the
+  panel's control arm. Supersedes the 2026-09-05 insider-curator shape from
+  issue #27.
+- **Memos shared**: `notes/memos/` joins `notes/reports/` as a shared artifact
+  type (any role writes `memo-NNN-slug.md` when a cue is too small and a report
+  too heavy); librarian and editor memo ownership dropped.
+- **Open**: the stale-number-sweep subagent (registry tracing) lost its
+  editor-adjacent home; belongs on the writer or orchestrator side. A persistent
+  editor session still accretes lab memory across rounds; fresh sessions per
+  review round would be the full fix (CLI concern).
+
 ## Decisions
 
 - 2026-09-18: first-author QC pinned as committed script; D1

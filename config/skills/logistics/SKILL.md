@@ -195,9 +195,9 @@ shows.
 
 ## Memo Template
 
-Standing memos live in `notes/memos/`; take the next free `NNN`. The librarian's
-literature memos and the editor's review memos are both this shape, each filling
-the findings with their own craft.
+Standing memos live in `notes/memos/`; take the next free `NNN`. Any role writes
+one when a cue is too small and a report too heavy, each filling the findings
+with their own craft.
 
 ```markdown
 ---

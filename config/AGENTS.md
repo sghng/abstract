@@ -7,19 +7,23 @@ state lives in `notes/`.
 
 ## The Team
 
-| Role         | Owns                                              | Consulted for                                          |
-| ------------ | ------------------------------------------------- | ------------------------------------------------------ |
-| Orchestrator | strategy, `notes/story.md`, tickets, user contact | (none)                                                 |
-| Engineer     | `src/`, `experiments/`, `notes/results.md`        | feasibility, technical approach                        |
-| Statistician | `model/`                                          | analysis design, model choice, estimation, derivations |
-| Librarian    | `notes/literature.md`, reference library, memos   | background, claims, literature                         |
-| Writer       | `draft/`                                          | manuscripts, proposals, grants, publishing conventions |
-| Editor       | review memos (`notes/memos/`)                     | writing quality, review panels, story coherence        |
+| Role         | Owns                                              | Expertise                                                                                                             |
+| ------------ | ------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------- |
+| Orchestrator | strategy, `notes/story.md`, tickets, user contact | coordination                                                                                                          |
+| Engineer     | `src/`, `experiments/`, `notes/results.md`        | any kind of coding, running simulations included                                                                      |
+| Statistician | `model/`                                          | derivations, statistical work, model development, psychometrics                                                       |
+| Librarian    | `notes/literature.md`, reference library          | the field's literature                                                                                                |
+| Writer       | `draft/`                                          | academic writing                                                                                                      |
+| Editor       | (none)                                            | a fresh eye on artifacts, catching bugs, inconsistencies, and misalignment with the target venue, audience, and style |
+
+The roster is structure, not choreography: how the roles combine this expertise
+is theirs to invent.
 
 Ownership means the owner writes and curates; everyone else reads and routes
-changes through the owner. `notes/reports/` is the one shared artifact type: the
-engineer and the statistician each write their own `report-NNN-name.md`, in one
-numbering sequence.
+changes through the owner. `notes/reports/` and `notes/memos/` are the shared
+artifact types: the engineer and the statistician each write their own
+`report-NNN-name.md`, and any role writes `memo-NNN-slug.md` when a cue is too
+small and a report too heavy, each directory in one numbering sequence.
 
 Protocol: **converge --> compile --> execute --> synthesize**. Consult the
 peers, write the ticket, execute it in isolation, synthesize the findings into a
@@ -42,7 +46,7 @@ project-root/
 |   +-- story.md            # CENTRAL NARRATIVE, the north star (orchestrator-owned)
 |   +-- tickets/            # Work assignments (required)
 |   +-- reports/            # Executive reports (required)
-|   +-- memos/              # Standing memos (librarian literature memos, editor review memos)
+|   +-- memos/              # Standing memos, any role (middle size between cue and report)
 |   +-- results.md          # Key-results registry: the canonical numbers (engineer-owned)
 |   `-- dev/                # Implementation notes (required; other themed dirs emerge organically)
 +-- src/                    # Core reusable code
@@ -56,7 +60,8 @@ project-root/
 
 ## Never Forget
 
-- **Read `notes/story.md` first.** Only the orchestrator edits it.
+- **Read `notes/story.md` first** (the editor never does; it reviews cold). Only
+  the orchestrator edits it.
 - **Naming**: kebab-case everywhere, for files the lab authors. An underscore
   marks foreign provenance (e.g. `*_edit.docx` from a collaborator); never
   rename such a file to kebab-case. `notes/tickets/ticket-NNN-name.md`,
