@@ -15,6 +15,10 @@
  *   abstract context [role] [--json]
  *                         print what each agent receives: context pieces,
  *                         skills, subagents, tools (static; live when up)
+ *   abstract typ2docx <file.typ>
+ *                         convert a Typst source to Word beside it, through
+ *                         the house reference stock (citeproc, native
+ *                         numbering); no server or model involved
  *   abstract doctor       contract smoke test against the pinned runtime
  *   abstract stop         stop the lab server
  *   abstract upgrade [v]  bump the pinned @opencode/cli version, then doctor
@@ -662,11 +666,49 @@ async function contextCmd(role?: string, json = false): Promise<void> {
 
 /* -- main ---------------------------------------------------------------- */
 
+/* -- typ2docx ------------------------------------------------------------- */
+
+/** Convert a Typst source to Word beside it, through the house reference
+ *  stock. Runs pandoc from the source's directory so relative bibliography
+ *  and asset paths in the .typ resolve as they do when drafting there. */
+function typeToDocx(arg: string | undefined): void {
+  if (!arg) fail("usage: abstract typ2docx <file.typ>");
+  const src = resolve(arg);
+  if (!src.endsWith(".typ")) fail(`not a .typ file: ${arg}`);
+  if (!existsSync(src)) fail(`not found: ${arg}`);
+  const stock = join(HARNESS_DIR, "reference", "reference.docx");
+  if (!existsSync(stock))
+    fail(`reference stock missing: ${stock} (run tools/build-reference.sh)`);
+  const out = src.slice(0, -4) + ".docx";
+  const r = spawnSync(
+    "pandoc",
+    [
+      src,
+      "-o",
+      out,
+      "--citeproc",
+      "-f",
+      "typst",
+      "-t",
+      "docx+native_numbering",
+      "--reference-doc",
+      stock,
+    ],
+    { stdio: "inherit", cwd: dirname(src) },
+  );
+  if (r.error) fail(`pandoc not runnable: ${r.error.message}`);
+  if (r.status !== 0) process.exit(r.status ?? 1);
+  console.log(`wrote ${out}`);
+}
+
 async function main(): Promise<void> {
   const [cmd, ...rest] = process.argv.slice(2);
   switch (cmd) {
     case undefined:
       await launch();
+      return;
+    case "typ2docx":
+      typeToDocx(rest[0]);
       return;
     case "context":
       await contextCmd(
@@ -691,6 +733,10 @@ async function main(): Promise<void> {
       console.log("       abstract context [role] [--json]");
       console.log(
         "                     print each agent's context, skills, subagents, tools",
+      );
+      console.log("       abstract typ2docx <file.typ>");
+      console.log(
+        "                     convert Typst to Word beside it (house stock, citeproc)",
       );
       console.log(
         "       abstract doctor   contract smoke test against the pinned runtime",

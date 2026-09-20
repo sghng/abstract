@@ -128,6 +128,28 @@ Until the harness exists, the `bin/` launchers + file-mediated consult relay
 
 ## Canonical Decisions Log
 
+- **Reference stock for Word exports (2026-09-20)**: deliverables converted to
+  docx now share one house template, and it lives in the codebase, not the
+  global abstract state: `~/.local/share/abstract` is the CLI's runtime
+  territory (server state, credentials, DB), while the stock must stay versioned
+  beside the patches that generate it (Helium-browser model; the pristine pandoc
+  template is never forked, the patches are the source of truth).
+  `tools/build-reference.sh` is deliberately minimal: export pandoc's pristine
+  reference docx, unpack, apply the named `*.patch` files in `tools/` in
+  alphabetical order (each names one concern, so template drift from a pandoc
+  upgrade fails at the offending patch; clean apply is the whole contract, no
+  smoke test), repack into `reference/reference.docx` where the existing
+  `lab-reference` alias already reaches every session (the CLI pins
+  `OPENCODE_CONFIG_DIR` to the repo's `config/`, and relative reference paths
+  resolve from the config file, so the alias is repo-anchored for all projects).
+  The stock carries the house styles: Times New Roman throughout, all heading
+  colors black, a 0.5 in first-line indent on every body paragraph with
+  inter-paragraph spacing removed (Compact and Block Text suppress it), figures
+  and tables centered, captions left, and a three-line table (top and bottom
+  rules added; the header rule ships in the stock's firstRow formatting, and the
+  stock has no other borders to suppress). The artifact stays a zip (pandoc
+  requires a real docx container) and is committed so sessions can export
+  without building.
 - **Style guide register recalibration (2026-09-20)**: the guide's first pass
   produced eleven false positives, all against the advisor's own edits (utilize,
   dramatically expanding, high-quality, rich, substantially, It is important to

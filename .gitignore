@@ -29,3 +29,6 @@ docs/.vitepress/cache/
 docs/.vitepress/dist/
 repertoire/legacy/__pycache__/
 tmp.typ
+
+# reference stock build scratch (reference.docx itself is committed)
+tools/work/

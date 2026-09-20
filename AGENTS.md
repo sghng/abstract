@@ -34,11 +34,17 @@ agents developing this repository. The lab agents' shared invariants live in
   six role sessions per project (`metadata.role`, created once); then attaches
   one TUI (`--server`, `--session`). Also `abstract context [role] [--json]`
   (print what each agent receives: context pieces, skills, subagents, tools),
-  `abstract doctor` (contract smoke test), `abstract stop`,
+  `abstract typ2docx <file.typ>` (Typst to Word beside the source, through the
+  house reference stock; citeproc and native numbering; no server or model
+  involved), `abstract doctor` (contract smoke test), `abstract stop`,
   `abstract upgrade [v]`
 - `reference/` -- reference material agents read on request; reaches agents as
   the `lab-reference` alias (OpenCode references feature, described in
   `config/opencode.json`)
+- `tools/` -- builds `reference/reference.docx` (the pandoc reference doc
+  styling every Word export, agent-visible via the `lab-reference` alias) by
+  applying the named `*.patch` files in alphabetical order to a pristine pandoc
+  template export; the generated stock is committed, `work/` is scratch
 - `repertoire/` -- the writer's convention corpus: pipeline scripts (`src/`
   journal-agnostic stages + `src/families/<j>/` fetchers) that turn journal
   articles (six families: psychometrika, jem, jebs, bjmsp, psyarxiv, arxiv stat)
