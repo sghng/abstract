@@ -34,24 +34,37 @@ but also avoid punchy short sentences. Simple, not fragmented.
 Link sentences with transition words, and keep each transition natural; the flow
 is what keeps the reader nodding.
 
+Signposting phrases ("It is important to note...") are transitions; they signal
+what deserves attention and keep the flow moving.
+
 A dash in running prose, in any form (em dash, en dash, double hyphen), means
 the sentence carries two thoughts. Split it. A semicolon also joins two
 sentences, so split it there. Fold a colon's explanation into the sentence.
 
 ## Tone
 
-Tone is neutral and objective. Language is professional and scientific. Hedge
-your claims, leave room in every statement, and do not be too certain.
+Tone is neutral toward the evidence and positive toward the contribution.
+Language is professional and scientific. Hedge what the findings and
+generalizations claim, and leave room there; hedging the contribution itself
+undersells it. The failure is exaggeration past the evidence, not confidence.
 
 Describe other researchers' work factually. Report what they did and found;
-never rate it, in praise or in disparagement.
+never rate it, in praise or in disparagement. Your own work is the exception;
+sell it.
 
 ## Words
 
-Word choice is plain, boring, and conservative. No nuanced, figurative, or
-"clever" use of words. Insider terms that a neighboring subfield would not share
-are defined or replaced. Define a term once, at first use; thereafter the term
-stands alone.
+Plain is measured against the field's published idiom, not against a stripped
+vocabulary. The field's routine words, evaluative words included ("rich",
+"high-quality", "substantially"), are plain words; a phrase the journals publish
+routinely is never a violation. What stays out is nuance, figurative language,
+and cleverness outside that idiom. Insider terms that a neighboring subfield
+would not share are defined or replaced. Define a term once, at first use;
+thereafter the term stands alone.
+
+Present the contribution positively. A draft that undersells its own work cannot
+sell it; positive emphasis is expected, and the failure is exaggeration or
+drama, never praise.
 
 Write in a written register, never a spoken one. No contractions, no
 conversational fillers, no rhetorical questions, no addressing the reader.
@@ -87,3 +100,6 @@ Consult the `repertoire` tool often for style reference while a deliverable is
 in generation. Search with the draft prose at hand, filtered to the target
 publication and in particular to the section being written, and match the
 register of the published passages that come back.
+
+The corpus settles doubt: when unsure whether a word or phrase is plain, search
+it; a phrase the target venue publishes routinely is plain.

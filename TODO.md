@@ -128,6 +128,22 @@ Until the harness exists, the `bin/` launchers + file-mediated consult relay
 
 ## Canonical Decisions Log
 
+- **Style guide register recalibration (2026-09-20)**: the guide's first pass
+  produced eleven false positives, all against the advisor's own edits (utilize,
+  dramatically expanding, high-quality, rich, substantially, It is important to
+  note, ...). Diagnosis: three wrong equivalences. Plain had been read as
+  stripped ("boring" drove it) instead of measured against the field's published
+  idiom, whose routine evaluative vocabulary is plain; hedging had been scoped
+  to every statement instead of empirical claims; signposting had been swept as
+  spoken filler instead of transition. Fixes: Words opens with plain-by-idiom
+  plus a positive-voice paragraph (the failure is exaggeration or drama, never
+  praise; "boring" retired from the vocabulary rule), Tone holds asymmetric
+  confidence (neutral toward the evidence, positive toward the contribution;
+  rate others factually, sell your own), Sentences blesses signposting as
+  transition, and Repertoire gains the arbiter role (a phrase the venue
+  publishes routinely is plain). This realigns the guide with writing-craft
+  Framing's strategic optimism: humble toward evidence, positive toward the
+  work, factual toward others.
 - **Style guide rename and restructure; density doctrine retired (2026-09-19)**:
   `prose-standard.md` renamed `style-guide.md` (the name says what it governs,
   prose level style) and restructured from a failure-modes/conventions grab-bag
