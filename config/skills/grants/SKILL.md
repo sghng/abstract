@@ -14,12 +14,12 @@ A proposal is a compressed paper, roughly 1,000 words.
   nothing.
 - Three to four visual elements, each serving one narrative claim. Two leaves
   claims unsupported; five is pretentious.
-- Visuals anchor the nod: the right figure makes the reviewer pause and feel
-  "I get this"; at the talk it is the diagram people photograph.
+- Visuals anchor the nod: the right figure makes the reviewer pause and feel "I
+  get this"; at the talk it is the diagram people photograph.
 - Citation density: every Background and Discussion paragraph cites at least
   once; Methods cites methodological sources; Results ties findings to prior
   literature ("aligns with Doe (2023)..."). An uncited paragraph reads as
   opinion.
 
-The prose standard, story doctrine, and writing craft are always in your
-context; this skill adds the proposal's own constraints.
+The style guide, story doctrine, and writing craft are always in your context;
+this skill adds the proposal's own constraints.

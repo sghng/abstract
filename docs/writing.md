@@ -183,8 +183,8 @@ is `draft/proposal-v1.md`, then `v1` is what leaves the lab.
 
 ## Open Questions
 
-- The writing conventions live in the **prose-standard** and **writing-craft**
-  movements (shared standard, then writer craft); venue-specific modules stay
+- The writing conventions live in the **style-guide** and **writing-craft**
+  prompt files (shared style, then writer craft); venue-specific modules stay
   skills (**grants**, **journal-review**).
 - Should the editor ever be engaged for non-draft artifacts (e.g., polishing an
   engineer report)? The harness does not forbid it, but the convention is that

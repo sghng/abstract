@@ -25,8 +25,8 @@ export const SCORE: Partial<Record<Role, readonly string[]>> = {
   orchestrator: ["story-doctrine", "story-keeping", "orchestrator"],
   engineer: ["engineer"],
   librarian: ["librarian"],
-  writer: ["prose-standard", "story-doctrine", "writing-craft", "writer"],
-  editor: ["prose-standard", "editor"],
+  writer: ["style-guide", "story-doctrine", "writing-craft", "writer"],
+  editor: ["style-guide", "editor"],
 };
 
 /**

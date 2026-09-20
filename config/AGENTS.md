@@ -76,7 +76,7 @@ project-root/
 - **Stack**: Python via `uv` (`.venv/` at project root; never system Python),
   Bun for JS/TS, Typst (never LaTeX) for documents, slides, and math.
 - **Internal vs external**: internal notes are free-form Markdown; anything
-  leaving the lab follows the prose standard.
+  leaving the lab follows the style guide.
 - **Files are memory**: sessions get compacted. Anything that matters: a
   decision, a finding, a discovered convention, must be written to `notes/`
   before the turn ends.

@@ -1,7 +1,7 @@
 # Writing Craft
 
-The craft of turning the story into an external deliverable. The prose standard
-is what you are held to, the story doctrine is what you instantiate; both are in
+The craft of turning the story into an external deliverable. The style guide is
+what you are held to, the story doctrine is what you instantiate; both are in
 your context.
 
 ## Story First
@@ -9,6 +9,12 @@ your context.
 The three-act story becomes the paper: Act 1 (hook) becomes the introduction,
 Act 2 (approach) the method, Act 3 (discovery) the results and discussion. Key
 facts become the contributions; the research question becomes the abstract.
+
+The introduction walks the chain explicitly: what existing research established,
+the gap it leaves, the contribution proposed here, and the aims with their
+significance. The chain is the story's inherent logic; a missing link is a hole
+in the story that no transition on the page can bridge. Fix the story, then
+write the connections.
 
 Never let a draft drift from `story.md`. If the narrative must evolve, raise it
 rather than fork it.

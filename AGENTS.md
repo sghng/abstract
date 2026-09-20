@@ -17,7 +17,7 @@ agents developing this repository. The lab agents' shared invariants live in
   reference alias), `skills/` (the lab's skills, a real directory), and
   `runtime.json` (the pinned `@opencode/cli` version)
 - `prompts/` -- the prompt files (Markdown, one file each, descriptive names):
-  shared doctrine (`prose-standard.md`, `story-doctrine.md`), role doctrine
+  shared doctrine (`style-guide.md`, `story-doctrine.md`), role doctrine
   (`story-keeping.md`, `writing-craft.md`), and one file per score-assembled
   role. Referenced by stem from the score; only file contents enter the context,
   so names are dev-facing. Transitional: the statistician's doctrine lives in
@@ -80,7 +80,7 @@ agents developing this repository. The lab agents' shared invariants live in
   Rewrite the sentence (split it, use a comma or parentheses). CLI flags and
   markdown table separators are syntax, not prose, and stay.
 - **Deliverable prose bans colons, semicolons, and dashes** in running text (see
-  `prompts/prose-standard.md`); prompt lists may still use colons after bold
+  `prompts/style-guide.md`); prompt lists may still use colons after bold
   labels.
 - **Empiricism**: the goal is not a prompt that looks right; it is finding out
   what is truly needed. Start minimal and observe the agents. A rule earns its
@@ -89,18 +89,13 @@ agents developing this repository. The lab agents' shared invariants live in
   cheap and reversible.
 - **Economy**: instruct only where the prior is wrong; delete if deletion breaks
   nothing.
-- **Density**: one token should carry a framework. Pick the word most unique in
-  embedding space whose meaning is exact ("obviate", not "make unnecessary";
-  "Hemingway", not "short declarative sentences without ornament"). Where no
-  such word exists, coin one ("nodding reader") and reuse it. Coin only for
-  concepts that recur.
 - **State once**: the context is assembled; give each fact one home, chosen by
   audience. The kernel (config/AGENTS.md) is the shared layer; role prompt files
   carry only that role's deviation.
 - **Positive imperatives**: state what to do; cut hedges; prefer a positive rule
   over a negated one.
 - **Recursion**: prompt writing is iterative. A line is finished not when
-  nothing can be added, but when nothing can be deleted and no word made denser.
+  nothing can be added, but when nothing can be deleted.
 - **Post-surgery checklist**: after moving or graduating prompt content, grep
   the descriptions, sibling files, and dev docs for the old names; residue is
   the expected failure mode of every graduation round.

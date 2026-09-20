@@ -39,7 +39,8 @@ Mix into each brief according to the persona:
 1. Standalone: are what, why, how, why it matters, and how it differs answered
    as early as the abstract and introduction, and re-answered wherever a title
    keyword recurs?
-2. Prose standard: the failure modes and conventions, with lines cited.
+2. Style guide: violations by level (paragraph, sentence, word, formatting,
+   numbers), with lines cited.
 3. Numbers as read: every number carries its unit of analysis and agrees with
    every other statement of it in the artifact.
 4. Statistics: reporting completeness (tests, effect sizes, intervals).

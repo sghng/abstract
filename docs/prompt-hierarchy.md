@@ -16,7 +16,7 @@ prompt, then the layers below, then tool schemas.
    alike. Membership test: forgetting it would be silent and costly.
 
 2. **Shared prompts (the all-hands meeting).** Doctrine two roles must reason
-   about together earns a file listed in both scores: `prose-standard` (writer +
+   about together earns a file listed in both scores: `style-guide` (writer +
    editor; a standard with one holder is not a standard), `story-doctrine`
    (orchestrator maintains the story, writer instantiates it).
 
@@ -56,10 +56,10 @@ prompt, then the layers below, then tool schemas.
   artifact; roles that shape it share the doctrine.
 - **Duplication rule.** Never repeat a statement within one agent's context.
   Repetition across different agents' contexts is acceptable and sometimes
-  intended (the prose standard shared by writer and editor; the editor's
-  checklist restating the writer's detail at recognition grain). When the same
-  fact serves two roles, give each the grain it needs: generative detail for the
-  producer, checkable items for the judge.
+  intended (the style guide shared by writer and editor; the editor's checklist
+  restating the writer's detail at recognition grain). When the same fact serves
+  two roles, give each the grain it needs: generative detail for the producer,
+  checkable items for the judge.
 - **Asymmetric detail protects independence.** The editor gets a checklist, not
   the writer's full rationale; an editor inside the writer's frame shares the
   writer's blind spots.

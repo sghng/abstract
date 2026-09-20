@@ -128,6 +128,24 @@ Until the harness exists, the `bin/` launchers + file-mediated consult relay
 
 ## Canonical Decisions Log
 
+- **Style guide rename and restructure; density doctrine retired (2026-09-19)**:
+  `prose-standard.md` renamed `style-guide.md` (the name says what it governs,
+  prose level style) and restructured from a failure-modes/conventions grab-bag
+  into units of the text (nodding reader, paragraphs, sentences, words,
+  formatting, numbers and citations), each rule at its own level. Author edits
+  folded in: the opening is now history and background --> field importance -->
+  our impact and novelty --> what we did (replacing the vague big/small story);
+  fragmented and too-short paragraphs are failure modes (very short usually
+  means the logic itself is fragmented); "undefined insider terms" widened to
+  nuanced wording, word choice conservative and boring; citations just follow
+  APA; the precision metric is usually the SD or the p value; the vague "no
+  AI-sounding constructions" bullet removed; new sentence rules (simple
+  structure, no clever clauses, natural transition words). AGENTS.md lost the
+  Density bullet and Recursion lost "no word made denser" (saying little is
+  economy, not density; density made prompts archaic). The rename was swept
+  through score.ts, the kernel token ("the style guide"), writing-craft, editor
+  aspect 2, the grants skill, and dev docs; historical entries in this log keep
+  the old name.
 - **Prompt audit round 2: fresh eyes; directory reshape; punctuation bans
   (2026-09-17)**: three subagent audits (cross-reference, cold-reader role
   simulation, rules-compliance) found seam failures, not machinery failures:
