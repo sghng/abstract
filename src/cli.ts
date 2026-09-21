@@ -15,10 +15,12 @@
  *   abstract context [role] [--json]
  *                         print what each agent receives: context pieces,
  *                         skills, subagents, tools (static; live when up)
- *   abstract typ2docx <file.typ>
+ *   abstract typ2docx [--build-reference] <file.typ>
  *                         convert a Typst source to Word beside it, through
  *                         the house reference stock (citeproc, native
- *                         numbering); no server or model involved
+ *                         numbering); no server or model involved.
+ *                         --build-reference rebuilds the stock from the
+ *                         patch series first; alone, it is a full call
  *   abstract doctor       contract smoke test against the pinned runtime
  *   abstract stop         stop the lab server
  *   abstract upgrade [v]  bump the pinned @opencode/cli version, then doctor
@@ -668,17 +670,34 @@ async function contextCmd(role?: string, json = false): Promise<void> {
 
 /* -- typ2docx ------------------------------------------------------------- */
 
+/** Rebuild the house reference stock from the tools/ patch series. */
+function buildReference(): void {
+  const script = join(HARNESS_DIR, "tools", "build-reference.sh");
+  const r = spawnSync(script, { stdio: "inherit" });
+  if (r.error) fail(`build script not runnable: ${script}`);
+  if (r.status !== 0) process.exit(r.status ?? 1);
+}
+
 /** Convert a Typst source to Word beside it, through the house reference
  *  stock. Runs pandoc from the source's directory so relative bibliography
- *  and asset paths in the .typ resolve as they do when drafting there. */
-function typeToDocx(arg: string | undefined): void {
-  if (!arg) fail("usage: abstract typ2docx <file.typ>");
+ *  and asset paths in the .typ resolve as they do when drafting there.
+ *  --build-reference rebuilds the stock first; alone, it is a full call. */
+function typeToDocx(args: string[]): void {
+  const build = args.includes("--build-reference");
+  const arg = args.find((a) => !a.startsWith("--"));
+  if (build) buildReference();
+  if (!arg) {
+    if (build) return;
+    fail("usage: abstract typ2docx [--build-reference] <file.typ>");
+  }
   const src = resolve(arg);
   if (!src.endsWith(".typ")) fail(`not a .typ file: ${arg}`);
   if (!existsSync(src)) fail(`not found: ${arg}`);
   const stock = join(HARNESS_DIR, "reference", "reference.docx");
   if (!existsSync(stock))
-    fail(`reference stock missing: ${stock} (run tools/build-reference.sh)`);
+    fail(
+      `reference stock missing: ${stock} (run: abstract typ2docx --build-reference)`,
+    );
   const out = src.slice(0, -4) + ".docx";
   const r = spawnSync(
     "pandoc",
@@ -710,7 +729,7 @@ async function main(): Promise<void> {
       await launch();
       return;
     case "typ2docx":
-      typeToDocx(rest[0]);
+      typeToDocx(rest);
       return;
     case "context":
       await contextCmd(
@@ -736,9 +755,12 @@ async function main(): Promise<void> {
       console.log(
         "                     print each agent's context, skills, subagents, tools",
       );
-      console.log("       abstract typ2docx <file.typ>");
+      console.log("       abstract typ2docx [--build-reference] <file.typ>");
       console.log(
-        "                     convert Typst to Word beside it (house stock, citeproc)",
+        "                     convert Typst to Word beside it (house stock, citeproc);",
+      );
+      console.log(
+        "                     --build-reference rebuilds the stock first",
       );
       console.log(
         "       abstract doctor   contract smoke test against the pinned runtime",

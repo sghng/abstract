@@ -34,9 +34,10 @@ agents developing this repository. The lab agents' shared invariants live in
   six role sessions per project (`metadata.role`, created once); then attaches
   one TUI (`--server`, `--session`). Also `abstract context [role] [--json]`
   (print what each agent receives: context pieces, skills, subagents, tools),
-  `abstract typ2docx <file.typ>` (Typst to Word beside the source, through the
-  house reference stock; citeproc and native numbering; no server or model
-  involved), `abstract doctor` (contract smoke test), `abstract stop`,
+  `abstract typ2docx [--build-reference] <file.typ>` (Typst to Word beside the
+  source, through the house reference stock; citeproc and native numbering; no
+  server or model involved; `--build-reference` rebuilds the stock from the
+  patch series first), `abstract doctor` (contract smoke test), `abstract stop`,
   `abstract upgrade [v]`
 - `reference/` -- reference material agents read on request; reaches agents as
   the `lab-reference` alias (OpenCode references feature, described in
@@ -47,7 +48,10 @@ agents developing this repository. The lab agents' shared invariants live in
   template export; the generated stock is committed, `work/` is scratch. Also
   `shading.lua` and `shading.patch`, the typ2docx pair shading captured block
   and box fills (`w:shd`, covers display math); `highlight` regions keep
-  pandoc's native mark handling
+  pandoc's native mark handling. A table-only region unwraps to the
+  `ShadedTable` table style (full-table fill, and the following paragraph
+  regains its `FirstParagraph` margin); shaded text regions carry their own
+  after-spacing
 - `repertoire/` -- the writer's convention corpus: pipeline scripts (`src/`
   journal-agnostic stages + `src/families/<j>/` fetchers) that turn journal
   articles (six families: psychometrika, jem, jebs, bjmsp, psyarxiv, arxiv stat)
