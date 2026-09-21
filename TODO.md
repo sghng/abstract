@@ -754,3 +754,19 @@ blinded reviewer arms were the only true fresh eyes. Inverted.
   typecheck could not catch it), and `abstract upgrade` now installs the new pin
   in-process (the PIN constant was captured at import, so upgrade silently
   deferred the install to the next command).
+- 2026-09-20: typ2docx marks changes through two Word mechanisms, chosen by the
+  source markup. Typst `highlight` regions become mark divs and spans, rendered
+  by pandoc's native handling with the highlight pen (`w:highlight`, yellow
+  runs; OMML equations cannot carry it). The manuscript's chg-block and
+  chg-inline wrappers (block/box fills) are captured by the reader as
+  background-color attributes; `tools/shading.lua` maps them onto the stock
+  styles from `shading.patch` (ShadingBlock paragraph band, ShadingInline
+  character shading, exact names so the writer injects no shadowing
+  placeholder), which is Word's own fill-color mechanism and does cover display
+  math. A first custom-style attempt failed before the exact-name rule was
+  understood: the writer injects a placeholder definition for any custom style
+  it cannot find by exact name in the reference stock, and Word resolves the
+  duplicate styleId to the empty placeholder. The capture needs the ~/.local/bin
+  pandoc build (PRs #11881 and #11884; release 3.11 drops highlighted content
+  silently, so keep the symlink ahead of homebrew until the patches land in a
+  release).

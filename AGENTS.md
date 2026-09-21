@@ -44,7 +44,10 @@ agents developing this repository. The lab agents' shared invariants live in
 - `tools/` -- builds `reference/reference.docx` (the pandoc reference doc
   styling every Word export, agent-visible via the `lab-reference` alias) by
   applying the named `*.patch` files in alphabetical order to a pristine pandoc
-  template export; the generated stock is committed, `work/` is scratch
+  template export; the generated stock is committed, `work/` is scratch. Also
+  `shading.lua` and `shading.patch`, the typ2docx pair shading captured block
+  and box fills (`w:shd`, covers display math); `highlight` regions keep
+  pandoc's native mark handling
 - `repertoire/` -- the writer's convention corpus: pipeline scripts (`src/`
   journal-agnostic stages + `src/families/<j>/` fetchers) that turn journal
   articles (six families: psychometrika, jem, jebs, bjmsp, psyarxiv, arxiv stat)

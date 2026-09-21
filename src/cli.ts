@@ -693,6 +693,8 @@ function typeToDocx(arg: string | undefined): void {
       "docx+native_numbering",
       "--reference-doc",
       stock,
+      "--lua-filter",
+      join(HARNESS_DIR, "tools", "shading.lua"),
     ],
     { stdio: "inherit", cwd: dirname(src) },
   );
