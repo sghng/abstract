@@ -30,5 +30,7 @@ docs/.vitepress/dist/
 repertoire/legacy/__pycache__/
 tmp.typ
 
-# reference stock build scratch (reference.docx itself is committed)
-tools/work/
+# reference stock build outputs (the patch series is the source of truth;
+# built docx artifacts are never committed)
+reference/reference.docx
+reference/reference.debug.docx

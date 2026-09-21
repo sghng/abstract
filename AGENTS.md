@@ -34,24 +34,27 @@ agents developing this repository. The lab agents' shared invariants live in
   six role sessions per project (`metadata.role`, created once); then attaches
   one TUI (`--server`, `--session`). Also `abstract context [role] [--json]`
   (print what each agent receives: context pieces, skills, subagents, tools),
-  `abstract typ2docx [--build-reference] <file.typ>` (Typst to Word beside the
-  source, through the house reference stock; citeproc and native numbering; no
-  server or model involved; `--build-reference` rebuilds the stock from the
-  patch series first), `abstract doctor` (contract smoke test), `abstract stop`,
-  `abstract upgrade [v]`
+  `abstract typ2docx <file.typ>` (Typst to Word beside the source, through a
+  house reference stock rebuilt fresh from the patch series; citeproc and native
+  numbering; no server or model involved), `abstract doctor` (contract smoke
+  test), `abstract stop`, `abstract upgrade [v]`
 - `reference/` -- reference material agents read on request; reaches agents as
   the `lab-reference` alias (OpenCode references feature, described in
   `config/opencode.json`)
-- `tools/` -- builds `reference/reference.docx` (the pandoc reference doc
-  styling every Word export, agent-visible via the `lab-reference` alias) by
-  applying the named `*.patch` files in alphabetical order to a pristine pandoc
-  template export; the generated stock is committed, `work/` is scratch. Also
-  `shading.lua` and `shading.patch`, the typ2docx pair shading captured block
-  and box fills (`w:shd`, covers display math); `highlight` regions keep
-  pandoc's native mark handling. A table-only region unwraps to the
-  `ShadedTable` table style (full-table fill, and the following paragraph
-  regains its `FirstParagraph` margin); shaded text regions carry their own
-  after-spacing
+- `tools/` -- builds the house reference doc (the pandoc reference doc styling
+  every Word export) by applying the numbered `NN-*.patch` series in order to a
+  pristine pandoc template export, one self-contained style concern per patch;
+  fuzz=0 and a pandoc version pin make drift fail loudly, `--max-patch N`
+  bisects the series (0 is the pristine export; partial builds write
+  `reference/reference.debug.docx`); built docx artifacts are never committed:
+  `abstract typ2docx` rebuilds a fresh stock into a private temp dir on every
+  conversion, so the patch series is the single source of truth. Also
+  `shading.lua` and `04-shading.patch`, the typ2docx pair shading captured block
+  and box fills (`w:shd`, covers display math; no spacing of its own, the body
+  rhythm stands); `highlight` regions keep pandoc's native mark handling. A
+  region ending in a table hoists the table out to the `ShadedTable` table style
+  (full-table fill, and the following paragraph regains its `FirstParagraph`
+  margin)
 - `repertoire/` -- the writer's convention corpus: pipeline scripts (`src/`
   journal-agnostic stages + `src/families/<j>/` fetchers) that turn journal
   articles (six families: psychometrika, jem, jebs, bjmsp, psyarxiv, arxiv stat)

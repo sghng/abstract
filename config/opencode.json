@@ -6,7 +6,7 @@
   "references": {
     "lab-reference": {
       "path": "../reference",
-      "description": "Lab reference shelf, read on request. style/ holds the corpus-grounded style system (zen, handbook, manual) for psychometric prose. reference.docx is the pandoc reference doc every Word export passes via --reference-doc"
+      "description": "Lab reference shelf, read on request. style/ holds the corpus-grounded style system (zen, handbook, manual) for psychometric prose"
     }
   },
   "formatter": {

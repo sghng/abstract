@@ -760,7 +760,7 @@ blinded reviewer arms were the only true fresh eyes. Inverted.
   runs; OMML equations cannot carry it). The manuscript's chg-block and
   chg-inline wrappers (block/box fills) are captured by the reader as
   background-color attributes; `tools/shading.lua` maps them onto the stock
-  styles from `shading.patch` (ShadingBlock paragraph band, ShadingInline
+  styles from `04-shading.patch` (ShadingBlock paragraph band, ShadingInline
   character shading, exact names so the writer injects no shadowing
   placeholder), which is Word's own fill-color mechanism and does cover display
   math. A first custom-style attempt failed before the exact-name rule was
@@ -770,3 +770,32 @@ blinded reviewer arms were the only true fresh eyes. Inverted.
   pandoc build (PRs #11881 and #11884; release 3.11 drops highlighted content
   silently, so keep the symlink ahead of homebrew until the patches land in a
   release).
+- 2026-09-21: reference stock series audited and hardened. An exhaustive
+  permutation audit (720 orderings) found one hard dependency (the float hunks
+  of 03-first-line-indent carry jc="center" context that only exists after
+  02-center-figures-tables) and one silent hazard: patch applied with fuzz
+  re-anchors a hunk somewhere else and still exits 0, so an exit-code check
+  cannot see drift. The series is numbered 01-06 (the audited canonical
+  order), the build runs patch with --fuzz=0 and pins the pandoc version
+  (3.11) so drift fails loudly, unnumbered patch names are rejected, and
+  --max-patch N bisects the series (0 is the pristine export; partial builds
+  write reference/reference.debug.docx and never touch the committed stock).
+  04-shading anchors on the EOF style close so it is order-independent, drops
+  its after-spacing (shaded regions keep the body rhythm), and shading.lua
+  hoists a table that ends a shaded region out to the ShadedTable style: left
+  in the div, the shading cannot reach the table and the writer leaves the
+  next paragraph in BodyText with no margin below it. Styling stays in the
+  stock, not in Lua filters: the writer can reference styles but never define
+  them, so per-instance formatting through filters would lose inheritance,
+  docDefaults, and theme fonts.
+- 2026-09-21: typ2docx conversion is stateless; the committed stock is gone.
+  Measured cost of a full rebuild (pristine export, six patches, repack) is
+  ~100 ms warm against ~320 ms for the conversion itself, so the flag and
+  the committed reference/reference.docx were removed rather than cached:
+  abstract typ2docx rebuilds a fresh stock into a private mktemp dir on
+  every conversion and removes it after, making the numbered patch series
+  the single source of truth (no dual-source drift, no git timestamp
+  churn). The build script gained --out for that, moved its scratch to a
+  per-run mktemp (concurrent conversions no longer share work/), and
+  --max-patch stays for bisecting. Built docx artifacts are gitignored;
+  the lab-reference alias description no longer mentions the stock.

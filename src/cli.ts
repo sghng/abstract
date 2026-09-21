@@ -15,12 +15,11 @@
  *   abstract context [role] [--json]
  *                         print what each agent receives: context pieces,
  *                         skills, subagents, tools (static; live when up)
- *   abstract typ2docx [--build-reference] <file.typ>
+ *   abstract typ2docx <file.typ>
  *                         convert a Typst source to Word beside it, through
- *                         the house reference stock (citeproc, native
- *                         numbering); no server or model involved.
- *                         --build-reference rebuilds the stock from the
- *                         patch series first; alone, it is a full call
+ *                         a house reference stock rebuilt fresh from the
+ *                         patch series (citeproc, native numbering); no
+ *                         server or model involved
  *   abstract doctor       contract smoke test against the pinned runtime
  *   abstract stop         stop the lab server
  *   abstract upgrade [v]  bump the pinned @opencode/cli version, then doctor
@@ -34,13 +33,15 @@ import {
   closeSync,
   existsSync,
   mkdirSync,
+  mkdtempSync,
   openSync,
   readFileSync,
   renameSync,
+  rmSync,
   writeFileSync,
 } from "node:fs";
 import { randomBytes } from "node:crypto";
-import { homedir } from "node:os";
+import { homedir, tmpdir } from "node:os";
 import { basename, dirname, join, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 import { OpenCode } from "@opencode/client";
@@ -670,34 +671,36 @@ async function contextCmd(role?: string, json = false): Promise<void> {
 
 /* -- typ2docx ------------------------------------------------------------- */
 
-/** Rebuild the house reference stock from the tools/ patch series. */
-function buildReference(): void {
+/** Build the house reference stock into a private temp dir and return the
+ *  dir path. Rebuilt on every conversion: the patch series is the single
+ *  source of truth and nothing is cached. Quiet on success; the build
+ *  log only surfaces when the build fails. */
+function buildReference(): string {
   const script = join(HARNESS_DIR, "tools", "build-reference.sh");
-  const r = spawnSync(script, { stdio: "inherit" });
+  const dir = mkdtempSync(join(tmpdir(), "typ2docx-"));
+  const r = spawnSync(script, ["--out", join(dir, "reference.docx")], {
+    encoding: "utf8",
+  });
   if (r.error) fail(`build script not runnable: ${script}`);
-  if (r.status !== 0) process.exit(r.status ?? 1);
+  if (r.status !== 0) {
+    process.stdout.write(r.stdout ?? "");
+    process.stderr.write(r.stderr ?? "");
+    process.exit(r.status ?? 1);
+  }
+  return dir;
 }
 
 /** Convert a Typst source to Word beside it, through the house reference
- *  stock. Runs pandoc from the source's directory so relative bibliography
- *  and asset paths in the .typ resolve as they do when drafting there.
- *  --build-reference rebuilds the stock first; alone, it is a full call. */
+ *  stock rebuilt fresh from the patch series. Runs pandoc from the
+ *  source's directory so relative bibliography and asset paths in the
+ *  .typ resolve as they do when drafting there. */
 function typeToDocx(args: string[]): void {
-  const build = args.includes("--build-reference");
   const arg = args.find((a) => !a.startsWith("--"));
-  if (build) buildReference();
-  if (!arg) {
-    if (build) return;
-    fail("usage: abstract typ2docx [--build-reference] <file.typ>");
-  }
+  if (!arg) fail("usage: abstract typ2docx <file.typ>");
   const src = resolve(arg);
   if (!src.endsWith(".typ")) fail(`not a .typ file: ${arg}`);
   if (!existsSync(src)) fail(`not found: ${arg}`);
-  const stock = join(HARNESS_DIR, "reference", "reference.docx");
-  if (!existsSync(stock))
-    fail(
-      `reference stock missing: ${stock} (run: abstract typ2docx --build-reference)`,
-    );
+  const stockDir = buildReference();
   const out = src.slice(0, -4) + ".docx";
   const r = spawnSync(
     "pandoc",
@@ -711,12 +714,13 @@ function typeToDocx(args: string[]): void {
       "-t",
       "docx+native_numbering",
       "--reference-doc",
-      stock,
+      join(stockDir, "reference.docx"),
       "--lua-filter",
       join(HARNESS_DIR, "tools", "shading.lua"),
     ],
     { stdio: "inherit", cwd: dirname(src) },
   );
+  rmSync(stockDir, { recursive: true, force: true });
   if (r.error) fail(`pandoc not runnable: ${r.error.message}`);
   if (r.status !== 0) process.exit(r.status ?? 1);
   console.log(`wrote ${out}`);
@@ -755,12 +759,9 @@ async function main(): Promise<void> {
       console.log(
         "                     print each agent's context, skills, subagents, tools",
       );
-      console.log("       abstract typ2docx [--build-reference] <file.typ>");
+      console.log("       abstract typ2docx <file.typ>");
       console.log(
-        "                     convert Typst to Word beside it (house stock, citeproc);",
-      );
-      console.log(
-        "                     --build-reference rebuilds the stock first",
+        "                     convert Typst to Word beside it (house stock, citeproc)",
       );
       console.log(
         "       abstract doctor   contract smoke test against the pinned runtime",
