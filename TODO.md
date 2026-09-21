@@ -775,27 +775,50 @@ blinded reviewer arms were the only true fresh eyes. Inverted.
   of 03-first-line-indent carry jc="center" context that only exists after
   02-center-figures-tables) and one silent hazard: patch applied with fuzz
   re-anchors a hunk somewhere else and still exits 0, so an exit-code check
-  cannot see drift. The series is numbered 01-06 (the audited canonical
-  order), the build runs patch with --fuzz=0 and pins the pandoc version
-  (3.11) so drift fails loudly, unnumbered patch names are rejected, and
-  --max-patch N bisects the series (0 is the pristine export; partial builds
-  write reference/reference.debug.docx and never touch the committed stock).
+  cannot see drift. The series is numbered 01-06 (the audited canonical order),
+  the build runs patch with --fuzz=0 and pins the pandoc version (3.11) so drift
+  fails loudly, unnumbered patch names are rejected, and --max-patch N bisects
+  the series (0 is the pristine export; partial builds write
+  reference/reference.debug.docx and never touch the committed stock).
   04-shading anchors on the EOF style close so it is order-independent, drops
   its after-spacing (shaded regions keep the body rhythm), and shading.lua
-  hoists a table that ends a shaded region out to the ShadedTable style: left
-  in the div, the shading cannot reach the table and the writer leaves the
-  next paragraph in BodyText with no margin below it. Styling stays in the
-  stock, not in Lua filters: the writer can reference styles but never define
-  them, so per-instance formatting through filters would lose inheritance,
-  docDefaults, and theme fonts.
+  hoists a table that ends a shaded region out to the ShadedTable style: left in
+  the div, the shading cannot reach the table and the writer leaves the next
+  paragraph in BodyText with no margin below it. Styling stays in the stock, not
+  in Lua filters: the writer can reference styles but never define them, so
+  per-instance formatting through filters would lose inheritance, docDefaults,
+  and theme fonts.
 - 2026-09-21: typ2docx conversion is stateless; the committed stock is gone.
-  Measured cost of a full rebuild (pristine export, six patches, repack) is
-  ~100 ms warm against ~320 ms for the conversion itself, so the flag and
-  the committed reference/reference.docx were removed rather than cached:
-  abstract typ2docx rebuilds a fresh stock into a private mktemp dir on
-  every conversion and removes it after, making the numbered patch series
-  the single source of truth (no dual-source drift, no git timestamp
-  churn). The build script gained --out for that, moved its scratch to a
-  per-run mktemp (concurrent conversions no longer share work/), and
-  --max-patch stays for bisecting. Built docx artifacts are gitignored;
-  the lab-reference alias description no longer mentions the stock.
+  Measured cost of a full rebuild (pristine export, six patches, repack) is ~100
+  ms warm against ~320 ms for the conversion itself, so the flag and the
+  committed reference/reference.docx were removed rather than cached: abstract
+  typ2docx rebuilds a fresh stock into a private mktemp dir on every conversion
+  and removes it after, making the numbered patch series the single source of
+  truth (no dual-source drift, no git timestamp churn). The build script gained
+  --out for that, moved its scratch to a per-run mktemp (concurrent conversions
+  no longer share work/), and --max-patch stays for bisecting. Built docx
+  artifacts are gitignored; the lab-reference alias description no longer
+  mentions the stock.
+- 2026-09-21: typ2docx filter widened and renamed (shading.lua is typ2docx.lua,
+  still paired with 04-shading.patch). Live debugging on the real R&R manuscript
+  showed the reported defects shared one root chain: the reader turns comment
+  lines, bracket newlines, and unreferenced labels into whitespace-only or
+  anchor-only paragraphs; a trailing artifact inside a chg-block defeated the
+  table hoist, so the writer left the next paragraph in BodyText at zero margin,
+  and the artifacts themselves rendered as blank lines. The filter now drops
+  blank paragraphs (Span-empty counts as blank: the labels are letter tooling,
+  never cross-referenced), trims regions, and normalizes fills and highlight
+  marks onto pandoc's native mark handling, the default text highlight pen (Word
+  semantics: the highlighter, not the paint bucket). Two pandoc layers bound
+  that choice: block math inside #highlight crashes the reader outright (why
+  fills stay the source-side convention for math), and the writer never applies
+  the pen to OMML runs (convertMath bypasses the run-property environment), so
+  math-bearing paragraphs in marked regions take the pen-yellow ShadingBlock
+  band and marked trailing tables take the ShadedTable fill. Spacing model
+  revised per owner: BodyText 180/180 (pristine values; only the first-line
+  indent differs from pristine) and boundaries (FirstParagraph, TableCaption,
+  Figure) before=240; the redundant caption jc=left left the series (captions
+  inherit left). A figure wrapping only a table flattens to the table
+  (insurance; the reader already flattens them). FigureTable stays undefined in
+  the stock on purpose: it is pandoc's borderless layout table for side-by-side
+  images, not a data table.

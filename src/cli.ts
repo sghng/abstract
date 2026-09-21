@@ -716,7 +716,7 @@ function typeToDocx(args: string[]): void {
       "--reference-doc",
       join(stockDir, "reference.docx"),
       "--lua-filter",
-      join(HARNESS_DIR, "tools", "shading.lua"),
+      join(HARNESS_DIR, "tools", "typ2docx.lua"),
     ],
     { stdio: "inherit", cwd: dirname(src) },
   );
