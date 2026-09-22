@@ -39,14 +39,18 @@ Mix into each brief according to the persona:
 1. Standalone: are what, why, how, why it matters, and how it differs answered
    as early as the abstract and introduction, and re-answered wherever a title
    keyword recurs?
-2. Style guide: violations by level (paragraph, sentence, word, formatting,
-   numbers), with lines cited.
-3. Numbers as read: every number carries its unit of analysis and agrees with
+2. Style guide: violations by level (document, paragraph, sentence, word,
+   formatting, numbers), with lines cited.
+3. Narrative: does everything introduced fire (methods, columns, distinctions)?
+   Does new information arrive in its turn, no result before its metric, no
+   method before its introduction? Does each table's prose carry a hedged
+   insight, or does the section enumerate?
+4. Numbers as read: every number carries its unit of analysis and agrees with
    every other statement of it in the artifact.
-4. Statistics: reporting completeness (tests, effect sizes, intervals).
-5. Citations: on a final-round draft, delegate `subagents/citation-check` so
+5. Statistics: reporting completeness (tests, effect sizes, intervals).
+6. Citations: on a final-round draft, delegate `subagents/citation-check` so
    every citation resolves to a verified passage.
-6. The hostile close: if this were the only round before submission, what would
+7. The hostile close: if this were the only round before submission, what would
    make a hostile reviewer reject?
 
 ## Rounds

@@ -19,6 +19,16 @@ write the connections.
 Never let a draft drift from `story.md`. If the narrative must evolve, raise it
 rather than fork it.
 
+## Progressions
+
+An ordered set of methods or analyses is a progression the reader walks: simple
+before complex, naive before rich. Each item's rationale arrives at its
+introduction, connected to the previous item's limit; what word frequencies
+cannot capture, embeddings can. One sentence may announce the progression where
+the section begins. A rationale section up front that names and justifies every
+item tells the reader about methods the paper has not yet introduced; it jumps
+ahead of the build, and it announces instead of showing.
+
 ## Storyteller, Not Documenter
 
 You construct a narrative; you do not document what was done. Every dataset
@@ -30,6 +40,18 @@ matters most. This is focus, not dishonesty.
   hard-won. It goes to internal notes, not the draft.
 - Only the story-supporting subset enters the draft; the full record stays in
   `notes/`.
+- Chekhov's gun: everything introduced must fire. A method named, a column
+  reported, a distinction drawn pays off later in the story or comes out. What
+  is not reported is not mentioned; "X is outside the scope of this report"
+  hangs a gun that never fires.
+- Selection operates at every granularity: which experiments enter, which
+  methods represent their families, which columns a table carries. The cast is a
+  story decision, recorded in `notes/story.md`, and held consistent across every
+  table; a benchmark reports everything, a story reports its cast.
+- Omit what invites a question the data cannot answer (a spec that was not
+  recorded), and omit without announcement.
+- You own nothing in the draft. Hard-won results live in internal notes;
+  attachment is the enemy of omission.
 - A published imperfect paper advances the field more than an unpublished
   perfect one. Prioritize getting it out.
 
@@ -100,6 +122,9 @@ against a background of met expectations.
 - A changed headline number triggers a stale-number sweep: delegate
   `subagents/stale-number-sweep` over the draft and verify zero stale hits
   before reporting done. The canonical numbers live in `notes/results.md`.
+- A revision absorbs new content into the story's order; it is never pasted
+  where the request pointed. After an insertion, re-run the nodding test over
+  the whole section, not only the new sentences.
 
 ## Tooling
 

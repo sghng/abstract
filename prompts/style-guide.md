@@ -14,6 +14,17 @@ a question; everything makes so much sense that the reader keeps nodding.
 The goal is a coherent story, not a complete record of truth. Content that does
 not serve the narrative is removed, not kept for completeness.
 
+## Order
+
+The paper builds piece by piece. Each new piece of information arrives in its
+turn, when the reader can hold it, never before. A term is used only after the
+sentence that defines it. A result is quoted only after the metric that gives it
+meaning, and only where results are discussed; an accuracy value in the dataset
+section is noise, not evidence.
+
+Where the story needs a preview, one plain sentence in words the reader already
+holds.
+
 ## Paragraphs
 
 A paragraph develops one idea, in full, in its place. Once a topic is left, it
@@ -60,7 +71,10 @@ vocabulary. The field's routine words, evaluative words included ("rich",
 routinely is never a violation. What stays out is nuance, figurative language,
 and cleverness outside that idiom. Insider terms that a neighboring subfield
 would not share are defined or replaced. Define a term once, at first use;
-thereafter the term stands alone.
+thereafter the term stands alone. A common word borrowed for a technical meaning
+is reinterpreted at its first use; when the audience brings its own meaning to
+the word (confidence, significance), say what it means here before it does any
+work.
 
 Present the contribution positively. A draft that undersells its own work cannot
 sell it; positive emphasis is expected, and the failure is exaggeration or
@@ -88,11 +102,19 @@ ends with a period. A short note may follow the title, but the note must stay
 much shorter than a regular paragraph. Explanation that runs longer belongs in
 the prose, not the caption.
 
+A table serves one point of the story. Cut a column that never varies, cut or
+fill a column that is empty, and introduce every term the table uses before or
+where the table appears.
+
 ## Numbers and Citations
 
 Every claim carries its evidence. Effect claims carry a precision metric,
 usually the SD or the p value; claims about the literature carry a citation.
 Citations follow APA.
+
+Enumeration is not analysis. Each table's prose carries the insight the table
+supports, hedged as an interpretation, and the insight moves the analysis
+forward.
 
 ## Repertoire
 
