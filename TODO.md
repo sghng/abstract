@@ -836,3 +836,18 @@ blinded reviewer arms were the only true fresh eyes. Inverted.
   transition to #highlight. Caption handling shrinks to the filter's caption_pen
   span, which is now exactly the signal the writer's insertCaptionLabel looks
   for.
+- 2026-09-22: Word style lives in the stock, not in the Typst source. Typst
+  carries content (pandoc's reader drops presentational directives anyway) plus
+  its own PDF styling; the reference stock owns every Word style definition
+  (the writer references styles but never defines them); the filter only maps
+  semantics. New patches: 07-double-spacing (BodyText double, FirstParagraph
+  pinned double since its own w:spacing would shadow the inherited line value,
+  Compact pinned single so table cells and tight lists stay tight),
+  08-title-14pt-bold (Title/TitleChar 14 pt bold; centered was pristine),
+  09-heading-1-body-size-bold, 10-heading-2-body-size-underline (linked Char
+  styles mirror their paragraph styles). No filter change was needed for the
+  title: the reader routes a #title[...] element to metadata (its BlockHandler
+  for "title") and the docx writer emits it with the Title style. A filter-side
+  first-paragraph promotion was tried and reverted within the day: with the
+  title in metadata, the first real block is the proposal line, which wrongly
+  took the Title style.
