@@ -7,16 +7,16 @@ every role's actual assembly; keep it honest.
 ## The Layers
 
 The system prompt is reassembled on every model request (kernel auto-load,
-plugin score assembly, skills index), so it survives compaction by construction;
-what compaction takes is message history. Order per request: OpenCode base
-prompt, then the layers below, then tool schemas.
+binder assembly, skills index), so it survives compaction by construction; what
+compaction takes is message history. Order per request: OpenCode base prompt,
+then the layers below, then tool schemas.
 
 1. **The kernel (`config/AGENTS.md`, auto-loaded).** Invariants plus the
-   delegation doctrine, for every session: the five roles and every subagent
+   delegation doctrine, for every session: the six roles and every subagent
    alike. Membership test: forgetting it would be silent and costly.
 
 2. **Shared prompts (the all-hands meeting).** Doctrine two roles must reason
-   about together earns a file listed in both scores: `style-guide` (writer +
+   about together earns a file listed in both binders: `style-guide` (writer +
    editor; a standard with one holder is not a standard), `story-doctrine`
    (orchestrator maintains the story, writer instantiates it).
 
@@ -36,13 +36,21 @@ prompt, then the layers below, then tool schemas.
    every prose reference uses the full ID. Named agents cover recurring task
    shapes; model pins live in their frontmatter.
 
-`src/score.ts` is the single source for which prompts a role assembles, in order
-(general --> specific); do not duplicate the mapping anywhere.
+Layers 2 and 3 are each role's binder. `src/binder.ts` is the single source for
+which prompts a role carries, in order (general --> specific); do not duplicate
+the mapping anywhere. Agent files (`config/agents/<role>.md`) hold registry
+config only, and the binder is why: the body is the agent's `system`, which
+rides in the cached request prefix (`session/runner/llm.ts`), so editing a body
+invalidates the prompt cache, and a prompt shared by two roles would have to
+live in two bodies. The binder re-reads `prompts/` per request and shares by
+reference. `abstract context` reports a non-empty body as a violation, and
+`abstract doctor` checks that every binder stem resolves, because a missing
+prompt is skipped silently.
 
 ## The Rules
 
-- **Always-on membership test** (score.ts): a line is always-on iff it is needed
-  in most turns of the role, or forgetting it is silent and costly.
+- **Always-on membership test** (the binder): a line is always-on iff it is
+  needed in most turns of the role, or forgetting it is silent and costly.
 - **The test is role-relative.** The same content can be a prompt file for one
   role and a skill (or nothing) for another. Doctrine graduates into exactly the
   scores that always need it; a single-role skill with near-certain invocation

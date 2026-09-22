@@ -14,9 +14,9 @@ Status: early. See `TODO.md` for the design rationale and roadmap, and
   kernel `AGENTS.md`, `agents/` (role personas and the subagent catalog),
   `plugin/harness.ts` (the cue and repertoire tools), `skills/`,
   `opencode.json`, and the pinned `runtime.json`
-- `prompts/` -- role doctrine assembled into the system prompt by the score
-  (transitional; retiring into the agent bodies, see `TODO.md`)
-- `src/` -- the `abstract` CLI, the score, and the context report
+- `prompts/` -- role doctrine, assembled into the system prompt by each role's
+  binder
+- `src/` -- the `abstract` CLI, the binders, and the context report
 - `docs/` -- dev-facing design documents; `repertoire/` is the writer's
   convention corpus (see `docs/repertoire/`)
 - `manifesto.md` -- the philosophy behind the project

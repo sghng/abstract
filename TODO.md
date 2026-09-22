@@ -120,11 +120,11 @@ Until the harness exists, the `bin/` launchers + file-mediated consult relay
   open interactively.
 - **Parallel workstreams**: multiple in-flight tickets with per-artifact
   ownership; revisit after the single-workstream protocol is solid.
-- **Prompts retirement**: `prompts/` + `src/score.ts` + the plugin's assembly
-  hook are transitional. Move every role's doctrine into its
-  `config/agents/<role>.md` body, absorb the shared stems at audience grain, and
-  update `abstract context`/`doctor`; the statistician is the first role born
-  native. Tracked as issue #38.
+- **Hot binder prompts (upstream watch)**: v2 inserts hot edits only for
+  SystemContext sources (instructions, skill index, references, env/date). A
+  `systemContext` plugin domain, or per-agent instructions, would let binder
+  prompts update without a cache re-prefill. Watch for it at upgrades; until
+  then editing a prompt costs one re-prefill for the affected roles.
 
 ## Canonical Decisions Log
 
@@ -712,6 +712,36 @@ blinded reviewer arms were the only true fresh eyes. Inverted.
   editor session still accretes lab memory across rounds; fresh sessions per
   review round would be the full fix (CLI concern).
 
+## 2026-09-22: the score becomes the binder; the agent body is not the home
+
+The prompt assembler is renamed: `src/score.ts` --> `src/binder.ts`, `SCORE` -->
+`BINDERS`. Every player has a binder; a role's binder lists the prompts it
+always carries, general --> specific, and two roles share a prompt by listing
+the same stem, so the text has exactly one home. The files stay "prompts" in
+`prompts/`. Vocabulary now: kernel (native, auto-loaded), binder (assembled per
+request), prompt (a `prompts/` file), skill (on demand). The rename was
+surgical: `score` in `prompts/statistician.md` (the likelihood score) and the
+repertoire similarity score are different words and were left alone.
+
+Why the binder and not the OpenCode-native agent body (supersedes the home
+decision in the 2026-09-18 entry; closes issue #38 as not planned): v2 inserts
+edits into the conversation without invalidating the cache only for
+SystemContext sources (instructions, skill index, references, env/date), which
+land as delta messages beside an unchanged baseline. An agent body is `system`,
+concatenated into the request prefix (`session/runner/llm.ts`), so editing it
+invalidates the prompt cache and takes effect no sooner than the binder does; it
+also cannot be shared, since a prompt used by two roles would be copied into two
+bodies. The plugin `session.hook("context")` is the documented seam for
+assembled system instructions and re-reads `prompts/` per request. Trade
+accepted: editing a prompt costs one cache re-prefill for the affected roles.
+
+Two defects fixed alongside the rename. The statistician's doctrine moved from
+its agent body into `prompts/statistician.md` with a binder entry, so all six
+roles now live in one architecture. And the single-home rule became checked
+rather than habitual: `abstract doctor` gained "binder resolves" (every stem has
+a file, since the plugin skips a missing prompt silently) and `abstract context`
+reports a non-empty agent body as a violation.
+
 ## Decisions
 
 - 2026-09-18: first-author QC pinned as committed script; D1
@@ -838,8 +868,8 @@ blinded reviewer arms were the only true fresh eyes. Inverted.
   for.
 - 2026-09-22: Word style lives in the stock, not in the Typst source. Typst
   carries content (pandoc's reader drops presentational directives anyway) plus
-  its own PDF styling; the reference stock owns every Word style definition
-  (the writer references styles but never defines them); the filter only maps
+  its own PDF styling; the reference stock owns every Word style definition (the
+  writer references styles but never defines them); the filter only maps
   semantics. New patches: 07-double-spacing (BodyText double, FirstParagraph
   pinned double since its own w:spacing would shadow the inherited line value,
   Compact pinned single so table cells and tight lists stay tight),
@@ -852,8 +882,8 @@ blinded reviewer arms were the only true fresh eyes. Inverted.
   title in metadata, the first real block is the proposal line, which wrongly
   took the Title style.
 - 2026-09-22: captions upright and paragraph gaps zeroed. 11-caption-upright
-  drops pandoc's italic Caption rPr (Word's built-in Caption is not italic;
-  APA italicizes only the title and the "Note." marker, which sources carry as
+  drops pandoc's italic Caption rPr (Word's built-in Caption is not italic; APA
+  italicizes only the title and the "Note." marker, which sources carry as
   emphasis runs regardless). 12-body-paragraph-spacing zeroes BodyText
   before/after (pristine 180/180): double spacing already separates paragraphs
   and the indent marks the break, per APA; boundary blocks (FirstParagraph,
@@ -869,26 +899,27 @@ blinded reviewer arms were the only true fresh eyes. Inverted.
   Title): APA doubles everything, bibliography included. Compact pins single
   spacing (doubled cells inflate tables), headings lose their pristine
   before/after spacing, and FirstParagraph loses its 240 boundary spacing: APA
-  adds no gap around headings, and the two stacked into inflated margins. cli.ts passes --figure-caption-position=above (APA labels figures
-  above like tables; the positions are pandoc writer defaults, not Typst's).
-  Caption shape moved into the writer (lab-stack 454b94aa7): the supplement is
-  its own bold paragraph, the title paragraph is italicized; a Typst caption
-  separator cannot work (the reader drops figure.caption(separator:) and the
-  label exists only at write time). Notes stay in the caption block for now
-  (they render above the table; distinguishing title from note is deferred per
-  owner). The filter starts the references section on a new page with a raw
-  page-break run inside the header preceding the refs div. Also fixed on
-  lab-stack (c2daea002): mark divs no longer reset the writer's
-  first-paragraph state, so highlighted regions stopped taking the
-  FirstParagraph boundary spacing (the reported margin regression).
+  adds no gap around headings, and the two stacked into inflated margins. cli.ts
+  passes --figure-caption-position=above (APA labels figures above like tables;
+  the positions are pandoc writer defaults, not Typst's). Caption shape moved
+  into the writer (lab-stack 454b94aa7): the supplement is its own bold
+  paragraph, the title paragraph is italicized; a Typst caption separator cannot
+  work (the reader drops figure.caption(separator:) and the label exists only at
+  write time). Notes stay in the caption block for now (they render above the
+  table; distinguishing title from note is deferred per owner). The filter
+  starts the references section on a new page with a raw page-break run inside
+  the header preceding the refs div. Also fixed on lab-stack (c2daea002): mark
+  divs no longer reset the writer's first-paragraph state, so highlighted
+  regions stopped taking the FirstParagraph boundary spacing (the reported
+  margin regression).
 - 2026-09-22: runtime 2.0.10 --> 2.0.14. Reviewed the full commit range (four
   releases, bare tags with no notes) plus tarball-level diffs of
   @opencode/plugin and @opencode/client. Nothing the lab stands on changed;
   everything on our surfaces was additive: the tool execute context gained an
-  AbortSignal (cancellation forwarding, #50190), the client types gained an
-  auth method field, and the TUI's tabs.enabled setting became tabs.mode with
-  in-memory normalization (#50456; the persisted tabs.json that seedTabs
-  writes is untouched). The rest is desktop/app/codemode work and models.dev
-  refreshes; Console-managed policies (#49729) bind only through remote
-  config, which the lab never uses. Doctor passed 12/12 on the new pin,
-  including the live cue bus and score assembly round trips.
+  AbortSignal (cancellation forwarding, #50190), the client types gained an auth
+  method field, and the TUI's tabs.enabled setting became tabs.mode with
+  in-memory normalization (#50456; the persisted tabs.json that seedTabs writes
+  is untouched). The rest is desktop/app/codemode work and models.dev refreshes;
+  Console-managed policies (#49729) bind only through remote config, which the
+  lab never uses. Doctor passed 12/12 on the new pin, including the live cue bus
+  and score assembly round trips.

@@ -1,9 +1,10 @@
 /**
  * The context report: what each lab agent receives, assembled the same way
- * the harness plugin assembles it (config/AGENTS.md + src/score.ts -->
- * prompts/*.md, read from disk) plus the OpenCode-native agent body, the
- * on-demand tier (skills index), the delegation tier (subagent catalog), and
- * the tool surface.
+ * the harness plugin assembles it (config/AGENTS.md + src/binder.ts -->
+ * prompts/*.md, read from disk), plus the on-demand tier (skills index), the
+ * delegation tier (subagent catalog), and the tool surface. Agent files hold
+ * registry config only; a prompt outside the binder is reported as a
+ * violation.
  *
  * Static by design: works with the server down, because the prompt
  * assembly itself is static (files + score). Live data (agent registry,
@@ -11,7 +12,7 @@
  */
 import * as fs from "node:fs";
 import * as path from "node:path";
-import { SCORE, ROLES, type Role } from "./score.ts";
+import { BINDERS, ROLES, type Role } from "./binder.ts";
 
 const REPO = path.resolve(import.meta.dir, "..");
 const CONFIG = path.join(REPO, "config");
@@ -30,7 +31,7 @@ const BUILTIN_TOOLS_NOTE =
   "read bash edit write glob grep ls patch task webfetch (curated from the pinned binary)";
 
 export type Piece = {
-  kind: "kernel" | "prompt" | "agent";
+  kind: "kernel" | "prompt";
   stem: string;
   file: string; // repo-relative
   lines: number;
@@ -67,6 +68,7 @@ export type RoleReport = {
     mcp: Array<{ name: string; status?: string }>;
   };
   denied: string[];
+  warnings: string[];
 };
 
 export type ContextReport = {
@@ -237,7 +239,7 @@ export function buildReport(live?: {
   // reverse map: which roles share each prompt
   const shared = new Map<string, Role[]>();
   for (const role of ROLES)
-    for (const stem of SCORE[role] ?? [])
+    for (const stem of BINDERS[role] ?? [])
       shared.set(stem, [...(shared.get(stem) ?? []), role]);
 
   const pieceFor = (
@@ -245,9 +247,8 @@ export function buildReport(live?: {
     stem: string,
     file: string,
     kind: Piece["kind"],
-    text?: string,
   ): Piece => {
-    const raw = text ?? read(file);
+    const raw = read(file);
     const s = raw ? stat(raw) : { lines: 0, tokens: 0 };
     return {
       kind,
@@ -269,20 +270,27 @@ export function buildReport(live?: {
   const roles: RoleReport[] = ROLES.map((role) => {
     const pieces: Piece[] = [
       pieceFor(role, "kernel", "config/AGENTS.md", "kernel"),
-      ...(SCORE[role] ?? []).map((stem) =>
+      ...(BINDERS[role] ?? []).map((stem) =>
         pieceFor(role, stem, `prompts/${stem}.md`, "prompt"),
       ),
     ];
-    // OpenCode-native doctrine: a non-empty agent body is appended by the
-    // server itself, outside the score (statistician today; every role after
-    // the prompts retirement).
+    // Single home: the binder holds doctrine, agent files hold registry
+    // config. Anything else is worth printing, since the plugin silently
+    // skips a prompt whose file is missing.
+    const warnings: string[] = [];
     const agentFile = `config/agents/${role}.md`;
     const agent = read(agentFile);
-    if (agent) {
+    if (!agent) warnings.push(`${agentFile} missing`);
+    else {
       const { body } = splitFrontmatter(agent);
       if (body.trim())
-        pieces.push(pieceFor(role, "agent-body", agentFile, "agent", body));
+        warnings.push(
+          `${agentFile} carries a system prompt; doctrine belongs in prompts/ and the binder`,
+        );
     }
+    for (const p of pieces)
+      if (p.missing)
+        warnings.push(`${p.file} missing; the plugin skips it silently`);
     return {
       role,
       pieces,
@@ -291,6 +299,7 @@ export function buildReport(live?: {
       subagents,
       tools: { builtin: BUILTIN_TOOLS_NOTE, plugin: PLUGIN_TOOLS, mcp },
       denied: live?.agents.get(role)?.denied ?? [],
+      warnings,
     };
   });
 
@@ -393,6 +402,7 @@ export function renderReport(r: ContextReport, only?: string): string {
         `  ${p.stem.padEnd(16)}${p.file.padEnd(28)}${String(p.lines).padStart(5)} ln  ${tok(p.tokens).padStart(9)}  # ${p.heading}${also}`,
       );
     }
+    for (const w of role.warnings) out.push(`  WARNING: ${w}`);
     const doctrine = role.totalTokens - k.tokens;
     out.push(
       `  always-on total ${tok(role.totalTokens)} = kernel ${tok(k.tokens)} + doctrine ${tok(doctrine)}` +

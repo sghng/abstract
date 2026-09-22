@@ -45,7 +45,7 @@ import { homedir, tmpdir } from "node:os";
 import { basename, dirname, join, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 import { OpenCode } from "@opencode/client";
-import { ROLES } from "./score.ts";
+import { BINDERS, ROLES } from "./binder.ts";
 import { buildReport, renderReport } from "./context.ts";
 
 const CLI_PATH = resolve(fileURLToPath(import.meta.url));
@@ -433,6 +433,15 @@ async function doctor(): Promise<void> {
     assert(!missing.length, `missing: ${missing.join(", ")}`);
     return `${want.length} agents`;
   });
+  await check("binder resolves", async () => {
+    const missing: string[] = [];
+    for (const role of ROLES)
+      for (const stem of BINDERS[role] ?? [])
+        if (!existsSync(join(HARNESS_DIR, "prompts", `${stem}.md`)))
+          missing.push(`${role}:${stem}`);
+    assert(!missing.length, `unresolved prompts: ${missing.join(", ")}`);
+    return ROLES.map((r) => `${r}(${(BINDERS[r] ?? []).length})`).join(" ");
+  });
   await check("skills discovered", async () => {
     const s = await api.skill.list();
     const names = s.data.map((x: any) => x.name ?? x.id);
@@ -465,7 +474,7 @@ async function doctor(): Promise<void> {
     return `${ids.length} plugins`;
   });
   // Live round trip: a queue-delivered prompt through a real model turn in a
-  // throwaway role session. Exercises score assembly (context hook), prompt
+  // throwaway role session. Exercises binder assembly (context hook), prompt
   // admission, and wait/drain.
   const scratch = join(ABSTRACT_HOME, "doctor-scratch");
   mkdirSync(scratch, { recursive: true });
@@ -489,7 +498,7 @@ async function doctor(): Promise<void> {
     writeFileSync(TUI_TABS_FILE, JSON.stringify(file));
     return "role tabs land in the persisted tab bar";
   });
-  await check("score assembly + queue round trip", async () => {
+  await check("binder assembly + queue round trip", async () => {
     const s = await api.session.create({
       title: "doctor",
       agent: "orchestrator",

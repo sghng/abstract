@@ -12,21 +12,20 @@ agents developing this repository. The lab agents' shared invariants live in
   kernel `AGENTS.md` (invariants + delegation, auto-loaded into every session),
   `agents/` (the six role personas at top level; `agents/subagents/` holds the
   named subagent catalog and reviewer panel, whose IDs carry the `subagents/`
-  prefix), `plugin/harness.ts` (the lab plugin: score assembly, cue,
+  prefix), `plugin/harness.ts` (the lab plugin: binder assembly, cue,
   repertoire), `opencode.json` (default model, MCP servers, the `lab-reference`
   reference alias), `skills/` (the lab's skills, a real directory), and
   `runtime.json` (the pinned `@opencode/cli` version)
 - `prompts/` -- the prompt files (Markdown, one file each, descriptive names):
   shared doctrine (`style-guide.md`, `story-doctrine.md`), role doctrine
-  (`story-keeping.md`, `writing-craft.md`), and one file per score-assembled
-  role. Referenced by stem from the score; only file contents enter the context,
-  so names are dev-facing. Transitional: the statistician's doctrine lives in
-  its agent body, and the directory's retirement is tracked in `TODO.md`
-- `src/score.ts` -- the score: which prompt files each role assembles, in order
-  (general --> specific), plus `ROLES`, the full roster the CLI, doctor, and tab
-  seeding iterate. The plugin appends score stems to the system prompt per model
-  request, re-reading from disk; a role absent from the score (the statistician)
-  carries its doctrine in its agent body
+  (`story-keeping.md`, `writing-craft.md`), and one file per role. Referenced by
+  stem from each role's binder; only file contents enter the context, so names
+  are dev-facing
+- `src/binder.ts` -- the binders: which prompts each role always carries, in
+  order (general --> specific), plus `ROLES`, the full roster the CLI, doctor,
+  and tab seeding iterate. The plugin assembles the binder into the system
+  prompt per model request, re-reading from disk; agent files hold registry
+  config only
 - `src/cli.ts` -- the `abstract` CLI (Bun, linked via `package.json` bin):
   ensures the pinned runtime at `~/.local/share/abstract/runtime/`, the central
   lab server (port 4319, own config/state/DB under `~/.local/share/abstract` and
@@ -77,8 +76,8 @@ agents developing this repository. The lab agents' shared invariants live in
 - **Naming**: nuanced, unusual names are for tokens that live in the agents'
   context and need markedness against generic prose. File and directory names
   are dev-facing and stay descriptive, since only contents enter the context.
-  Musical names (`score`, `cue`, `repertoire`) apply exactly when the token will
-  appear in an agent's context, including tool names.
+  Musical names (`binder`, `cue`, `repertoire`) apply exactly when the token
+  will appear in an agent's context, including tool names.
 - **The kernel holds invariants only** (`config/AGENTS.md`). Membership test: if
   the lab agents forgot it, would the failure be silent and costly? Episodic
   procedures and templates belong in skills.

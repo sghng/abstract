@@ -1,8 +1,8 @@
 /**
  * abstract harness plugin -- the lab's three in-process behaviors:
  *
- *   score assembly   session.context hook appends the calling role's
- *                    prompt files (src/score.ts --> prompts/*.md, read from
+ *   binder assembly  session.context hook appends the calling role's
+ *                    prompts (src/binder.ts --> prompts/*.md, read from
  *                    disk on every request, so edits go live next turn)
  *   cue              tool: brokerless message exchange between role sessions
  *                    on this server (session.synthetic, delivery "steer";
@@ -21,7 +21,7 @@ import { homedir } from "node:os";
 import { Plugin } from "@opencode/plugin";
 import { OpenCode } from "@opencode/client";
 import { z } from "zod";
-import { SCORE, ROLES, type Role } from "../../src/score.ts";
+import { BINDERS, ROLES, type Role } from "../../src/binder.ts";
 
 const REPO = path.resolve(import.meta.dir, "..", "..");
 const PROMPTS_DIR = path.join(REPO, "prompts");
@@ -53,9 +53,9 @@ const MAX_MESSAGE_BYTES = 32 * 1024;
 export default Plugin.define({
   id: "abstract-harness",
   setup: async (ctx) => {
-    // -- score assembly ----------------------------------------------------
+    // -- binder assembly ---------------------------------------------------
     await ctx.session.hook("context", (event) => {
-      const stems = SCORE[event.agent as Role];
+      const stems = BINDERS[event.agent as Role];
       if (process.env.ABSTRACT_DEBUG)
         fs.appendFileSync(
           DEBUG_LOG,
