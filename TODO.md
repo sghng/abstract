@@ -858,3 +858,26 @@ blinded reviewer arms were the only true fresh eyes. Inverted.
   before/after (pristine 180/180): double spacing already separates paragraphs
   and the indent marks the break, per APA; boundary blocks (FirstParagraph,
   headings, captions) keep their spacing.
+- 2026-09-22: APA pass. Series restructured minimal: 08 is title-bold-centered
+  (body size, bold; centered was pristine), 09 is apa-headings (H1 bold
+  centered, H2 bold left, H3 bold italic left, all body size; pristine headings
+  are NOT bold, verified by rendering, despite Word's built-in defaults), 10
+  deleted (the underline was pre-APA), 13 adds the page-number header (a
+  header1.xml part with a right-aligned PAGE field; the writer carries headers
+  from the stock into the output). 07 now puts double spacing on docDefaults
+  with explicit pins where a style's own w:spacing would shadow it (BodyText,
+  Title): APA doubles everything, bibliography included. Compact pins single
+  spacing (doubled cells inflate tables), headings lose their pristine
+  before/after spacing, and FirstParagraph loses its 240 boundary spacing: APA
+  adds no gap around headings, and the two stacked into inflated margins. cli.ts passes --figure-caption-position=above (APA labels figures
+  above like tables; the positions are pandoc writer defaults, not Typst's).
+  Caption shape moved into the writer (lab-stack 454b94aa7): the supplement is
+  its own bold paragraph, the title paragraph is italicized; a Typst caption
+  separator cannot work (the reader drops figure.caption(separator:) and the
+  label exists only at write time). Notes stay in the caption block for now
+  (they render above the table; distinguishing title from note is deferred per
+  owner). The filter starts the references section on a new page with a raw
+  page-break run inside the header preceding the refs div. Also fixed on
+  lab-stack (c2daea002): mark divs no longer reset the writer's
+  first-paragraph state, so highlighted regions stopped taking the
+  FirstParagraph boundary spacing (the reported margin regression).

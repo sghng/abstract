@@ -713,6 +713,7 @@ function typeToDocx(args: string[]): void {
       "typst",
       "-t",
       "docx+native_numbering",
+      "--figure-caption-position=above",
       "--reference-doc",
       join(stockDir, "reference.docx"),
       "--lua-filter",
