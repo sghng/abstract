@@ -49,16 +49,15 @@ agents developing this repository. The lab agents' shared invariants live in
   `reference/reference.debug.docx`); built docx artifacts are never committed:
   `abstract typ2docx` rebuilds a fresh stock into a private temp dir on every
   conversion, so the patch series is the single source of truth. Also
-  `typ2docx.lua` and `04-shading.patch`, the typ2docx pair. The filter
-  normalizes captured block/box fills and `highlight` mark regions onto
-  pandoc's native mark handling, the default text highlight pen (block math
-  inside `#highlight` crashes the reader, so fills stay the source-side
-  convention); math-bearing paragraphs in marked regions take the pen-yellow
-  `ShadingBlock` band (the pen never reaches OMML runs) and a marked region
-  ending in a table hoists it out to the pen-yellow `ShadedTable` style (the
-  following paragraph regains its `FirstParagraph` margin). The filter also
-  drops the reader's whitespace-only and anchor-only paragraph artifacts
-  (comment lines and labels) and flattens a figure that wraps only a table
+  `typ2docx.lua`, the typ2docx filter. The filter normalizes captured block/box
+  fills and `highlight` mark regions onto pandoc's native mark handling, the
+  default text highlight pen, and the writer pens every run inside a mark: text,
+  OMML math, and the caption supplements it builds itself (a marked caption's
+  "Table 9:" label lands inside the mark span). A marked region ending in a
+  table hoists it out (the following paragraph regains its `FirstParagraph`
+  margin). The filter also drops the reader's whitespace-only and anchor-only
+  paragraph artifacts (comment lines and labels) and flattens a figure that
+  wraps only a table
 - `repertoire/` -- the writer's convention corpus: pipeline scripts (`src/`
   journal-agnostic stages + `src/families/<j>/` fetchers) that turn journal
   articles (six families: psychometrika, jem, jebs, bjmsp, psyarxiv, arxiv stat)

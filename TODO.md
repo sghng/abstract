@@ -822,3 +822,17 @@ blinded reviewer arms were the only true fresh eyes. Inverted.
   (insurance; the reader already flattens them). FigureTable stays undefined in
   the stock on purpose: it is pandoc's borderless layout table for side-by-side
   images, not a data table.
+- 2026-09-21: typ2docx drops shading; everything is the pen. The pandoc
+  lab-stack build now covers the whole marked surface natively: the reader
+  parses multi-paragraph and math-bearing #highlight bodies into mark divs/spans
+  (PR #11881), the docx writer pens OMML runs inside marks (PR #11885), and a
+  new local writer change labels marked captions inside the mark span so their
+  "Table 9:" supplements take the pen too (the raw numbering field carries its
+  own w:rPr, since raw XML bypasses the pen). With no run left the pen cannot
+  reach, the shading workarounds left: 04-shading.patch and typ2docx-captions.py
+  are deleted, the filter no longer bands math paragraphs or tables, and cli.ts
+  lost the captions post-pass. Fills still normalize to marks so the
+  manuscript's chg-block/chg-inline sources keep converting during the
+  transition to #highlight. Caption handling shrinks to the filter's caption_pen
+  span, which is now exactly the signal the writer's insertCaptionLabel looks
+  for.
