@@ -881,3 +881,14 @@ blinded reviewer arms were the only true fresh eyes. Inverted.
   lab-stack (c2daea002): mark divs no longer reset the writer's
   first-paragraph state, so highlighted regions stopped taking the
   FirstParagraph boundary spacing (the reported margin regression).
+- 2026-09-22: runtime 2.0.10 --> 2.0.14. Reviewed the full commit range (four
+  releases, bare tags with no notes) plus tarball-level diffs of
+  @opencode/plugin and @opencode/client. Nothing the lab stands on changed;
+  everything on our surfaces was additive: the tool execute context gained an
+  AbortSignal (cancellation forwarding, #50190), the client types gained an
+  auth method field, and the TUI's tabs.enabled setting became tabs.mode with
+  in-memory normalization (#50456; the persisted tabs.json that seedTabs
+  writes is untouched). The rest is desktop/app/codemode work and models.dev
+  refreshes; Console-managed policies (#49729) bind only through remote
+  config, which the lab never uses. Doctor passed 12/12 on the new pin,
+  including the live cue bus and score assembly round trips.

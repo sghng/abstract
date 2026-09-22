@@ -11,9 +11,9 @@
     "docs:preview": "vitepress preview docs"
   },
   "dependencies": {
-    "@opencode/client": "2.0.10",
-    "@opencode/plugin": "2.0.10",
-    "@opencode/sdk": "2.0.10",
+    "@opencode/client": "2.0.14",
+    "@opencode/plugin": "2.0.14",
+    "@opencode/sdk": "2.0.14",
     "cheerio": "^1.2.0",
     "cloudflare": "^7.1.0",
     "playwright": "^1.63.0",
