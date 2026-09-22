@@ -851,3 +851,10 @@ blinded reviewer arms were the only true fresh eyes. Inverted.
   first-paragraph promotion was tried and reverted within the day: with the
   title in metadata, the first real block is the proposal line, which wrongly
   took the Title style.
+- 2026-09-22: captions upright and paragraph gaps zeroed. 11-caption-upright
+  drops pandoc's italic Caption rPr (Word's built-in Caption is not italic;
+  APA italicizes only the title and the "Note." marker, which sources carry as
+  emphasis runs regardless). 12-body-paragraph-spacing zeroes BodyText
+  before/after (pristine 180/180): double spacing already separates paragraphs
+  and the indent marks the break, per APA; boundary blocks (FirstParagraph,
+  headings, captions) keep their spacing.
