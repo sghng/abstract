@@ -20,9 +20,10 @@
  *                         a house reference stock rebuilt fresh from the
  *                         patch series (citeproc, native numbering); no
  *                         server or model involved
- *   abstract lint <file.typ> [--threshold p] [--explain ids]
- *                         style-check a manuscript against the expert edits
- *                         dataset via Jev; exit 1 flags violations
+ *   abstract lint <file.typ> | -   [--threshold p] [--explain ids]
+ *                         style-check a manuscript (or one plain prose
+ *                         passage on stdin) against the style rule set
+ *                         via Jev; exit 1 flags violations
  *   abstract doctor       contract smoke test against the pinned runtime
  *   abstract stop         stop the lab server
  *   abstract upgrade [v]  bump the pinned @opencode/cli version, then doctor
@@ -476,6 +477,33 @@ async function doctor(): Promise<void> {
     assert(ids.includes("abstract-harness"), `abstract-harness missing`);
     return `${ids.length} plugins`;
   });
+  // Local contract test of the lint extractor (builds it on first run; no
+  // model, no API): one fixture paragraph through parse, classify, machine.
+  // The math sits directly under the paragraph so the flush it must cause
+  // is pinned (a regression to prose would drag line 4 into the block).
+  await check("lint extractor", async () => {
+    const { scanText, extractorVersion } = await import("../lint/scan.ts");
+    const version = extractorVersion();
+    const blocks = scanText(
+      "= Intro\n" +
+        "\n" +
+        "A paragraph of reasonable length, so it survives the minimum filter.\n" +
+        "$ x + y $\n" +
+        "\n" +
+        "= References\n" +
+        "\n" +
+        "This section is dropped because reference entries are not prose.\n",
+    );
+    assert(
+      blocks.length === 1,
+      `expected 1 block, got ${JSON.stringify(blocks).slice(0, 200)}`,
+    );
+    const b = blocks[0];
+    assert(b.section === "Intro", `section ${JSON.stringify(b.section)}`);
+    assert(b.role === "body", `role ${JSON.stringify(b.role)}`);
+    assert(b.start === 3 && b.end === 3, `lines ${b.start}-${b.end}`);
+    return `${version}, Block contract round-trip ok`;
+  });
   // Live round trip: a queue-delivered prompt through a real model turn in a
   // throwaway role session. Exercises binder assembly (context hook), prompt
   // admission, and wait/drain.
@@ -782,10 +810,13 @@ async function main(): Promise<void> {
         "                     convert Typst to Word beside it (house stock, citeproc)",
       );
       console.log(
-        "       abstract lint <file.typ> [--threshold p] [--explain ids]",
+        "       abstract lint <file.typ> | -   [--threshold p] [--explain ids]",
       );
       console.log(
-        "                     style-check a manuscript against the expert edits",
+        "                     style-check a manuscript, or one prose passage on",
+      );
+      console.log(
+        "                     stdin, against the style rules (R53 p=.78 hits)",
       );
       console.log(
         "       abstract doctor   contract smoke test against the pinned runtime",

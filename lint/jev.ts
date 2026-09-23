@@ -1,11 +1,14 @@
 /**
  * jev.ts -- the Jev client behind abstract lint.
  *
- * One systemOne call per block: state is { text, section, role }, questions
- * one noul per rule, keyed by edits.yaml entry id. A rule's instruction is
- * its entry's lesson (or judgement) verbatim; the shared criteria pin the
- * semantics for every rule: true is a violation, false is fine or not
- * applicable. A small pool keeps concurrent calls in flight.
+ * One systemOne call per block: state is { text, section, role } for
+ * document blocks, or just { text } for a bare prose passage (the prose
+ * route passes no invented section; applicability rides on the lesson
+ * wording). Questions are one noul per rule, keyed by rules.yaml entry id.
+ * A rule's instruction is its entry's lesson (or judgement) verbatim; the
+ * shared criteria pin the semantics for every rule: true is a violation,
+ * false is fine or not applicable. A small pool keeps concurrent calls in
+ * flight.
  */
 import { readFileSync } from "node:fs";
 import { join } from "node:path";
@@ -39,7 +42,7 @@ export function loadRules(editsPath: string): Rule[] {
       const text = (entry.lesson ?? entry.judgement ?? "").trim();
       if (!text)
         throw new Error(
-          `edits.yaml entry ${key} has neither lesson nor judgement`,
+          `rules.yaml entry ${key} has neither lesson nor judgement`,
         );
       return { id: Number(key), text };
     })
@@ -106,8 +109,12 @@ export async function lintBlocks(
     while (next < blocks.length) {
       const index = next++;
       const block = blocks[index];
+      // A bare prose passage has no document around it: no invented section.
+      const state: Record<string, unknown> = { text: block.text };
+      if (block.section !== undefined) state.section = block.section;
+      if (block.role !== undefined) state.role = block.role;
       const { answers } = await client.systemOne({
-        state: { text: block.text, section: block.section, role: block.role },
+        state,
         questions,
       });
       const hits: Hit[] = [];

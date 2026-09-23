@@ -30,6 +30,10 @@ docs/.vitepress/dist/
 repertoire/legacy/__pycache__/
 tmp.typ
 
+# rust extractor build outputs (the wrapper builds into ~/.local/share/abstract;
+# target/ only appears after a manual in-repo cargo build)
+lint/extract/target/
+
 # reference stock build outputs (the patch series is the source of truth;
 # built docx artifacts are never committed)
 reference/reference.docx

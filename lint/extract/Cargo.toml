@@ -1,0 +1,13 @@
+# abstract-extract -- the Typst paragraph extractor behind `abstract lint`.
+#
+# Parser-level only (typst-syntax, pinned to the lab's installed typst): a
+# sidecar, spawned by lint/scan.ts, that turns a .typ source into the Block
+# contract (text, line range, H1 section, role) as JSON on stdout. All Typst
+# dialect knowledge lives here; no rules, no API, no thresholds.
+[package]
+name = "abstract-extract"
+version = "0.1.0"
+edition = "2024"
+
+[dependencies]
+typst-syntax = "=0.15.1"
