@@ -998,5 +998,5 @@ reports a non-empty agent body as a violation.
   within-arm noise, one pair of 2,432 moves more than 0.15, parking band 611 to
   594, hits at 0.75 overlap (26/28/29 versus 30/29/27). The judgment lives in
   the rule text and the paragraph; every meta-knob probed so far (framing,
-  isolation, criteria paraphrase) is inert. The branch keeps --abcd, --dump, and
-  --neg for replay.
+  isolation, criteria paraphrase) is inert. Both flags and the branch were then
+  dropped; the stock noul with its bundled false pole is the whole mechanism.
