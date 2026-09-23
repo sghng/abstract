@@ -981,3 +981,22 @@ reports a non-empty agent body as a violation.
   construction; the misplaced "our research" qualifier was tried and reverted (5
   hits on we-voice methods). Entries 2 and 9's twin fell to a shortening edit
   and duplication of the advisor's bullet comment. Keys now 76.
+- 2026-09-23: abcd verdict mode tested on branch lint-abcd (--abcd), and a
+  criteria paraphrase A/B (--neg conforms). The verdict mode asks one choice
+  question per rule (violates, conforms, needs context, not applicable) with a
+  per-judgment TSV dump. On the submit manuscript (32 blocks, 76 rules, 2,432
+  judgments) every noul hit at 0.75 transfers (28 of 28, 23 at P(violates) >=
+  0.9), but the verdict framing is chattier, not sharper: 25.5% of judgments
+  pick violates, 160 pass P >= 0.75 against noul's 28, half the violates picks
+  carry confidence under 0.5, needs context is dead (1.3%), not applicable
+  duplicates what low noul p already encodes (mean noul p 0.26 under it), and
+  spot checks of the P >= 0.9 enrichment finds both a real catch (the
+  limitations close against rule 76, noul had 0.63) and a conf 0.93 false
+  positive (rule 22 on results prose). Noul stays the flag mechanism. The
+  paraphrase A/B (false pole "It conforms, or the rule is not applicable here",
+  3 runs per arm) is inert: cross-wording mean delta 0.020 against 0.015
+  within-arm noise, one pair of 2,432 moves more than 0.15, parking band 611 to
+  594, hits at 0.75 overlap (26/28/29 versus 30/29/27). The judgment lives in
+  the rule text and the paragraph; every meta-knob probed so far (framing,
+  isolation, criteria paraphrase) is inert. The branch keeps --abcd, --dump, and
+  --neg for replay.
