@@ -949,3 +949,16 @@ reports a non-empty agent body as a violation.
   while rule 21 (exact counts) fires broadly on exact round simulation
   parameters (5,000 simulees, 80/20), the one clear systematic false-positive
   family so far.
+- 2026-09-23: per-rule paradigm tested and dropped. One call per (block, rule)
+  pair (1,472 calls) versus one call per block with all 46 rules (32 calls),
+  same state, rules, and criteria, on the submit docx. The judgments are
+  indistinguishable: across all 323 matched (block, rule) pairs at p >= 0.5, the
+  mean probability difference is 0.016, zero pairs differ by 0.10 or more, and
+  the p >= 0.75 strong tier is identical pair for pair. This confirms the SDK
+  docs' claim that questions in one request are judged independently in
+  parallel; isolation buys no precision and costs 46x the requests (roughly 17x
+  input tokens, the state resent per call). Wall clock was fine either way (69 s
+  for the per-rule run at pool 4). The --per-rule flag was dropped; batching
+  stays the only mode. An academic-context framing variant was tried the same
+  day and dropped for the same reason (downward recalibration, no sharper
+  discrimination).
