@@ -35,11 +35,14 @@ import {
   expandInputs,
   bibStrip,
   preprocess,
+  LADDER_LEVELS,
 } from "./tex-extract.ts";
 
 const PANDOC =
   process.env.PANDOC ??
-  (fs.existsSync("/opt/homebrew/bin/pandoc") ? "/opt/homebrew/bin/pandoc" : "pandoc");
+  (fs.existsSync("/opt/homebrew/bin/pandoc")
+    ? "/opt/homebrew/bin/pandoc"
+    : "pandoc");
 const PANDOC_TO_MD = ["-f", "latex", "-t", "markdown", "--wrap=none"];
 const PANDOC_TO_PLAIN = ["-f", "latex", "-t", "plain", "--wrap=none"];
 const RESIDUAL_ESCALATE_PER_KB = 1.5; // corrected metric (newline-tolerant $ strip): clean <=0.8, macro-degraded rescues ~1.6; P1's 3.0 was calibrated on its under-stripped counter
@@ -332,10 +335,33 @@ function shiftHeadings(md: string): string {
     "#".repeat(Math.min(6, h.length + shift)),
   );
 }
+// ladder path: pandoc passes source-embedded html and unconvertible
+// figure constructs through as raw-html islands (img/embed with style
+// attrs, span-wrapped math, MathML blobs, stranded table tags). Strip
+// them from the converted body, keeping text content; fenced blocks and
+// inline code are protected so code samples survive verbatim. Mirrors
+// the html-stage sanitize of the latexml branch (attribute-value aware).
+const HTML_ATTRS = `(?:"[^"]*"|'[^']*'|[^>"'])*`;
+export function stripRawHtml(md: string): string {
+  const parts = md.split(/(```[\s\S]*?```|~~~[\s\S]*?~~~|`[^`\n]*`)/g);
+  const drop = new RegExp(
+    `<(?:svg|math)\\b(?:${HTML_ATTRS})>[\\s\\S]*?<\\/(?:svg|math)>|<(?:embed|img|picture|video|audio|source|track)\\b(?:${HTML_ATTRS})/?>`,
+    "gi",
+  );
+  const unwrap = new RegExp(
+    `<\\/?(?:p|div|span|a|abbr|figure|figcaption|aside|footer|header|nav|section|article|main|table|thead|tbody|tfoot|tr|td|th|caption|semantics|annotation|m(?:row|i|n|o|sd|sub|sup|frac|sqrt|text)?)\\b(?:${HTML_ATTRS})/?>`,
+    "gi",
+  );
+  return parts
+    .map((seg, i) =>
+      i % 2 === 1 ? seg : seg.replace(drop, "").replace(unwrap, ""),
+    )
+    .join("");
+}
 // belt and braces: cut a TRAILING References heading section if the
 // source-level bibStrip missed a manual one. Only fires when the heading
 // is the last heading in the document.
-function sweepReferences(md: string): { text: string; swept: boolean } {
+export function sweepReferences(md: string): { text: string; swept: boolean } {
   const lines = md.split("\n");
   let lastRef = -1;
   for (let i = 0; i < lines.length; i++) {
@@ -350,7 +376,7 @@ function sweepReferences(md: string): { text: string; swept: boolean } {
     swept: true,
   };
 }
-function stripMathSpans(s: string): string {
+export function stripMathSpans(s: string): string {
   // single-$ spans are newline-tolerant (pandoc emits multi-line inline
   // math); [^$] keeps the match from crossing into the next span
   return s.replace(/\$\$[\s\S]+?\$\$/g, "").replace(/\$[^$]+\$/g, "");
@@ -362,7 +388,7 @@ function stripMathSpans(s: string): string {
 // 60 lines and its first non-blank content line restates the title.
 const EMPTY_DISPLAY_MATH =
   /^[ \t]*(?:\\\[[ \t]*\\]|::: \{\.math[ \t]*display\}[ \t]*$)/;
-function frontMatterSweep(
+export function frontMatterSweep(
   md: string,
   title: string | null,
 ): { text: string; divs: number; emptyMath: number } {
@@ -412,7 +438,7 @@ function frontMatterSweep(
   const text = out.join("\n").replace(/\n{3,}/g, "\n\n");
   return { text, divs, emptyMath };
 }
-function mathCounts(md: string): { display: number; inline: number } {
+export function mathCounts(md: string): { display: number; inline: number } {
   const display = (md.match(/\$\$[\s\S]+?\$\$/g) || []).length;
   const noDisp = md.replace(/\$\$[\s\S]+?\$\$/g, "");
   let inline = 0;
@@ -547,6 +573,143 @@ export function convert(doiId: string): ConvertResult {
     truncated: bib.truncatedTail,
     section_redefs: bib.sectionRedefsDropped,
   };
+
+  // tier 1: LaTeXML over the whole document. TeX binds macros natively, which
+  // the regex ladder can never do (the 2026-09-18 failure census: 58% of fails
+  // were macro-parameter text). The pandoc ladder below remains as the
+  // fallback for hosts without latexmlc. Output is the whole document; the
+  // references section is swept like the ladder path.
+  if (process.env.LATEXMLC) {
+    const lmIn = `${dir}/latexml.tex`;
+    const lmHtml = `${dir}/lm.html`;
+    const lmMd = `${dir}/lm.md`;
+    fs.writeFileSync(lmIn, text);
+    base.in_bytes = Buffer.byteLength(text);
+    base.sections_src = (
+      text.match(/\\(?:section|subsection)\*?\s*[{\[]/g) || []
+    ).length;
+    base.chapters_src = (text.match(/\\chapter\*?\s*[{\[]/g) || []).length;
+    const lm = spawnSync(
+      "timeout",
+      [
+        "-k",
+        "10",
+        "290",
+        process.env.LATEXMLC,
+        "--quiet",
+        "--nocomments",
+        // the install's default log path goes stale on NFS and kills the run
+        "--log=" + `${dir}/latexml-run.log`,
+        // latexmlc's own timeout tears down its subprocess tree; without it a
+        // hung child holds the stdio pipe and spawnSync never returns
+        "--timeout=240",
+        `--path=${dir}`,
+        `--dest=${lmHtml}`,
+        lmIn,
+      ],
+      // GNU timeout -k guarantees a SIGKILL follow-up: a wedged perl can
+      // defer SIGTERM indefinitely inside one backtracking regex, which
+      // blocks spawnSync's own kill timer
+      { timeout: 330_000, maxBuffer: 1 << 24, stdio: "ignore" },
+    );
+    // latexmlc exits nonzero on warnings alone; judge by the artifact
+    const htmlOk = fs.existsSync(lmHtml) && fs.statSync(lmHtml).size > 5000;
+    if (htmlOk) {
+      // sanitize before pandoc: latexml emits unbound macros as
+      // <span class="ltx_ERROR ...">\macroname</span> and layout scaffolding
+      // (<div class="ltx_flex_*">, semantic figure panels, glossary spans)
+      // that pandoc would pass through as raw html. Drop error spans whole
+      // (their text is the macro name, pure junk); unwrap layout wrappers
+      // keeping inner content. Tag matching is attribute-value aware (ATTRS
+      // alternation) because title="a > b" style values defeat [^>]*.
+      // Table-family tags stay: pandoc converts well-formed tables, and
+      // stripping ltx_-classed cells would break them.
+      const ATTRS = `(?:"[^"]*"|'[^']*'|[^>"'])*`;
+      const htmlRaw = fs.readFileSync(lmHtml, "utf8");
+      const html = htmlRaw
+        .replace(
+          new RegExp(
+            `<span\\b(?:${ATTRS})class="[^"]*ltx_ERROR[^"]*"(?:${ATTRS})>[\\s\\S]*?<\\/span>`,
+            "g",
+          ),
+          "",
+        )
+        .replace(new RegExp(`<svg\\b(?:${ATTRS})>[\\s\\S]*?<\\/svg>`, "g"), "")
+        .replace(
+          new RegExp(
+            `<(?:embed|img|picture|video|audio|source|track)\\b(?:${ATTRS})/?>`,
+            "g",
+          ),
+          "",
+        )
+        .replace(
+          new RegExp(
+            `<\\/?(?:div|span|a|abbr|figure|figcaption|aside|footer|header|nav|section|article|main)\\b(?:${ATTRS})/?>`,
+            "g",
+          ),
+          "",
+        );
+      const lmClean = `${dir}/lm-clean.html`;
+      fs.writeFileSync(lmClean, html);
+      const p = spawnSync(
+        PANDOC,
+        ["-f", "html", "-t", "markdown", "--wrap=none", lmClean, "-o", lmMd],
+        { timeout: 180_000, maxBuffer: 1 << 24 },
+      );
+      if (p.status === 0) {
+        const md = fs
+          .readFileSync(lmMd, "utf8")
+          .replace(/^:+[^\n]*$/gm, "") // latexml semantic div wrappers
+          .replace(/\{#[^}\n]*\}/g, "")
+          .replace(/\{\.ltx_[^}\n]*\}/g, "")
+          .replace(/\n{3,}/g, "\n\n")
+          .trim();
+        if (md.length > STUB_BYTES) {
+          const t0 = md.match(/^# (.+)$/m);
+          const fm = frontMatterSweep(md, t0 ? t0[1] : null);
+          const swept = sweepReferences(fm.text);
+          const outMd = swept.text;
+          const mo = mathCounts(outMd);
+          const headingsOut = (outMd.match(/^#{1,6} .+$/gm) || []).length;
+          const outBytes = Buffer.byteLength(outMd);
+          const noMath = stripMathSpans(outMd);
+          const residual = (noMath.match(/\\[a-zA-Z]+/g) || []).length;
+          const residualPerKb = +(
+            residual / Math.max(1, outBytes / 1024)
+          ).toFixed(1);
+          const report: ConvertReport = {
+            ...(base as ConvertReport),
+            doi_id: doiId,
+            status: outBytes < STUB_BYTES ? "stub" : "ok",
+            ladder: "latexml",
+            title: { how: "latexml", text: t0 ? t0[1] : null },
+            abstract_env: /abstract/i.test(outMd.slice(0, 2000)),
+            paragraphs_demoted: 0,
+            refs_swept: swept.swept,
+            headings_out: headingsOut,
+            headings_vs_sections: +(
+              headingsOut / Math.max(1, base.sections_src ?? 0)
+            ).toFixed(2),
+            math_display_out: mo.display,
+            math_inline_out: mo.inline,
+            residual_bs: residual,
+            residual_per_kb: residualPerKb,
+            out_bytes: outBytes,
+            out_in_ratio: +(outBytes / Math.max(1, base.in_bytes ?? 1)).toFixed(
+              2,
+            ),
+            refs_absent: refsAbsent(outMd),
+            escalate: null,
+            err: null,
+          };
+          fs.rmSync(dir, { recursive: true, force: true });
+          return { md: outMd, report };
+        }
+      }
+    }
+    // latexmlc unavailable output or failed -> pandoc ladder below
+  }
+
   const srcMath = srcMathCounts(bib.text);
   base.math_src_env = srcMath.env;
   base.math_src_inline = srcMath.inline;
@@ -571,11 +734,11 @@ export function convert(doiId: string): ConvertResult {
   let errHead: string | undefined;
   const inFile = `${dir}/body.tex`;
   const outFile = `${dir}/body.md`;
-  for (let level = 0; level <= 3; level++) {
-    fs.writeFileSync(inFile, preprocess(bodySrc, level as 0 | 1 | 2 | 3));
+  for (let level = 0; level < LADDER_LEVELS.length; level++) {
+    fs.writeFileSync(inFile, preprocess(bodySrc, level as 0 | 1 | 2 | 3 | 4));
     const r = pandocRun(inFile, outFile);
     if (r.ok) {
-      bodyMd = fs.readFileSync(outFile, "utf8");
+      bodyMd = stripRawHtml(fs.readFileSync(outFile, "utf8"));
       ladder = `r${level}`;
       break;
     }
