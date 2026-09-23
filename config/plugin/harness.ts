@@ -10,6 +10,8 @@
  *                    step boundary of a busy one)
  *   repertoire       tool: the writing-style corpus as a tool
  *                    (see docs/repertoire/index.md for the contract)
+ *   tuning           tool: prose checked against the style rule set
+ *                    via Jev (lint's agent route; see lint/)
  *
  * Runs inside the Abstract server. The server URL and password arrive via
  * env (ABSTRACT_SERVER_URL, OPENCODE_PASSWORD), both set by `abstract`.
@@ -22,9 +24,13 @@ import { Plugin } from "@opencode/plugin";
 import { OpenCode } from "@opencode/client";
 import { z } from "zod";
 import { BINDERS, ROLES, type Role } from "../../src/binder.ts";
+import { scanFile, type Block } from "../../lint/scan.ts";
+import { loadRules, lintBlocks, makeClient } from "../../lint/jev.ts";
+import { explainRule, renderLint } from "../../lint/format.ts";
 
 const REPO = path.resolve(import.meta.dir, "..", "..");
 const PROMPTS_DIR = path.join(REPO, "prompts");
+const EDITS = path.join(REPO, "lint", "rules.yaml");
 
 const SERVER_URL = process.env.ABSTRACT_SERVER_URL ?? "http://127.0.0.1:4319";
 const SERVER_PASSWORD = process.env.OPENCODE_PASSWORD ?? "";
@@ -136,6 +142,96 @@ export default Plugin.define({
     // -- repertoire --------------------------------------------------------
     await ctx.tool.transform((tools) => {
       tools.add(repertoireTool());
+    });
+
+    // -- tuning --------------------------------------------------------------
+    await ctx.tool.transform((tools) => {
+      tools.add({
+        name: "tuning",
+        description:
+          "Check prose against the lab's style rules " +
+          "(distilled from real expert manuscript edits), judged by Jev. " +
+          "check-file: lint every paragraph of a Typst manuscript (path). " +
+          "check-prose: lint one passage of plain prose (no Typst markup). " +
+          "explain: print the full rule entry for one id. " +
+          'Hits print as "R53  p=.78  <rule text>"; p is the probability ' +
+          "the paragraph violates the rule, and hits surface at p >= 0.75.",
+        options: { codemode: false },
+        input: z.object({
+          action: z.enum(["check-file", "check-prose", "explain"]),
+          path: z
+            .string()
+            .optional()
+            .describe("check-file: the .typ manuscript path"),
+          prose: z
+            .string()
+            .optional()
+            .describe("check-prose: the passage, plain prose"),
+          id: z.number().optional().describe("explain: one rule id, e.g. 53"),
+        }),
+        execute: async (params: any, context: { sessionID: string }) => {
+          const say = (text: string): { content: string } => ({
+            content: text,
+          });
+          const THRESHOLD = 0.75;
+          try {
+            if (params.action === "explain") {
+              if (typeof params.id !== "number")
+                return say("explain requires id (a rule number, e.g. 53)");
+              const entry = explainRule(EDITS, params.id);
+              return entry
+                ? say(entry)
+                : say(`no rule ${params.id} in the rule set`);
+            }
+
+            const rules = loadRules(EDITS);
+            let blocks: Block[];
+            let header: string;
+            if (params.action === "check-prose") {
+              if (!params.prose?.trim())
+                return say("check-prose requires prose (the passage to check)");
+              // One literal block: verbatim, no section, no document.
+              blocks = [{ text: params.prose.trim(), start: 1, end: 1 }];
+              header = "prose";
+            } else {
+              if (!params.path) return say("check-file requires path");
+              const session = await client().session.get({
+                sessionID: context.sessionID,
+              });
+              const file = path.resolve(
+                session.location.directory,
+                params.path,
+              );
+              if (!file.endsWith(".typ"))
+                return say(`not a .typ file: ${params.path}`);
+              if (!fs.existsSync(file)) return say(`not found: ${params.path}`);
+              blocks = scanFile(file);
+              if (!blocks.length)
+                return say(`no paragraph blocks found in ${params.path}`);
+              // Relative to the project when inside it; absolute otherwise.
+              header = file.startsWith(session.location.directory + path.sep)
+                ? file.slice(session.location.directory.length + 1)
+                : file;
+            }
+
+            const jev = makeClient(REPO);
+            const reports = await lintBlocks(jev, blocks, rules, THRESHOLD);
+            const { text, flagged } = renderLint(reports, header, THRESHOLD);
+            // The tool is self-contained: the caveat rides with the hits,
+            // so no prompt or skill has to restate it.
+            return say(
+              flagged
+                ? text +
+                    "\n\nFalse positives are expected. Use your judgment on each hit."
+                : text,
+            );
+          } catch (e) {
+            return say(
+              `tuning failed: ${e instanceof Error ? e.message : String(e)}`,
+            );
+          }
+        },
+      });
     });
   },
 });

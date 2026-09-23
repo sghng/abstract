@@ -13,14 +13,17 @@ agents developing this repository. The lab agents' shared invariants live in
   `agents/` (the six role personas at top level; `agents/subagents/` holds the
   named subagent catalog and reviewer panel, whose IDs carry the `subagents/`
   prefix), `plugin/harness.ts` (the lab plugin: binder assembly, cue,
-  repertoire), `opencode.json` (default model, MCP servers, the `lab-reference`
-  reference alias), `skills/` (the lab's skills, a real directory), and
-  `runtime.json` (the pinned `@opencode/cli` version)
-- `lint/` -- `abstract lint`: the expert edits dataset (`edits.yaml`, the rule
-  set, lessons verbatim) plus the Typst scanner (`scan.ts`, the Block contract:
-  text, line range, H1, role), the Jev client (`jev.ts`), and the command
-  (`cli.ts`); the scanner is homegrown per the provisional sketch and swappable
-  behind the Block contract
+  repertoire, tuning), `opencode.json` (default model, MCP servers, the
+  `lab-reference` reference alias), `skills/` (the lab's skills, a real
+  directory), and `runtime.json` (the pinned `@opencode/cli` version)
+- `lint/` -- `abstract lint`: the rule set (`rules.yaml`, lessons verbatim,
+  distilled from the calibrated expert edits), the Typst extractor (`extract/`,
+  a Rust sidecar on parser-level typst-syntax, pinned to the installed typst; it
+  owns all dialect knowledge and emits the Block contract: text, line range, H1,
+  role), `scan.ts` (the sidecar wrapper: lazy cargo build into the abstract
+  home, stamped by a source hash, no fallback), the Jev client (`jev.ts`), the
+  shared renderer (`format.ts`; one output for the CLI and the tuning tool), and
+  the command (`cli.ts`; `-` lints one plain prose passage from stdin)
 - `prompts/` -- the prompt files (Markdown, one file each, descriptive names):
   shared doctrine (`style-guide.md`, `story-doctrine.md`), role doctrine
   (`story-keeping.md`, `writing-craft.md`), and one file per role. Referenced by

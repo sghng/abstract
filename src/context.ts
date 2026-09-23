@@ -26,7 +26,7 @@ const OPENCODE_JSON = path.join(CONFIG, "opencode.json");
  * Plugin tool names. Keep in sync with config/plugin/harness.ts (tools.add).
  * The builtin set belongs to the pinned binary and is only summarized.
  */
-const PLUGIN_TOOLS = ["cue", "repertoire"];
+const PLUGIN_TOOLS = ["cue", "repertoire", "tuning"];
 const BUILTIN_TOOLS_NOTE =
   "read bash edit write glob grep ls patch task webfetch (curated from the pinned binary)";
 
