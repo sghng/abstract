@@ -5,8 +5,8 @@
 # the turn from one to the other. Good examples alone are cheap, any
 # published paper has them; an entry without a transformation is not a
 # lesson. lesson or judgement states the turn, in the curator's words or
-# the expert's. Feeds the style shelf next to zen.md, handbook.md, and
-# manual.md.
+# the expert's. Feeds the style shelf (zen.md, handbook.md, and manual.md
+# under reference/style) and the rule set of abstract lint.
 #
 # Rules for producing entries
 #
@@ -257,10 +257,9 @@
     The Transformer architecture <cite> represents a significant advancement in
     NLP, largely due to its self-attention mechanism, which captures complex
     semantic relationships by modeling interactions among all tokens in a
-    sequence, as illustrated in Figure 3.
+    sequence.
   lesson: >-
-    Fold background recitation into one sentence with the cause subordinated and
-    the figure pointed from inside it.
+    Fold background recitation into one sentence with the cause subordinated.
 10:
   project: q-matrix
   section: methods
@@ -403,8 +402,8 @@
   project: q-matrix
   section: methods
   before: >-
-    We eschewed the term embedding here, since traditional word frequency based
-    techniques such as TFIDF and Bag of Words are not embedding.
+    We eschewed the term embedding <cite> here, since traditional word frequency
+    based techniques such as TFIDF and Bag of Words are not embedding.
   after: null
   lesson: >-
     A footnote defending a terminology choice is a confession. Pick the right
@@ -417,8 +416,7 @@
     high-quality AP Statistics items [...]
   lesson: >-
     Report exact counts, a round number reads as unverified.
-  judgement: >-
-    Report the exact item count, not an approximation like 1,300.
+  judgement: "Please provide the exact number here."
 22:
   project: q-matrix
   section: introduction
@@ -429,11 +427,10 @@
     Anchor the dataset claim in one real worked example with its own
     illustration figure.
   judgement: >-
-    Choose a real item as the worked example and prepare an illustration figure
-    for it.
+    Please choose an item as an example and prepare an illustration figure.
 23:
   project: q-matrix
-  section: discussion
+  section: results
   before: >-
     In contrast, pooled word embeddings performed less effectively, likely
     because averaging dilutes important word frequency patterns.
@@ -501,7 +498,7 @@
   judgement: >-
     This figure should have some components related to our model. For the
     manuscript, every figure is important. It is a waste of space to add a
-    figure just to illustrate other's work.
+    figure just to illustrate other's work. [...]
 29:
   project: q-matrix
   section: abstract
@@ -509,7 +506,7 @@
   after: >-
     Leveraging on 1,308 expert-labeled AP Statistics items with 16 knowledge
     attributes, we explored a range of interdisciplinary approaches, including
-    NLP, ML, transformer architectures, and LLMs.
+    NLP, ML, transformer architecture, and LLMs.
   lesson: >-
     Name the corpus and its scale in the abstract's method sentence, and let the
     toolbox ride in an including clause.
@@ -572,10 +569,11 @@
     ambiguously defined <cite>. Moreover, the manual annotation process is
     time-consuming and costly [...]. Even when expert panels are carefully
     assembled, the resulting Q-matrices may reflect systematic biases [...],
-    which can ultimately affect model identification and diagnostic accuracy.
+    which can ultimately affect model identification and diagnostic accuracy
+    <cite>.
   lesson: >-
-    Give each documented difficulty its own sentence, opened by the studies that
-    established it, closed by its downstream consequence.
+    Give each documented difficulty its own sentence, with its evidence and its
+    downstream consequence.
 34:
   project: q-matrix
   section: introduction
@@ -627,12 +625,13 @@
 37:
   project: q-matrix
   section: methods
+  prefix: "In order to investigate which approach provides the best prediction,"
   before: >-
     The methods we investigated, as illustrated in <ref>, fall into three major
     categories: 1) traditional ML methods, 2) transformer-based models with
     fine-tuning, and 3) LLMs with zero-shot prompting.
   after: >-
-    We designed a comparative evaluation of three families of text-based
+    we designed a comparative evaluation of three families of text-based
     approaches that vary in how much semantic information they encode from
     items: (1) classical NLP + machine learning pipelines, (2) fine-tuned
     transformer models, and (3) large language models (LLMs) via zero-shot
@@ -655,17 +654,14 @@
   lesson: >-
     When two granularities are reported, say which is stricter and what it
     decides downstream.
-  project: q-matrix
-  project: q-matrix
-  project: q-matrix
 39:
   project: q-matrix
   section: introduction
   prefix: >-
-    Automated approaches can serve several roles [...] generate high-quality
-    initial Q-matrix drafts that experts subsequently refine, provide empirical
-    validation for expert-specified matrices, or serve as starting points for
-    iterative refinement [...]
+    Automated or semi-automated approaches can serve several roles [...]
+    generate high-quality initial Q-matrix drafts that experts subsequently
+    refine, provide empirical validation for expert-specified matrices, or serve
+    as starting points for iterative refinement [...]
   before: >-
     Additionally, automated Q-matrix labeling also offers several potential
     benefits beyond mere efficiency gains. Automatically labeled Q-matrices can
@@ -712,32 +708,30 @@
   before: "optimal"
   after: "balanced"
   suffix:
-    "tradeoff between accuracy and computational efficiency for this task."
+    "tradeoff between accuracy and computational efficiency for this task [...]"
   lesson: >-
     Claim optimal only when optimality was tested, otherwise write balanced.
-  project: q-matrix
 43:
   project: q-matrix
   section: methods
   prefix: >-
     The process begins with pre-trained transformer models (DistilBERT, BERT, or
-    BERT-Large),
+    BERT-Large)
   before: >-
     that have been trained on large text corpora. These models, with a
     classifier head attached, are fine-tuned
   after: >-
-    originally trained on large text corpora, which are then fine-tuned
+    , originally trained on large text corpora, which are then fine-tuned
   suffix: >-
     on the AP Statistics item text to predict 16-dimensional attribute
     probability vectors [...]
   lesson: >-
     Chain pipeline stages so each hands off to the next, never restart the
     subject for the following stage.
-  project: q-matrix
 44:
   project: q-matrix
   section: methods
-  prefix: "F1 macro = <eq>"
+  prefix: "F1 macro = <eq> and <eq>,"
   before: null
   after: "where K is the total number of attributes."
   lesson: >-
@@ -762,7 +756,7 @@
   after: >-
     One limitation of the present study is that human-generated Q-matrix labels
     are treated as the ground truth, which overlooks the possibility of error in
-    expert judgment. [...] The AI-generated Q-matrix proposed in the present
+    expert judgment. [...] the AI-generated Q-matrix proposed in the present
     study should be used as an initial approximation rather than a definitive
     solution.
   lesson: >-
