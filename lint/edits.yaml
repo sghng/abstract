@@ -1,11 +1,12 @@
 # Expert edits for academic writing, a hand-curated reference set.
 #
 # Every entry is an exemplar pair from an expert's edits and comments on
-# our drafts. The value of an entry is the pair: the bad, the good, and
-# the turn from one to the other. Good examples alone are cheap, any
-# published paper has them; an entry without a transformation is not a
-# lesson. lesson or judgement states the turn, in the curator's words or
-# the expert's. Feeds the style shelf (zen.md, handbook.md, and manual.md
+# our drafts. The value of an entry is the turn from bad to good, in a
+# pair when the drafts show it, or in the expert's stated rule when a
+# comment teaches it without touching one place in the text. Good
+# examples alone are cheap, any published paper has them. lesson or
+# judgement states the turn, in the curator's words or the expert's. Feeds
+# the style shelf (zen.md, handbook.md, and manual.md
 # under reference/style) and the rule set of abstract lint.
 #
 # Rules for producing entries
@@ -33,20 +34,22 @@
 #      borderline cases to the user rather than deciding alone.
 #
 # 3. Schema. Fields, in reading order: project, section, prefix, before,
-#    after, suffix, lesson, judgement. Read prefix -> before -> after ->
-#    suffix to see the edit in place.
+#    after, suffix, judgement, lesson. Read prefix -> before -> after ->
+#    suffix to see the edit in place, the lesson closes the entry.
 #    - project: the project the draft belongs to.
-#    - section: the H1 heading the edit lives under. Where an edit
+#    - section: the H1 heading the edit lives under, normalized to the
+#      canonical names, a Findings heading is results. Where an edit
 #      appears is part of its lesson.
 #    - prefix / suffix: the unchanged text around a diff, factored out so
 #      the pair quotes only what changed. Omit them when the pair stands
 #      alone. They exist for understanding, never to locate the edit.
 #    - before / after: the pair, the bad side and the good side.
-#    - lesson: the turn as a rule. judgement: the expert's stated rule on
-#      comment entries, carried beside the lesson.
+#    - judgement: the expert's stated rule on comment entries. lesson: the
+#      turn as a rule, closing every entry.
 #
 # 4. The pair.
-#    - Every entry must show a transformation.
+#    - Every entry must show a transformation, the pair itself or the
+#      expert's stated rule demanding one.
 #    - The absent side of the pair is an explicit null, never dropped.
 #    - after: null only for a pure deletion, where the turn is the
 #      removal.
@@ -54,10 +57,13 @@
 #      wholesale new passage is not a lesson; carried to that extreme, no
 #      paper is bad and any paper is good.
 #
-# 5. Comments. A comment carries before, lesson, and judgement. Add a
-#    prefix when the comment targets the anchor's relation to what
-#    precedes it. Trim before to the part the comment targets, [...] for
-#    the rest. Word judgement for clarity, it need not be verbatim.
+# 5. Comments. A comment carries judgement and lesson, and before when
+#    it targets text; a maxim with no single target carries judgement and
+#    lesson alone, a section only when the comment ties it to one. A
+#    comment shows no diff, so quote one continuous before, trimmed with
+#    [...] to what the comment targets; factor a prefix only when the
+#    comment targets the anchor's relation to what precedes it. Word
+#    judgement for clarity, it need not be verbatim.
 #    Verify the comment's premise before curating it, an expert's
 #    question can be a false positive.
 #
@@ -414,29 +420,29 @@
   before: >-
     This study evaluates multiple models for Q-matrix prediction on 1,300
     high-quality AP Statistics items [...]
+  judgement: "Please provide the exact number here."
   lesson: >-
     Report exact counts, a round number reads as unverified.
-  judgement: "Please provide the exact number here."
 22:
   project: q-matrix
   section: introduction
   before: >-
     This study evaluates multiple models for Q-matrix prediction on 1,300
     high-quality AP Statistics items (Fig. 1) [...]
+  judgement: >-
+    Please choose an item as an example and prepare an illustration figure.
   lesson: >-
     Anchor the dataset claim in one real worked example with its own
     illustration figure.
-  judgement: >-
-    Please choose an item as an example and prepare an illustration figure.
 23:
   project: q-matrix
   section: results
   before: >-
     In contrast, pooled word embeddings performed less effectively, likely
     because averaging dilutes important word frequency patterns.
+  judgement: "Link it with the corresponding results"
   lesson: >-
     Anchor every discussion claim to the result that supports it.
-  judgement: "Link it with the corresponding results"
 24:
   project: q-matrix
   section: introduction
@@ -482,23 +488,23 @@
     - FastText, which converts (sub)words to [...]
     - DistilRoBERTa, which provides [...]
     - Voyage AI voyage-3-large, [...]
-  lesson: >-
-    Write the paper's body as running prose, never bullet lists.
   judgement: >-
     No bullet points for research paper in this field. Combine them into one
     paragraph.
+  lesson: >-
+    Write the paper's body as running prose, never bullet lists.
 28:
   project: q-matrix
   section: methods
   before: >-
     The Transformer architecture <cite> [...] as illustrated in Figure 3.
-  lesson: >-
-    A figure earns its space by showing this manuscript's contribution, never by
-    illustrating cited work alone.
   judgement: >-
     This figure should have some components related to our model. For the
     manuscript, every figure is important. It is a waste of space to add a
     figure just to illustrate other's work. [...]
+  lesson: >-
+    A figure earns its space by showing this manuscript's contribution, never by
+    illustrating cited work alone.
 29:
   project: q-matrix
   section: abstract
@@ -669,10 +675,10 @@
     They can also provide a basis for data-driven validation procedures [...]
     Furthermore, automated methods can facilitate rapid prototyping of cognitive
     diagnostic assessments [...]
-  lesson: >-
-    Remove a paragraph that reiterates the previous one without adding value.
   judgement: >-
     It contributes limited value and can simply be deleted, no need to merge.
+  lesson: >-
+    Remove a paragraph that reiterates the previous one without adding value.
 40:
   project: q-matrix
   section: introduction
@@ -762,3 +768,432 @@
   lesson: >-
     Admit the ground truth may itself err, and position the automated output as
     an initial approximation, never a definitive solution.
+47:
+  project: llm-aig
+  judgement: >-
+    Whenever you make a statement in academic writing, you should ask yourself:
+    Is this claim accurate? Is it supported by the literature or our data? Can I
+    defend it if a reviewer challenges it?
+  lesson: >-
+    Ask of every claim whether it is accurate, supported by the literature or
+    the data, and defensible when a reviewer challenges it.
+48:
+  project: llm-aig
+  section: abstract
+  before: >-
+    Personalized learning demands many items and preferably in real time.
+  judgement: >-
+    The first sentence is not necessarily true. Personalized learning systems
+    may benefit from access to large item pools, but a large number of items is
+    not a requirement of personalized learning. The claim that items are
+    "preferably" generated in real time is even less clear and would require
+    justification.
+  lesson: >-
+    Never promote a benefit to a requirement of the task.
+49:
+  project: llm-aig
+  section: abstract
+  before: >-
+    Large language models write them, but hallucinate, miscalculate, mishandle
+    images, and stray from intended knowledge.
+  judgement: >-
+    There is no reason to imply that LLMs are the only way to generate these
+    items. LLMs may provide a promising approach to addressing some of the
+    challenges associated with scalable item generation, but that is very
+    different from saying that "large language models write them."
+  lesson: >-
+    Present the method as a promising approach to the challenge, never as the
+    way the need is met.
+50:
+  project: llm-aig
+  section: introduction
+  judgement: >-
+    After reading the Introduction, I do not feel motivated to learn more about
+    the study because I still do not clearly understand what the key
+    contributions are or why the work is important. [...] And the significance
+    of the work is the key.
+  lesson: >-
+    By the end of the introduction the reader must know the key contributions
+    and why the work matters.
+51:
+  project: llm-aig
+  judgement: >-
+    You tend to favor short, direct, and punchy statements and expect readers to
+    make connections between them. That may work well in conversation, but
+    academic writing requires a different approach. [...] This is not simply
+    about editing individual sentences; it requires changing how you approach
+    and organize academic writing.
+  lesson: >-
+    Separate the conversational habit of short punchy statements from scholarly
+    writing, explain ideas precisely, objectively, and logically.
+52:
+  project: llm-aig
+  section: introduction
+  before: >-
+    Large language models (LLMs) bring scale to exactly that work, and reviews
+    of the growing literature find them flexible and effective at generating
+    items across languages and subject domains. Yet on their own they
+    hallucinate, miscalculate, mishandle images, and stray from the knowledge an
+    item should assess [...]
+  judgement: >-
+    These two sentences are constructed in a bad way. You should break the
+    sentence into clearer academic statements with one main idea per sentence
+    and explicit logical transitions.
+  lesson: >-
+    Give each sentence one main idea, joined to the next by an explicit logical
+    transition.
+53:
+  project: llm-aig
+  section: introduction
+  before: >-
+    To address these problems, we propose an exemplar-based agentic AIG pipeline
+    and evaluate what it produces through expert review.
+  judgement: >-
+    This is another bad habit. Academic writing should be very clear and
+    straightforward. What do you mean "what it produces"? You should never let
+    the reader to guess what you want to express.
+  lesson: >-
+    Name what a phrase denotes, the reader must never guess the referent.
+54:
+  project: llm-aig
+  section: introduction
+  before: >-
+    the models run as agents that write each item as code, reading and writing
+    files, calculating in a Python/R console, and inspecting the compiled page
+  judgement: >-
+    Phrases such as "write each item as code" are not self-explanatory [...]
+    Simply stacking technical terms without explaining their meaning or purpose
+    does not make the writing more sophisticated; instead, it takes up valuable
+    space while reducing clarity. Something like this will be always a minus to
+    your proposal.
+  lesson: >-
+    Explain what each technical phrase means and why it is there, stacking terms
+    is not sophistication.
+55:
+  project: llm-aig
+  section: introduction
+  prefix: "so that mathematical and visual errors"
+  before: "surface"
+  after: "are identified"
+  suffix: "before submission"
+  judgement: >-
+    From now on, please stop using this type of drama terms. Use standard
+    academic terms, such as identify xxx and xxx prior to submission
+  lesson: >-
+    Write standard academic verbs like identify, never drama terms like surface.
+56:
+  project: llm-aig
+  section: introduction
+  before: >-
+    Generation is only half the problem. Review is the other, and at machine
+    writing speeds it becomes the binding one.
+  after: >-
+    In addition to item generation, scalable quality review represents another
+    important challenge.
+  judgement: >-
+    Another bad habit. This is too conversational. Academic writing is not a
+    casual talk. Academic writing usually follows standard relationship flow,
+    such as "In addition to item generation, scalable quality review represents
+    another important challenge."
+  lesson: >-
+    State how the second challenge relates to the first in standard academic
+    flow, never as conversational aphorism.
+57:
+  project: llm-aig
+  section: introduction
+  before: >-
+    they judge from the item text in a single pass
+  after: >-
+    existing approaches evaluate items based solely on item text with a
+    single-pass procedure
+  judgement: >-
+    This term is too subjective for academic writing. You need to develop the
+    habit of describing the facts objectively and allowing readers to draw
+    conclusions from the evidence. [...] report what the method actually does
+    rather than using subjective language to characterize it. For example
+    "existing approaches evaluate items based solely on item text with a
+    single-pass procedure"
+  lesson: >-
+    Report what a method does, never characterize it in subjective terms.
+58:
+  project: llm-aig
+  section: introduction
+  before: >-
+    This study therefore had two aims. One was to determine whether an LLM agent
+    working from an exemplar can produce items that human experts accept [...]
+    The other was to examine whether the same models can serve as judges whose
+    accept/reject decisions agree with the experts closely enough to triage the
+    review.
+  judgement: >-
+    I do not see a clear logical progression here, particularly after you
+    introduce the prior work. If your argument is that a single-pass approach is
+    insufficient, you need to clearly explain why it is insufficient [...]
+    simply pointing out that the previous approach uses a single pass does not
+    establish a meaningful research gap. [...] The research aims should
+    naturally emerge from the preceding argument. Please strengthen the logical
+    progression from prior work -> research gap -> our contribution -> research
+    aims. [...] You need to make the logical connections explicit and clearly
+    guide readers from one point to the next.
+  lesson: >-
+    Let the aims emerge from an explicit progression, the prior work, its
+    insufficiency, the contribution, then the aims.
+59:
+  project: llm-aig
+  section: abstract
+  before: >-
+    LLMs, out of the box, aren't good item writers due to hallucination.
+  after: >-
+    Off-the-shelf LLMs may not be reliable item writers due to hallucination.
+  lesson: >-
+    Carry claims in standard technical terms, never in conversational idiom or
+    contractions.
+60:
+  project: llm-aig
+  section: abstract
+  prefix: "We propose an exemplar-based AI agent"
+  before: "that sees, calculates, and iterates."
+  after: >-
+    integrating visual inspection, computational verification, and iterative
+    refinement.
+  lesson: >-
+    Spell out each operation by name, visual inspection, computational
+    verification, never its casual verb.
+61:
+  project: llm-aig
+  section: abstract
+  before: >-
+    Generated items showed promising acceptance rate, reviews by AI agreed
+    closely with those by experts. The results suggest potential for quality
+    item writing and accelerated review.
+  after: >-
+    Generated items achieved promising acceptance rates, with high agreement
+    between human and AI reviewers, demonstrating potential for efficient item
+    generation and quality assurance.
+  lesson: >-
+    Carry supporting detail inside the finding's sentence, the agreement in a
+    with phrase, the promise in a closing participle.
+62:
+  project: llm-aig
+  section: introduction
+  before: >-
+    The field's standing response is automatic item generation (AIG), which
+    writes items algorithmically from expert-built templates [...]
+  after: >-
+    Automatic item generation (AIG) addresses this challenge by generating items
+    algorithmically from expert-built templates [...]
+  lesson: >-
+    Let the named method act on the stated challenge as the sentence's subject,
+    not the field's standing response.
+63:
+  project: llm-aig
+  section: introduction
+  before: >-
+    AIG multiplies the items a template yields.
+  after: null
+  lesson: >-
+    Delete the flourish sentence that sells with a flashy verb and adds no
+    information.
+64:
+  project: llm-aig
+  section: introduction
+  before: >-
+    However, the templates and the review of every generated item remain expert
+    work <cite>, so the supply still runs through expert hands.
+  after: >-
+    However, template development and the review of every generated item still
+    heavily rely on human expertise <cite>.
+  lesson: >-
+    State the constraint once in plain terms, never restate it as metaphor.
+65:
+  project: llm-aig
+  section: introduction
+  before: >-
+    On their own, however, LLMs hallucinate, miscalculate, mishandle images, and
+    stray from the knowledge an item is intended to assess.
+  after: >-
+    However, studies have also identified several limitations, including factual
+    and computational errors, problems with image content, and misalignment with
+    the intended knowledge and skills <cite>.
+  lesson: >-
+    Report limitations as named categories the studies identified, never as
+    vivid verbs the model performs.
+66:
+  project: llm-aig
+  section: methods
+  before: >-
+    We generated the items and then had them reviewed by human experts and by
+    the models themselves. The corpus comprised 200 expert-written AP Statistics
+    items serving as exemplars.
+  after: >-
+    The corpus comprised 200 expert-written AP Statistics items serving as
+    exemplars. The items were developed by high school content experts and
+    annotated with detailed knowledge attributes [...] each item underwent a
+    rigorous review process involving discussion and consensus of four content
+    experts.
+  lesson: >-
+    Open the method on the corpus and its expert provenance, never on a
+    we-did-then-we-did summary.
+67:
+  project: llm-aig
+  section: methods
+  before: >-
+    The agent thus chose each action from the full history of what it had done
+    and seen, and the loop ended the moment it chose to submit.
+  after: >-
+    At each step, the agent selects an action based on the complete history of
+    its previous actions and observations. This iterative process continues
+    until the predefined stopping criterion is met.
+  judgement: >-
+    Why thus? I don't see any causal relationship here. This is a very awkward
+    sentence constructed to confuse readers.
+  lesson: >-
+    Describe the procedure in the present tense, statement by statement, with no
+    narrative connective the logic does not earn.
+68:
+  project: llm-aig
+  section: methods
+  before: >-
+    Figure 1: The agent's generation loop. One run of the loop produces one
+    item.
+  after: >-
+    Figure 1: Illustration of agentic AIG pipeline.
+  lesson: >-
+    Caption a figure with a label naming what it illustrates, not with sentences
+    narrating it.
+69:
+  project: llm-aig
+  section: results
+  prefix: "can yield items that on average exceed their exemplars on"
+  before: "the core quality dimensions."
+  after: "some core quality dimensions."
+  lesson: >-
+    Scope a comparative claim to the range the data showed, some dimensions, not
+    all.
+70:
+  project: llm-aig
+  section: results
+  before: >-
+    Generation quality also depended on item format and reading level (Table 3),
+    with choice items at text-only or harder-reading levels rated above the pool
+    [...]
+  after: >-
+    Furthermore, Table 3 showed that the item generation quality also depends on
+    item format and reading level, with multiple-choice items at text-only or
+    harder-reading levels rated above the pool [...]
+  lesson: >-
+    Let the table carry the claim as the sentence's subject, never park it in a
+    parenthetical.
+71:
+  project: llm-aig
+  section: methods
+  before: >-
+    We therefore measured generation quality as exemplar drift, the difference
+    between a generated item's mean ratings and its parent exemplar's mean
+    ratings [...]
+  after: >-
+    The performance of agentic AIG pipeline was evaluated using an
+    exemplar-relative difference, defined as the difference between the mean
+    rating of a generated item and that of its corresponding exemplar.
+  judgement: >-
+    This is not drift. Drift implies gradual change over time, which is not what
+    we are measuring.
+  lesson: >-
+    Never borrow an established term for a different measure, name the quantity
+    for what it is.
+72:
+  project: llm-aig
+  section: methods
+  before: >-
+    Averaging expert r's rating matrix X_r over the R_i raters of item i on
+    dimension d gave <eq> where T_id is the parent exemplar's mean rating on the
+    same dimension.
+  judgement: >-
+    Usually, in academic writing, persons are denoted by I, item by j. Tid
+    should be explained in a more professional way, "ith item's difference for
+    dimension d" something similar format.
+  lesson: >-
+    Follow the field's index letters, i for the person and j for the item, in
+    every formula.
+73:
+  project: llm-aig
+  section: results
+  before: >-
+    Experts accepted 88.5% of the reviewed generated items, nearly the
+    exemplars' own 92.8%.
+  judgement: >-
+    I don't understand what this means. Again, write full sentence if needed for
+    a clear statement.
+  lesson: >-
+    Write the comparison as a full sentence, an elliptical percentage makes the
+    reader decode it.
+74:
+  project: llm-aig
+  section: results
+  before: >-
+    The confidence intervals of these rates largely overlapped, suggesting that
+    recent advances in LLMs have not substantially improved item writing.
+  judgement: >-
+    I don't think this claim is necessary true. Moreover, this claim imposes a
+    negative impact to this proposal.
+  lesson: >-
+    Let weak evidence stay silent, never let it carry a claim against the work
+    itself.
+75:
+  project: llm-aig
+  section: results
+  prefix: "agentic generation with expert review can"
+  before: "yield"
+  after: "generate"
+  suffix: "items that on average exceed their exemplars [...]"
+  judgement: >-
+    Use the same term for your academic writing for consistence, generate
+  lesson: >-
+    Keep one term for the study's core action and use it throughout, never
+    rotate its synonyms.
+76:
+  project: llm-aig
+  section: results
+  before: >-
+    Table 3: Item cells whose Quality drift departs from the pool. Each row is
+    one kind of item's mean drift on Quality minus the full pool's mean [...]
+  judgement: >-
+    I don't understand what this table is measuring after reading this
+    description [...]
+  lesson: >-
+    A table's title and caption state what is measured and what a row shows,
+    never a riddle of internal shorthand.
+77:
+  project: llm-aig
+  section: results
+  before: >-
+    The second aim asked whether the same models can review generated items well
+    enough to triage them for human review.
+  after: >-
+    To examine whether AI reviewers can provide evaluations comparable to those
+    of human experts, we conducted an additional experiment comparing review
+    performance across different LLMs.
+  judgement: >-
+    Nobody still remembers the second aim here. Therefore, there is no need to
+    mention second here. Just use [...]
+  lesson: >-
+    Restate the purpose where its results appear, never point back to a numbered
+    aim.
+78:
+  project: llm-aig
+  section: conclusion
+  before: >-
+    These findings rest on one content area, one group of experts, and mostly
+    single-rater verdicts. The reviews still accumulating will let us answer
+    more research questions, starting with whether these results hold in another
+    content area.
+  judgement: >-
+    The conclusion should summarize the major findings of the study and clearly
+    highlight their contributions and implications for the field. [...] Framing
+    the findings this way unnecessarily undermines confidence in the results you
+    have just presented and may even give reviewers a reason to question whether
+    the study is ready for submission. [...] If the existing evidence is not
+    sufficient to support a convincing conclusion, then the study is simply not
+    ready for submission.
+  lesson: >-
+    Close on the findings and their contribution, never on speculation about how
+    accumulating data might change them.
