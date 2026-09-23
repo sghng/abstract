@@ -14,6 +14,8 @@
 #    then build the entry around that lesson. The lesson is the standard
 #    for every later choice, what to quote and what to trim.
 #    - Too generic if it survives deletion of the pair.
+#    - Too vague if a cold reader must work to see the turn. The fault is
+#      the lesson's wording, the span chosen, or the example itself.
 #    - Not a lesson if the only turn is a content correction, a
 #      mechanical fix, or a rewording of prose that was already fine.
 #      No entry.
@@ -26,18 +28,22 @@
 #    that teaches a convention, even when it requests an action. Leave
 #    out pure logistics (word limits, deadlines, tooling, data
 #    verification).
+#    - An edit that turns on a project-local decision, a rename or a
+#      numbering scheme, does not generalize and is not an entry. Flag
+#      borderline cases to the user rather than deciding alone.
 #
-# 3. Schema. Fields, in reading order: project, prefix, before, after,
-#    suffix, lesson, judgement. Read prefix -> before -> after -> suffix
-#    to see the edit in place.
+# 3. Schema. Fields, in reading order: project, section, prefix, before,
+#    after, suffix, lesson, judgement. Read prefix -> before -> after ->
+#    suffix to see the edit in place.
 #    - project: the project the draft belongs to.
-#    - prefix / suffix: shared context around a small diff, quoted once
-#      instead of on both sides of the pair. Omit them when the pair
-#      stands alone. They exist for understanding, never to locate the
-#      edit.
+#    - section: the H1 heading the edit lives under. Where an edit
+#      appears is part of its lesson.
+#    - prefix / suffix: the unchanged text around a diff, factored out so
+#      the pair quotes only what changed. Omit them when the pair stands
+#      alone. They exist for understanding, never to locate the edit.
 #    - before / after: the pair, the bad side and the good side.
-#    - lesson: the turn as a rule, on pair entries. judgement: the
-#      expert's stated rule, on comment entries. Never both on one entry.
+#    - lesson: the turn as a rule. judgement: the expert's stated rule on
+#      comment entries, carried beside the lesson.
 #
 # 4. The pair.
 #    - Every entry must show a transformation.
@@ -48,10 +54,12 @@
 #      wholesale new passage is not a lesson; carried to that extreme, no
 #      paper is bad and any paper is good.
 #
-# 5. Comments. A comment anchored on a whole self-contained text carries
-#    only before and judgement. Trim before to the part the comment
-#    targets, [...] for the rest. Word judgement for clarity, it need
-#    not be verbatim.
+# 5. Comments. A comment carries before, lesson, and judgement. Add a
+#    prefix when the comment targets the anchor's relation to what
+#    precedes it. Trim before to the part the comment targets, [...] for
+#    the rest. Word judgement for clarity, it need not be verbatim.
+#    Verify the comment's premise before curating it, an expert's
+#    question can be a false positive.
 #
 # 6. Keys are bare integers, incremental and dense; renumber when an
 #    entry is removed. No zero padding: YAML 1.1 reads a leading zero as
@@ -85,9 +93,9 @@
 #    space, not content.
 #
 # Three passes before a batch lands, each catching what the others miss:
-# cold-read every entry against its stated lesson, verify every entry
-# against the raw source, strip every span that stopped earning its
-# tokens.
+# cold-read every entry against its stated lesson, flagging any entry the
+# reader must work to understand, verify every entry against the raw
+# source, strip every span that stopped earning its tokens.
 #
 # Rules for consuming entries
 # Each entry teaches one lesson, stated in lesson or in judgement.
@@ -95,6 +103,7 @@
 
 1:
   project: q-matrix
+  section: abstract
   before: >-
     The Q-matrix has been a crucial component of cognitive diagnosis assessment.
     In this study, we evaluate a wide range of NLP, ML, transformer, and LLM
@@ -116,6 +125,7 @@
     model and its exact numbers.
 2:
   project: q-matrix
+  section: introduction
   before: >-
     Cognitive diagnosis assessment (CDA) <cite> provides a framework for
     assessing students' cognitive strengths and weaknesses. The Q-matrix <cite>,
@@ -131,6 +141,7 @@
     sentences of recitation.
 3:
   project: q-matrix
+  section: introduction
   before: >-
     In practice, Q-matrices can be difficult to specify <cite> due to expert
     disagreement, inherent ambiguity in skill mapping, and time and budget
@@ -145,6 +156,7 @@
     motivating case.
 4:
   project: q-matrix
+  section: introduction
   before: >-
     In this study, we evaluate multiple techniques for Q-matrix prediction on
     1,300 AP Statistics items with high-quality expert-labeled topics (16
@@ -161,6 +173,7 @@
     adjective like promising.
 5:
   project: q-matrix
+  section: methods
   before: >-
     The methods we evaluated, as depicted in <ref>, fall into three major
     categories: ML + vectorization pipeline, transformer fine-tuning, and LLMs
@@ -174,6 +187,7 @@
     symbols.
 6:
   project: q-matrix
+  section: methods
   before: >-
     All items are converted into a unified string representation, in format of
     TITLE: <title> QUESTION: <question> ANSWER: <answer>.
@@ -185,6 +199,7 @@
     at the reader's level.
 7:
   project: q-matrix
+  section: methods
   before: |-
     The following machine learning models were used. (Listed in
       chronological order.)
@@ -209,6 +224,7 @@
     never inventory every tool tried.
 8:
   project: q-matrix
+  section: methods
   before: |-
     The following vectorization methods were used.
 
@@ -231,6 +247,7 @@
     what it contributes.
 9:
   project: q-matrix
+  section: methods
   before: >-
     The Transformer architecture <cite> marks a significant advancement in NLP
     research. The attention mechanism, its core component, enables capturing
@@ -246,6 +263,7 @@
     the figure pointed from inside it.
 10:
   project: q-matrix
+  section: methods
   before: |-
     In this study, we tested the popular BERT model <cite> and several of
       its variants. The pre-trained models are obtained from the HuggingFace
@@ -266,6 +284,7 @@
     roster list.
 11:
   project: q-matrix
+  section: methods
   before: >-
     After pre-trained transformer is obtained, a classification head is
     attached, the new model is fine-tuned over the training set until
@@ -279,6 +298,7 @@
     the reader already knows.
 12:
   project: q-matrix
+  section: methods
   before: >-
     LLMs are trained on vast datasets and can perform complex intellectual and
     creative tasks with minimal instruction. Using an LLM without additional
@@ -289,6 +309,7 @@
     paragraph that defines them.
 13:
   project: q-matrix
+  section: methods
   before: |-
     Some state-of-the-art LLMs can perform reasoning <cite> before
       generating outputs. We tested the LLMs both with and without reasoning
@@ -306,6 +327,7 @@
     inline in prose.
 14:
   project: q-matrix
+  section: results
   before: >-
     The most promising result we obtained is from DistilBERT, achieving pattern
     level accuracy of 84.41% and label level accuracy of 98.55%. For machine
@@ -325,6 +347,7 @@
     claim they support.
 15:
   project: q-matrix
+  section: discussion
   prefix: "Regarding vectorization methods,"
   before:
     "TF-IDF's strong performance indicates that topic-level Q-matrix prediction"
@@ -335,12 +358,14 @@
     support.
 16:
   project: q-matrix
+  section: discussion
   before: "This aligns with intuitive expectations."
   after: null
   lesson: >-
     An appeal to intuition is not evidence. Delete it.
 17:
   project: q-matrix
+  section: discussion
   before: >-
     Conversely, pooled word embeddings underperformed, likely because averaging
     destroys informative word frequency patterns.
@@ -351,6 +376,7 @@
     Calibrate the verb to the mechanism. Averaging dilutes rather than destroys.
 18:
   project: q-matrix
+  section: discussion
   before: >-
     This was further validated by the transformer fine-tuning approach, which
     directly optimizes semantic representations for the task, as explained in
@@ -365,6 +391,7 @@
     one further validation plus a pointer elsewhere.
 19:
   project: q-matrix
+  section: results
   before: >-
     Complete results are not included in the proposal in observation of length
     limitation.
@@ -374,6 +401,7 @@
     left out.
 20:
   project: q-matrix
+  section: methods
   before: >-
     We eschewed the term embedding here, since traditional word frequency based
     techniques such as TFIDF and Bag of Words are not embedding.
@@ -383,27 +411,38 @@
     term and delete the footnote.
 21:
   project: q-matrix
+  section: introduction
   before: >-
     This study evaluates multiple models for Q-matrix prediction on 1,300
     high-quality AP Statistics items [...]
+  lesson: >-
+    Report exact counts, a round number reads as unverified.
   judgement: >-
     Report the exact item count, not an approximation like 1,300.
 22:
   project: q-matrix
+  section: introduction
   before: >-
     This study evaluates multiple models for Q-matrix prediction on 1,300
     high-quality AP Statistics items (Fig. 1) [...]
+  lesson: >-
+    Anchor the dataset claim in one real worked example with its own
+    illustration figure.
   judgement: >-
     Choose a real item as the worked example and prepare an illustration figure
     for it.
 23:
   project: q-matrix
+  section: discussion
   before: >-
     In contrast, pooled word embeddings performed less effectively, likely
     because averaging dilutes important word frequency patterns.
+  lesson: >-
+    Anchor every discussion claim to the result that supports it.
   judgement: "Link it with the corresponding results"
 24:
   project: q-matrix
+  section: introduction
   before: >-
     This study evaluates multiple approaches for Q-matrix prediction on 1,308
     high-quality AP Statistics items, each with 16 cognitive attributes, as
@@ -419,6 +458,7 @@
     developing, not merely evaluating.
 25:
   project: q-matrix
+  section: methods
   prefix: "The methods we investigated can be"
   before: "broadly"
   after: null
@@ -427,6 +467,7 @@
     Empty softeners like broadly blur the claim. Delete them.
 26:
   project: q-matrix
+  section: methods
   before: >-
     To convert these continuous predictions into binary labels, we applied 16
     independent K-means classifiers, one per output channel.
@@ -438,19 +479,292 @@
     reconstructs the mechanics.
 27:
   project: q-matrix
+  section: methods
   before: |-
     - TF-IDF, which encodes text based on word frequency and importance.
     - FastText, which converts (sub)words to [...]
     - DistilRoBERTa, which provides [...]
     - Voyage AI voyage-3-large, [...]
+  lesson: >-
+    Write the paper's body as running prose, never bullet lists.
   judgement: >-
     No bullet points for research paper in this field. Combine them into one
     paragraph.
 28:
   project: q-matrix
+  section: methods
   before: >-
     The Transformer architecture <cite> [...] as illustrated in Figure 3.
+  lesson: >-
+    A figure earns its space by showing this manuscript's contribution, never by
+    illustrating cited work alone.
   judgement: >-
     This figure should have some components related to our model. For the
     manuscript, every figure is important. It is a waste of space to add a
     figure just to illustrate other's work.
+29:
+  project: q-matrix
+  section: abstract
+  before: null
+  after: >-
+    Leveraging on 1,308 expert-labeled AP Statistics items with 16 knowledge
+    attributes, we explored a range of interdisciplinary approaches, including
+    NLP, ML, transformer architectures, and LLMs.
+  lesson: >-
+    Name the corpus and its scale in the abstract's method sentence, and let the
+    toolbox ride in an including clause.
+30:
+  project: q-matrix
+  section: abstract
+  before: >-
+    The best method achieved over 98.39% accuracy at the attribute level (also
+    known as hamming accuracy) and 83.00% at the item Q-vector level (also known
+    as subset accuracy) (16-dimensional multi-hot encoded attribute vector).
+  after: >-
+    The best-performing model, a fine-tuned transformer, achieved over 98.39%
+    accuracy at the attribute level and 83.00% at the item profile level (i.e.,
+    16-dimensional attribute vector).
+  lesson: >-
+    Give each metric one reader-facing name and delete the alias footnotes.
+31:
+  project: q-matrix
+  section: abstract
+  before: null
+  after: >-
+    These AI-driven approaches offer considerable practical and methodological
+    value for managing complex attribute structures, while substantially
+    reducing the time, cost, and specialized expertise required for manual
+    Q-matrix specification.
+  lesson: >-
+    After the finding, state the concrete payoff, the time, cost, and expertise
+    the method saves.
+32:
+  project: q-matrix
+  section: introduction
+  before: >-
+    Various CDMs have been developed that utilize the Q-matrix in different
+    ways, including the DINA (Deterministic Input, Noisy "And" Gate) model
+    <cite>, which assumes a conjunctive relationship among required attributes,
+    and its extensions that accommodate different attribute interaction
+    structures.
+  after: >-
+    The development of CDMs represents a shift [...] Early conceptual
+    foundations emerged in the 1980s with the Rule Space Method proposed by
+    Tatsuoka <cite> [...] researchers developed statistical models to
+    operationalize cognitive diagnosis, including the DINA model <cite> [...]
+    the framework has expanded to more flexible models such as the G-DINA model
+    <cite>.
+  lesson: >-
+    Trace the framework from its founding technique through each generalization,
+    citing the origin of every step.
+33:
+  project: q-matrix
+  section: introduction
+  before: >-
+    This process is fraught with difficulties: experts frequently disagree on
+    attribute requirements <cite>, particularly when skills are ambiguous or
+    overlapping; the process is time-consuming and expensive, especially for
+    large item banks; and the resulting Q-matrices may be susceptible to
+    systematic biases [...]
+  after: >-
+    Empirical studies have shown that experts frequently disagree on attribute
+    specifications, particularly when skills are abstract, overlapping, or
+    ambiguously defined <cite>. Moreover, the manual annotation process is
+    time-consuming and costly [...]. Even when expert panels are carefully
+    assembled, the resulting Q-matrices may reflect systematic biases [...],
+    which can ultimately affect model identification and diagnostic accuracy.
+  lesson: >-
+    Give each documented difficulty its own sentence, opened by the studies that
+    established it, closed by its downstream consequence.
+34:
+  project: q-matrix
+  section: introduction
+  before: >-
+    These challenges are amplified in the modern context of continuous
+    assessment development, where item banks are constantly expanded and revised
+    to meet evolving curriculum standards, combat item exposure, and support
+    adaptive testing systems. [...] This situation calls for automated or
+    semi-automated approaches [...]
+  after: >-
+    These challenges have become increasingly salient with the rapid growth of
+    large-scale digital assessment systems, automated item generation (AIG), and
+    adaptive testing platforms. Automated item generation techniques enable the
+    rapid production of large numbers of assessment items from cognitive
+    templates <cite> [...] In such environments, the scalability and reliability
+    of Q-matrix development become critical bottlenecks [...]
+  lesson: >-
+    Ground each amplifying force in a named, cited practice of the field.
+35:
+  project: q-matrix
+  section: introduction
+  before: >-
+    Their potential for Q-matrix prediction is intriguing: can these models
+    leverage their broad world knowledge and reasoning capabilities to identify
+    the cognitive attributes required for assessment items?
+  after: >-
+    The core assumption is that item wording contains systematic signals about
+    the cognitive processes required for problem solving. If items associated
+    with the same attributes exhibit similar semantic patterns, then models
+    capable of capturing these patterns may approximate expert Q-matrix
+    judgments with reasonable accuracy.
+  lesson: >-
+    State the study's core assumption as an explicit conditional, not as an
+    intriguing open question.
+36:
+  project: q-matrix
+  section: introduction
+  before: >-
+    By systematically comparing methods across these paradigms, we aim to
+    provide practical guidance for practitioners [...] while illuminating the
+    fundamental role of semantic understanding in accurate prediction.
+  after: >-
+    Our findings are threefold. First, we benchmark representative methods [...]
+    Second, we identify consistent patterns across methods, showing that
+    semantic representations are the primary driver of predictive accuracy.
+    Third, we offer practical guidance for assessment developers [...]
+  lesson: >-
+    Preview the contributions as enumerated findings, never as aims.
+37:
+  project: q-matrix
+  section: methods
+  before: >-
+    The methods we investigated, as illustrated in <ref>, fall into three major
+    categories: 1) traditional ML methods, 2) transformer-based models with
+    fine-tuning, and 3) LLMs with zero-shot prompting.
+  after: >-
+    We designed a comparative evaluation of three families of text-based
+    approaches that vary in how much semantic information they encode from
+    items: (1) classical NLP + machine learning pipelines, (2) fine-tuned
+    transformer models, and (3) large language models (LLMs) via zero-shot
+    prompting.
+  lesson: >-
+    Recast a bare category list as families that vary along the dimension the
+    study tests.
+38:
+  project: q-matrix
+  section: methods
+  prefix: >-
+    At the attribute level, we report Hamming accuracy [...]. At the item level,
+    we report subset accuracy [...]
+  before: null
+  after: >-
+    The latter provides a stricter criterion and is often more consequential for
+    downstream applications, such as item calibration, model fit evaluation, and
+    diagnostic classification, because even a single misclassified attribute
+    changes this item's cognitive specification as a vector.
+  lesson: >-
+    When two granularities are reported, say which is stricter and what it
+    decides downstream.
+  project: q-matrix
+  project: q-matrix
+  project: q-matrix
+39:
+  project: q-matrix
+  section: introduction
+  prefix: >-
+    Automated approaches can serve several roles [...] generate high-quality
+    initial Q-matrix drafts that experts subsequently refine, provide empirical
+    validation for expert-specified matrices, or serve as starting points for
+    iterative refinement [...]
+  before: >-
+    Additionally, automated Q-matrix labeling also offers several potential
+    benefits beyond mere efficiency gains. Automatically labeled Q-matrices can
+    serve as initial estimates for subsequent refinement by human experts [...]
+    They can also provide a basis for data-driven validation procedures [...]
+    Furthermore, automated methods can facilitate rapid prototyping of cognitive
+    diagnostic assessments [...]
+  lesson: >-
+    Remove a paragraph that reiterates the previous one without adding value.
+  judgement: >-
+    It contributes limited value and can simply be deleted, no need to merge.
+40:
+  project: q-matrix
+  section: introduction
+  prefix: "For example, Liao, Jiao, and He (2024)"
+  before: "demonstrated"
+  after: "showed"
+  suffix: >-
+    that item linguistic features extracted via NLP techniques can explain CDM
+    item parameters [...]
+  lesson: >-
+    Write showed when you attribute a finding to one cited study, demonstrated
+    overclaims a single result.
+41:
+  project: q-matrix
+  section: results
+  prefix: "These findings"
+  before: >-
+    vote against directly using LLMs
+  after: >-
+    indicate that LLMs are not sufficiently reliable
+  suffix: >-
+    as stand-alone Q-matrix labelers without explicit calibration through
+    labeled examples or domain-specific fine-tuning.
+  lesson: >-
+    Let findings indicate a measured conclusion, never vote or argue against a
+    practice.
+42:
+  project: q-matrix
+  section: results
+  prefix: >-
+    This finding highlights the practicality of using more compact transformer
+    models, such as DistilBERT, which offers the
+  before: "optimal"
+  after: "balanced"
+  suffix:
+    "tradeoff between accuracy and computational efficiency for this task."
+  lesson: >-
+    Claim optimal only when optimality was tested, otherwise write balanced.
+  project: q-matrix
+43:
+  project: q-matrix
+  section: methods
+  prefix: >-
+    The process begins with pre-trained transformer models (DistilBERT, BERT, or
+    BERT-Large),
+  before: >-
+    that have been trained on large text corpora. These models, with a
+    classifier head attached, are fine-tuned
+  after: >-
+    originally trained on large text corpora, which are then fine-tuned
+  suffix: >-
+    on the AP Statistics item text to predict 16-dimensional attribute
+    probability vectors [...]
+  lesson: >-
+    Chain pipeline stages so each hands off to the next, never restart the
+    subject for the following stage.
+  project: q-matrix
+44:
+  project: q-matrix
+  section: methods
+  prefix: "F1 macro = <eq>"
+  before: null
+  after: "where K is the total number of attributes."
+  lesson: >-
+    Close a displayed formula with a where clause defining every symbol.
+45:
+  project: q-matrix
+  section: methods
+  prefix: "we investigated whether"
+  before: "general-purpose large language models"
+  after: >-
+    commercial large language models that have been pre-trained on substantially
+    richer semantic information
+  suffix: >-
+    can function as immediately deployable Q-matrix labelers [...]
+  lesson: >-
+    Replace a generic label with the specific class and the property that
+    motivates it here.
+46:
+  project: q-matrix
+  section: discussion
+  before: null
+  after: >-
+    One limitation of the present study is that human-generated Q-matrix labels
+    are treated as the ground truth, which overlooks the possibility of error in
+    expert judgment. [...] The AI-generated Q-matrix proposed in the present
+    study should be used as an initial approximation rather than a definitive
+    solution.
+  lesson: >-
+    Admit the ground truth may itself err, and position the automated output as
+    an initial approximation, never a definitive solution.
