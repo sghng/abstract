@@ -20,6 +20,9 @@
  *                         a house reference stock rebuilt fresh from the
  *                         patch series (citeproc, native numbering); no
  *                         server or model involved
+ *   abstract lint <file.typ> [--threshold p] [--explain ids]
+ *                         style-check a manuscript against the expert edits
+ *                         dataset via Jev; exit 1 flags violations
  *   abstract doctor       contract smoke test against the pinned runtime
  *   abstract stop         stop the lab server
  *   abstract upgrade [v]  bump the pinned @opencode/cli version, then doctor
@@ -745,6 +748,11 @@ async function main(): Promise<void> {
     case "typ2docx":
       typeToDocx(rest);
       return;
+    case "lint": {
+      const { lint } = await import("../lint/cli.ts");
+      await lint(rest);
+      return;
+    }
     case "context":
       await contextCmd(
         rest.find((a) => !a.startsWith("--")),
@@ -772,6 +780,12 @@ async function main(): Promise<void> {
       console.log("       abstract typ2docx <file.typ>");
       console.log(
         "                     convert Typst to Word beside it (house stock, citeproc)",
+      );
+      console.log(
+        "       abstract lint <file.typ> [--threshold p] [--explain ids]",
+      );
+      console.log(
+        "                     style-check a manuscript against the expert edits",
       );
       console.log(
         "       abstract doctor   contract smoke test against the pinned runtime",

@@ -923,3 +923,29 @@ reports a non-empty agent body as a violation.
   Console-managed policies (#49729) bind only through remote config, which the
   lab never uses. Doctor passed 12/12 on the new pin, including the live cue bus
   and score assembly round trips.
+- 2026-09-23: abstract lint built per the grill plan. edits.yaml lessons are the
+  rules, verbatim, one noul per rule keyed by entry id, shared criteria pinning
+  true = violates / false = fine or inapplicable; one systemOne call per block
+  ({ text, section, role }, pool of 4); scanner is the homegrown provisional
+  sketch behind the Block contract (the parser swap stays parked). Baseline on
+  manuscript-v0.typ (60 blocks, 46 rules, jev-latest): threshold 0.5 flags every
+  block (665 hits, 11.1 per block); inapplicable rules park at p 0.50-0.65
+  instead of falling to 0, while precise rules concentrate high (>= 0.75 keeps
+  46 hits, and the strongest are exactly the expert's edits: roster lists
+  0.83-0.85, implementation constants 0.80-0.83, "promising" 0.79-0.81). Default
+  threshold stays 0.5 as planned; the measured spread says the refinement, when
+  wanted, is a higher default or per-rule calibration, not neighbor context.
+- 2026-09-23: scanner hardened on manuscript-rnr-v1.typ (the R&R generation, a
+  different template). #highlight[...] blocks are captured as body blocks (they
+  wrap the revised prose; skipping them as code would lint only the old text),
+  captures split on blank lines, indented headings inside captures update
+  structure instead of leaking as text, label-only lines drop, display math
+  closes on "$," (trailing punctuation), fenced raw inside captures is skipped,
+  and an H1 named Abstract yields the abstract role so both template generations
+  agree. v0 rescans identically (60 blocks). Second baseline, 102 blocks:
+  threshold 0.5 flags 101/102 (1001 hits); the strong tier concentrates on real
+  patterns (rule 6 on implementation recitations at 0.79-0.85, "highly
+  promising" in the Discussion opener at 0.79, metric aliasing at 0.76-0.82),
+  while rule 21 (exact counts) fires broadly on exact round simulation
+  parameters (5,000 simulees, 80/20), the one clear systematic false-positive
+  family so far.

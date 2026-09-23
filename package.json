@@ -14,10 +14,12 @@
     "@opencode/client": "2.0.14",
     "@opencode/plugin": "2.0.14",
     "@opencode/sdk": "2.0.14",
+    "@typesafe-ai/sdk": "0.6.0",
     "cheerio": "^1.2.0",
     "cloudflare": "^7.1.0",
     "playwright": "^1.63.0",
     "turndown": "^7.2.4",
+    "yaml": "^2.9.1",
     "zod": "^4.6.5"
   },
   "devDependencies": {
