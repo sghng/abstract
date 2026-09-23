@@ -962,3 +962,22 @@ reports a non-empty agent body as a violation.
   stays the only mode. An academic-context framing variant was tried the same
   day and dropped for the same reason (downward recalibration, no sharper
   discrimination).
+- 2026-09-23: default threshold 0.5 --> 0.75, rule 1 scoped to introductions.
+  Submit-manuscript baseline (32 blocks, 78 rules after the llm-aig batch): 0.5
+  flagged all 32 blocks with 581 hits, 74% of them under 0.65, the parked
+  inapplicable floor the earlier baselines measured; the 0.75 tier held 45 hits
+  from 15 rules and spot checks came back mostly real (subjective praise of
+  classifiers 0.86, BERT roster with 67M parameters 0.84 and 0.82, telegraphic
+  enumeration 0.79, "Strikingly" 0.79, the abstract's re-drifted "promising
+  approach" 0.75 to 0.79). Rule 1 fired section-blind on 28 of 32 blocks;
+  qualifying its lesson ("When introducing the research, open at...") cut it to
+  one residual hit (0.79, a background paragraph misread as an introduction).
+  Rerun at the new default: 46 hits on 20 of 32 blocks. Known residue above
+  0.75: rule 67's genre bleed (present tense, a proposal preference, punishing
+  journal past-tense methods, 7 hits to 0.80) and the ungated acknowledgment
+  block (4 hits). A source re-read then re-sourced rules 9, 10, and 67 to syntax
+  and form (comma-bounded inserts, bullet formatting, chained subordinate
+  clauses), dissolving the genre and section false-positive families by
+  construction; the misplaced "our research" qualifier was tried and reverted (5
+  hits on we-voice methods). Entries 2 and 9's twin fell to a shortening edit
+  and duplication of the advisor's bullet comment. Keys now 76.

@@ -1,7 +1,7 @@
 /**
  * lint/cli.ts -- the abstract lint command.
  *
- *   abstract lint <file.typ> [--threshold p] [--explain id,id,...]
+ *   abstract lint <file.typ> [--threshold p, default 0.75] [--explain id,id,...]
  *
  * Lints every paragraph block of a Typst manuscript against the edits.yaml
  * rule set (one Jev call per block) and prints each flagged block: its
@@ -51,7 +51,7 @@ function oneline(text: string): string {
 
 export async function lint(args: string[]): Promise<void> {
   let file: string | undefined;
-  let threshold = 0.5;
+  let threshold = 0.75;
   let explainIds: number[] | undefined;
 
   const ids = (value: string): number[] => {
