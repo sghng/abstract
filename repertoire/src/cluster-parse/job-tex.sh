@@ -5,11 +5,16 @@
 # args: <slice-file>
 set -u
 R="$HOME/parse-run"; W="$R/work"
-export PATH="$HOME/.bun/bin:$R/bin:$PATH"
+export PATH="$HOME/homebrew/bin:$HOME/.bun/bin:$R/bin:$PATH"
 export PANDOC="$R/bin/pandoc"
+# tier 1: LaTeXML (homebrew, home prefix). SGE does not source login profiles,
+# so the homebrew bin dir must be on PATH explicitly; tex-convert enables the
+# LaTeXML tier only when LATEXMLC is set.
+command -v latexmlc >/dev/null 2>&1 && export LATEXMLC="$(command -v latexmlc)"
+echo "latexml tier: ${LATEXMLC:-disabled}"
 # slice derived from SGE_TASK_ID env (qsub args are not var-substituted)
 slice="${1:-}"
-[ -z "$slice" ] && slice="$R/slices/tex-${SGE_TASK_ID}.ids"
+[ -z "$slice" ] && slice="$R/slices/${SLICE_PREFIX:-tex}-${SGE_TASK_ID}.ids"
 task="${SLURM_PROCID:-}${SGE_TASK_ID}"
 cd "$W" || exit 1
 export RAW_DIR="$TMPDIR/raw-new"
