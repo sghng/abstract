@@ -134,7 +134,7 @@ export default Plugin.define({
             metadata: { from, to: target },
             delivery: "steer",
           });
-          return { content: `cue sent to ${target}:\n\n${message}` };
+          return { content: `cue sent to ${target}` };
         },
       });
     });
