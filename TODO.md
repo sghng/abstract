@@ -1023,3 +1023,10 @@ reports a non-empty agent body as a violation.
   a highlight-block PR build had been copied over ~/.local/bin/pandoc, so
   the rebuild-refresh-verify loop is now explicit after every lab-stack
   change.
+- 2026-09-24: trailing tables keep the pen. The filter's trailing-table hoist
+  (a workaround from before lab-stack c2daea002 kept first-paragraph state
+  across mark divs) pulled a region's final table out of its mark div, so the
+  writer never penned the cells. The writer already pens tables inside mark
+  divs, tables included; the hoist is deleted and the map branch's captioned()
+  covers what the special case did. Verified: cells pen, the paragraph after a
+  marked table still takes FirstParagraph exactly as after a plain one.
