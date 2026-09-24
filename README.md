@@ -12,8 +12,8 @@ Status: early. See `TODO.md` for the design rationale and roadmap, and
 
 - `config/` -- the lab's OpenCode config root (`OPENCODE_CONFIG_DIR`): the
   kernel `AGENTS.md`, `agents/` (role personas and the subagent catalog),
-  `plugin/harness.ts` (the cue and repertoire tools), `skills/`,
-  `opencode.json`, and the pinned `runtime.json`
+  `plugin/harness.ts` (the cue and repertoire tools), `skills/`, and
+  `opencode.json`
 - `prompts/` -- role doctrine, assembled into the system prompt by each role's
   binder
 - `src/` -- the `abstract` CLI, the binders, and the context report
@@ -37,7 +37,6 @@ abstract context      # what each agent receives: context, skills, subagents, to
 abstract lint <f.typ> # style-check a manuscript against the expert edits (Jev)
 abstract doctor       # contract smoke test against the pinned runtime
 abstract stop         # stop the lab server
-abstract upgrade <v>  # bump the pinned @opencode/cli version
 ```
 
 The lab runs on a per-host OpenCode server at port 4319 with its own config,

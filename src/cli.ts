@@ -26,7 +26,6 @@
  *                         via Jev; exit 1 flags violations
  *   abstract doctor       contract smoke test against the pinned runtime
  *   abstract stop         stop the lab server
- *   abstract upgrade [v]  bump the pinned @opencode/cli version, then doctor
  *
  * Files are memory; sessions are a lossy cache. The server is the only
  * long-running thing, and it is rebuildable from the DB.
@@ -56,9 +55,11 @@ const CLI_PATH = resolve(fileURLToPath(import.meta.url));
 const HARNESS_DIR = resolve(CLI_PATH, "..", "..");
 const CONFIG_DIR = join(HARNESS_DIR, "config");
 
-const PIN_FILE = join(CONFIG_DIR, "runtime.json");
-const PIN = (JSON.parse(readFileSync(PIN_FILE, "utf8")) as { version: string })
-  .version;
+const PKG = JSON.parse(
+  readFileSync(join(HARNESS_DIR, "package.json"), "utf8"),
+) as { dependencies: Record<string, string> };
+// The @opencode/* deps move in lockstep; the runtime serves the same version.
+const PIN = PKG.dependencies["@opencode/client"];
 
 const ABSTRACT_HOME =
   process.env.ABSTRACT_HOME ?? join(homedir(), ".local", "share", "abstract");
@@ -131,7 +132,7 @@ function client() {
 
 /* -- runtime ------------------------------------------------------------ */
 
-function ensureRuntime(pin: string = PIN): void {
+function ensureRuntime(): void {
   mkdirSync(RUNTIME_DIR, { recursive: true });
   const pkg = join(RUNTIME_DIR, "package.json");
   if (!existsSync(pkg))
@@ -141,11 +142,11 @@ function ensureRuntime(pin: string = PIN): void {
   if (installed) {
     version = spawnSync(BIN, ["--version"], { encoding: "utf8" }).stdout.trim();
   }
-  if (!installed || !version.includes(pin)) {
+  if (!installed || !version.includes(PIN)) {
     console.log(
-      `abstract: installing @opencode/cli@${pin} into ${RUNTIME_DIR}`,
+      `abstract: installing @opencode/cli@${PIN} into ${RUNTIME_DIR}`,
     );
-    const out = spawnSync("bun", ["add", "-E", `@opencode/cli@${pin}`], {
+    const out = spawnSync("bun", ["add", "-E", `@opencode/cli@${PIN}`], {
       cwd: RUNTIME_DIR,
       encoding: "utf8",
     });
@@ -347,15 +348,6 @@ async function stop(): Promise<void> {
   } catch {
     console.log("abstract: server already stopped");
   }
-}
-
-async function upgrade(version?: string): Promise<void> {
-  const v = version ?? PIN;
-  writeFileSync(PIN_FILE, `${JSON.stringify({ version: v }, null, 2)}\n`);
-  console.log(`abstract: pin set to ${v}`);
-  ensureRuntime(v); // PIN was captured at import; install the new pin now
-  await stop();
-  console.log("abstract: run `abstract doctor` against the new pin");
 }
 
 /* -- doctor -------------------------------------------------------------- */
@@ -793,9 +785,6 @@ async function main(): Promise<void> {
     case "stop":
       await stop();
       return;
-    case "upgrade":
-      await upgrade(rest[0]);
-      return;
     case "--help":
     case "-h":
       console.log(
@@ -822,9 +811,6 @@ async function main(): Promise<void> {
         "       abstract doctor   contract smoke test against the pinned runtime",
       );
       console.log("       abstract stop     stop the lab server");
-      console.log(
-        "       abstract upgrade [v]  pin a new @opencode/cli version",
-      );
       return;
     default:
       fail(`unknown argument: ${cmd} (try --help)`);
@@ -832,3 +818,5 @@ async function main(): Promise<void> {
 }
 
 await main();
+// The SDK leaves pooled handles behind; a finished CLI exits, it does not idle.
+process.exit(0);

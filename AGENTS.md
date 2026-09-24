@@ -14,8 +14,8 @@ agents developing this repository. The lab agents' shared invariants live in
   named subagent catalog and reviewer panel, whose IDs carry the `subagents/`
   prefix), `plugin/harness.ts` (the lab plugin: binder assembly, cue,
   repertoire, tuning), `opencode.json` (default model, MCP servers, the
-  `lab-reference` reference alias), `skills/` (the lab's skills, a real
-  directory), and `runtime.json` (the pinned `@opencode/cli` version)
+  `lab-reference` reference alias), and `skills/` (the lab's skills, a real
+  directory)
 - `lint/` -- `abstract lint`: the rule set (`rules.yaml`, lessons verbatim,
   distilled from the calibrated expert edits), the Typst extractor (`extract/`,
   a Rust sidecar on parser-level typst-syntax, pinned to the installed typst; it
@@ -44,7 +44,7 @@ agents developing this repository. The lab agents' shared invariants live in
   `abstract typ2docx <file.typ>` (Typst to Word beside the source, through a
   house reference stock rebuilt fresh from the patch series; citeproc and native
   numbering; no server or model involved), `abstract doctor` (contract smoke
-  test), `abstract stop`, `abstract upgrade [v]`
+  test), `abstract stop`
 - `reference/` -- reference material agents read on request; reaches agents as
   the `lab-reference` alias (OpenCode references feature, described in
   `config/opencode.json`)
@@ -90,11 +90,13 @@ agents developing this repository. The lab agents' shared invariants live in
   the lab agents forgot it, would the failure be silent and costly? Episodic
   procedures and templates belong in skills.
 - **Ground truth is the pinned published binary** (`@opencode/cli` at the
-  version in `config/runtime.json`), not any source checkout, which may lag.
-  Contract surfaces are enforced by `abstract doctor`, not by reading source.
-- **Upgrades are deliberate**: `abstract upgrade <version>`, then `npm diff`
-  plus release notes for new features to adopt, then `abstract doctor`; bump the
-  pin only when doctor passes. The user's daily install is never touched.
+  version of the `@opencode/*` deps in `package.json`), not any source checkout,
+  which may lag. Contract surfaces are enforced by `abstract doctor`, not by
+  reading source.
+- **Upgrades are deliberate**: bump the `@opencode/*` deps in `package.json`,
+  `npm diff` plus release notes for new features to adopt, then `abstract stop`
+  and `abstract doctor`; keep the bump only when doctor passes. The user's daily
+  install is never touched.
 - **Commits**: conventional commits. Record architectural decisions in
   `TODO.md`'s decisions log.
 
