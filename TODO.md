@@ -1012,3 +1012,14 @@ reports a non-empty agent body as a violation.
   break before the title. No stock change: the heading stays H1, already
   centered bold at body size. Labels inside highlighted appendices take the
   pen with their headings; unmarked ones stay clean.
+- 2026-09-24: typ2docx table proportions, pandoc-side pair. The Typst
+  reader was averaging fractions over auto columns ((auto, 1fr, auto, 1fr)
+  became four explicit 25% columns) and the docx writer would have given
+  the defaults zero-width gridCols anyway, so the pair landed on lab-stack
+  (29d3e8df6 reader, ac097c17a writer): auto stays ColWidthDefault, and a
+  table mixing widths with defaults gets pct 100% plus autofit layout, so
+  Word sizes unspecified columns from content. Layout belongs to the layout
+  engine; the AST carries intent. The frozen-binary convention bit again:
+  a highlight-block PR build had been copied over ~/.local/bin/pandoc, so
+  the rebuild-refresh-verify loop is now explicit after every lab-stack
+  change.
