@@ -1000,3 +1000,15 @@ reports a non-empty agent body as a violation.
   the rule text and the paragraph; every meta-knob probed so far (framing,
   isolation, criteria paraphrase) is inert. Both flags and the branch were then
   dropped; the stock noul with its bundled false pole is the whole mechanism.
+- 2026-09-24: APA appendices in typ2docx, filter side. The Typst source keeps
+  carrying content only: the reader drops set/show rules anyway (verified in
+  the caption round), so a Typst-side heading style could never reach Word,
+  and hard-typing "Appendix A" would content-ize a write-time numbering
+  artifact. The filter walks the zone after citeproc's empty refs div in
+  order, collecting level-1 headers wherever they open (appendix headings
+  sit at the top level or open a highlight region), and gives each the same
+  page-break run the references header gets, a label line ("Appendix",
+  lettered only when the paper has more than one, per APA 2.14), and a line
+  break before the title. No stock change: the heading stays H1, already
+  centered bold at body size. Labels inside highlighted appendices take the
+  pen with their headings; unmarked ones stay clean.
