@@ -1072,3 +1072,7 @@ reports a non-empty agent body as a violation.
   the default double spacing multiplied the image height into a doubled line
   box, a giant gap below the figure; the Figure style pins single spacing,
   like Compact.
+- 2026-09-24: no-indent float notes. A float note (italic "Note." opening a
+  paragraph after a table or image, at any nesting depth) is an annotation,
+  not a paragraph start: the filter detects it and wraps it in a no-indent
+  div, the writer's continuation suppression under a plainer name.
