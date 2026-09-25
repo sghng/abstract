@@ -1030,3 +1030,30 @@ reports a non-empty agent body as a violation.
   divs, tables included; the hoist is deleted and the map branch's captioned()
   covers what the special case did. Verified: cells pen, the paragraph after a
   marked table still takes FirstParagraph exactly as after a plain one.
+- 2026-09-24: air before tables, Word-side. Word applies none of a paragraph's
+  line-spacing lead when a table follows, so the caption-cluster zeroing glued
+  every caption title to its table rule at 0 in Word (LibreOffice honors the
+  lead, which is why the render checks never caught it). TableCaption regains
+  after=120 with contextualSpacing: same-style label and title stay tight,
+  the table side gets the air. Highlighting is innocent here; marked and plain
+  tables emit identical paragraphs.
+- 2026-09-24: air after tables, writer-side. The table's bottom boundary is
+  the same Word quirk as its top (no line-spacing lead applies), but the fix
+  could not live in the stock: the paragraph after a table shares
+  FirstParagraph with post-heading paragraphs, which must stay at zero. The
+  docx writer now marks the table boundary itself (lab-stack 76bba4aef) and
+  the next paragraph carries direct before=120; setFirstPara clears the mark,
+  so intervening headings, figures, and lists absorb it, and containers stay
+  transparent so it survives mark divs. Both table sides now carry 120 twips
+  of air, matched.
+- 2026-09-24: display-math continuations carry no indent. fixDisplayMath
+  (shared writer preprocessing) chops a paragraph at its display equations so
+  each centers alone, and the docx writer then indented every following piece
+  as a fresh paragraph. The continuation pieces are now marked at the source
+  of that knowledge (fixDisplayMath wraps them in a math-continuation div,
+  lab-stack b62ac57a7) and the docx writer suppresses the first-line indent
+  with a direct zero ind, rendering the div transparently like mark divs.
+  Highlighted display math never had the bug: the equation sits inside the
+  mark span, past the chop's top-level view, so it stays embedded in one
+  paragraph. The two paths still differ structurally; deferred until it
+  shows.
