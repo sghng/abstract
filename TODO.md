@@ -1057,3 +1057,14 @@ reports a non-empty agent body as a violation.
   mark span, past the chop's top-level view, so it stays embedded in one
   paragraph. The two paths still differ structurally; deferred until it
   shows.
+- 2026-09-24: table-boundary spacing corrected to Word's lead model, from the
+  owner's in-Word measurements: the lead of a double-spaced line attaches
+  below its text, so a caption before a table already shows a full lead (the
+  +120 made it slightly more than double) and the paragraph after a table
+  shows none above (the +120 was too small). The caption cluster returns to
+  zero spacing, gap exactly one lead; the writer's after-table air rises to
+  240 twips, half the line pitch (lab-stack 940c45651). Both boundaries now
+  read as one double-spaced lead.
+- 2026-09-24: heading after a table. A heading needs the same air as a
+  paragraph after one (Word gives a heading nothing above it either), so the
+  Header case reads the boundary mark too (lab-stack).
