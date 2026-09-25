@@ -1068,3 +1068,7 @@ reports a non-empty agent body as a violation.
 - 2026-09-24: heading after a table. A heading needs the same air as a
   paragraph after one (Word gives a heading nothing above it either), so the
   Header case reads the boundary mark too (lab-stack).
+- 2026-09-24: single-spaced figure lines. An image rides a text line, and
+  the default double spacing multiplied the image height into a doubled line
+  box, a giant gap below the figure; the Figure style pins single spacing,
+  like Compact.
