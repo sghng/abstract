@@ -16,6 +16,11 @@ merges the D1 papers dump) rebuild the table from scratch.
 | parsed         | 159,465 | 97.0% of the corpus, all on R2 under `md/` |
 | parsing-failed | 4,886   | 3.0%, every one bucketed below             |
 
+Campaign tier quality for context: the tex tier ran LaTeXML on 73.5% of its
+items (pandoc ladder the rest) and scored 96.3% clean on a 3,000-file QC sample;
+the pdf tier is prose-faithful but placeholder-math (the table below tells that
+story).
+
 Parsed Markdown by source (also `papers.parse_source` on D1):
 
 | parse_source   | n       | share | no headings | raw leak | formula heavy | math rich (>20 display blocks) |

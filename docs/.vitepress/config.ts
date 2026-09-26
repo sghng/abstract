@@ -14,37 +14,39 @@ export default defineConfig({
     // render literally, not parse as HTML through the Vue compiler
     html: false,
   },
-  sidebar: [
-    {
-      text: "Repertoire manual",
-      items: [
-        { text: "Overview + spec", link: "/repertoire/" },
-        { text: "Fetch layer", link: "/repertoire/fetch" },
-        { text: "Parse layer", link: "/repertoire/parse" },
-        { text: "Storage layout", link: "/repertoire/storage" },
-        { text: "Host fleet", link: "/repertoire/hostfleet" },
-        { text: "Rebuild runbook", link: "/repertoire/rebuild" },
-        { text: "ETL audit (2026-09-14)", link: "/repertoire/audit" },
-        {
-          text: "Rebuild decisions (2026-09-09)",
-          link: "/repertoire/rebuild-decisions",
-        },
-      ],
-    },
-    {
-      text: "Harness",
-      items: [
-        { text: "Multi-agent pattern", link: "/multi-agent" },
-        { text: "Implementation plan", link: "/harness" },
-      ],
-    },
-    {
-      text: "Prompts + writing",
-      items: [
-        { text: "Prompt hierarchy", link: "/prompt-hierarchy" },
-        { text: "Writing", link: "/writing" },
-        { text: "Ledger", link: "/ledger" },
-      ],
-    },
-  ],
+  themeConfig: {
+    nav: [
+      { text: "Home", link: "/" },
+      { text: "Repertoire", link: "/repertoire/" },
+      { text: "Harness", link: "/multi-agent" },
+      { text: "Prompts", link: "/prompt-hierarchy" },
+    ],
+    sidebar: [
+      {
+        text: "Repertoire manual",
+        items: [
+          { text: "Overview + spec", link: "/repertoire/" },
+          { text: "Fetch layer", link: "/repertoire/fetch" },
+          { text: "Parse layer", link: "/repertoire/parse" },
+          { text: "Parse report (ledger)", link: "/repertoire/parse-report" },
+          { text: "Build history", link: "/repertoire/history" },
+        ],
+      },
+      {
+        text: "Harness",
+        items: [
+          { text: "Multi-agent pattern", link: "/multi-agent" },
+          { text: "Implementation plan", link: "/harness" },
+        ],
+      },
+      {
+        text: "Prompts + writing",
+        items: [
+          { text: "Prompt hierarchy", link: "/prompt-hierarchy" },
+          { text: "Writing", link: "/writing" },
+          { text: "Ledger", link: "/ledger" },
+        ],
+      },
+    ],
+  },
 });

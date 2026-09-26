@@ -4,12 +4,8 @@ Durable reference for the corpus fetch layer after the 2026-09 expansion
 rebuild: what the corpus is, how each family is fetched, the machinery
 conventions everything shares, and the recipes for future work (annual
 increments, refetches, new journals). Evidence base: the run OPS-LOGs in
-`repertoire/.cache/bulk/<family>/`, the fetch spikes
-(`repertoire/.cache/notes/repertoire-spike-2026-09-15.md`), and
-`docs/repertoire/audit.md`. The expansion plan
-(`repertoire/.cache/notes/repertoire-rebuild-expansion.md`, local memo) is the
-temporary working plan for the remaining phases (2-5: parse routes, full
-re-derivation, cutover); this doc survives it.
+`repertoire/.cache/bulk/<family>/` and the fetch spikes
+(`repertoire/.cache/notes/repertoire-spike-2026-09-15.md`).
 
 ## Corpus inventory (post-expansion fetch, 2026-09-16)
 
@@ -25,19 +21,21 @@ re-derivation, cutover); this doc survives it.
 Totals: 163,654 papers, 167,210 source objects. The 801-paper gap (arxiv papers
 without a source object) is the withheld-and-fallback-failed set: source 403
 with no pdf fallback obtainable. Papers rows carry the full OAI bibliographic
-universe; sources carry only what has bytes.
+universe; sources carry only what has bytes. Note: the arxiv tex tier (140,191
+tarballs) was purged from storage 2026-09-25 after the HTML doctrine landed; the
+table above records what was fetched. Current stored mix: see
+[index.md](./index.md).
 
-D1 `repertoire`: papers 163,654, sources 167,210, exact match with the upload
-checkpoint file (`repertoire/.cache/r2-bulk-state.txt`). Local raws staging:
-`repertoire/raw-new/` (flat; drains into the canonical local mirror, see
-`docs/repertoire/storage.md`).
+D1 `repertoire`: papers 164,351 (after the psyarxiv docx row repair below),
+sources 39,143 post-purge, exact match with storage. Local raws staging:
+`repertoire/raw-new/` (flat; the canonical local mirror).
 
 ## Per-family reference
 
 Durable scripts: `repertoire/src/families/<family>/` (list / fetch /
 backfill-html as applicable). Run state and OPS-LOGs:
-`repertoire/.cache/bulk/<family>/`. All fetchers run on this Mac (institution-IP
-entitlement; never proxied), one family per browser profile.
+`repertoire/.cache/bulk/<family>/`. Publisher fetches need the institutional
+IP, never a proxy; one browser profile per family.
 
 ### psychometrika (Cambridge)
 
@@ -69,7 +67,7 @@ entitlement; never proxied), one family per browser profile.
 ### jebs (SAGE)
 
 - Listing: SAGE per-volume pages; `list.ts`.
-- Routes: PDF all eras (100% coverage incl. 1970s scans, p50 ~1.2MB); XML modern
+- Routes: PDF all eras (100% coverage, incl. 1970s scans); XML modern
   era; HTML via landing page for 2007+ xml-absent.
 - Era facts: pre-2007 HTML is ABSTRACT-ONLY (spike-proven shells on both routes;
   excluded by year gate). SAGE challenges (Turnstile) self-clear on a warmed
@@ -113,28 +111,26 @@ entitlement; never proxied), one family per browser profile.
   has a prolific co-author). Adopted rule (owner, 2026-09-17): drop each first
   author's earliest preprint. One-timers vanish entirely, everyone else
   decrements by one. Filter application belongs to training-set assembly, as a
-  papers-table flag (papers.train_include), never a fetch-layer deletion.
-  Census of record (pinned 2026-09-18, src/arxiv-firstauthor-qc.ts owns the
-  normalization; supersedes the ad-hoc 2026-09-17 numbers): 150,806 ->
-  103,488 kept (47,318 dropped, 31.4%); 47,318 unique first-author keys,
-  52.8% of them one-timers; 23 no-author rows kept. Applied to D1
-  papers.train_include 2026-09-18 and count-verified per family.
+  papers-table flag (papers.train_include), never a fetch-layer deletion. Census
+  of record (pinned 2026-09-18, src/arxiv-firstauthor-qc.ts owns the
+  normalization; supersedes the ad-hoc 2026-09-17 numbers): 150,806 -> 103,488
+  kept (47,318 dropped, 31.4%); 47,318 unique first-author keys, 52.8% of them
+  one-timers; 23 no-author rows kept. Applied to D1 papers.train_include
+  2026-09-18 and count-verified per family.
 - Fetch: e-print source (`/e-print/<id>`, gzip tarball -> .tex artifact); on
   withheld-source 403, PDF fallback (manifest carries `via: pdf-fallback`).
   Final mix: 140,191 tex (93.5%), 9,814 pdf (6.5%); 801 papers metadata-only
   (source withheld, no fallback obtainable). Sizes: tex p50 416KB / p90 3.9MB /
-  max 79MB; pdf p50 503KB. Final: 150,005 objects.
-  Papers-table repair (2026-09-18, found by the parse-queue build): 697
-  psyarxiv docx papers existed in manifest/sources/R2 but had no papers row
-  (docx listing path and papers.jsonl diverged; the fetch audit reconciled
-  sources, never papers-vs-sources). Inserted from manifest truth; papers
-  163,654 -> 164,351, now identical to the parse-queue universe.
-- Distribution: 7-host fleet (5 lab nodes + 1 fast Linux box + this Mac), one
-  fetcher per host, partitions ~18.8k items. See `docs/repertoire/hostfleet.md`
-  (access, deployment, gotchas) and `repertoire/.cache/bulk/arxiv/README.md`
-  (code/state split). Centralization is wave-based (tar staged batches, rsync
-  --partial --append pulls; gzip -t gate before any remote prune). Endgame ran
-  2026-09-15..17: topup + 403-repair + final waves, all verified.
+  max 79MB; pdf p50 503KB. Final: 150,005 objects. One reconciliation scar:
+  697 psyarxiv docx papers had manifest/sources rows but no papers row (the
+  listing path and papers.jsonl had diverged). Reconcile papers AGAINST
+  sources after every family round, not just sources against the upload.
+- Scale is rate-limit-bound, not bandwidth-bound. arXiv tolerates sustained
+  per-IP fetching poorly; the round that worked spread requests across
+  independent source IPs (any set of machines; nothing about the specific
+  fleet mattered), paced each host, and centralized in batched waves with an
+  integrity gate (gzip -t) before any remote prune. A few thousand items is a
+  single-host job with pacing; six-figure pulls need distribution.
 
 ## Shared machinery conventions
 
@@ -166,9 +162,8 @@ entitlement; never proxied), one family per browser profile.
 
 ## Storage and metadata
 
-- R2 `repertoire-docs`, flat pristine namespace `raw/<doi_id>.<fmt>` (arxiv ids
-  form their own keyspace: `raw/arxiv:2310.06725.tex`). R2 limits: unlimited
-  objects and total storage; 5GiB single PUT.
+- R2 bucket `repertoire`, flat pristine namespace `raw/<doi_id>.<fmt>`. R2
+  limits: unlimited objects and total storage; 5GiB single PUT.
 - D1 `repertoire`: papers + sources tables (schema.sql). Limits that bite: 100KB
   max SQL statement (insert batches are 50 rows/statement; 1,000-row batches
   measured ~500KB and fail SQLITE_TOOBIG with an error easy to miss in grep'd
@@ -199,8 +194,7 @@ entitlement; never proxied), one family per browser profile.
 4. `upload-bulk --family <fam>` + apply SQL. NO old-row reset (increment rows
    are new; existing rows untouched).
 5. arxiv: re-run the OAI harvest from last harvest date (from-until), partition
-   only the new ids, fleet or single-host (a few thousand items is a one-host
-   job).
+   only the new ids (a few thousand items is a single-host paced job).
 
 ### Full refetch (raws suspected stale or lost)
 
@@ -208,9 +202,8 @@ entitlement; never proxied), one family per browser profile.
    skipped -- DELETE the manifest + checkpoint entries for what must be
    refetched, or fetch into a fresh family dir.
 2. Apply the old-row reset for refetched journals (parse_source lies otherwise).
-3. Derived cleanup follows per docs/repertoire/storage.md (enumerable lists: old
-   raw keys not in fresh sources, per-paper md
-   - assets replacement at re-derive time).
+3. Derived cleanup follows per [index.md](./index.md) (old raw keys not in
+   fresh sources; per-paper md and assets replacement at re-derive time).
 
 ### Adding a journal
 
@@ -224,12 +217,10 @@ entitlement; never proxied), one family per browser profile.
 
 ## Pointers
 
-- `docs/repertoire/storage.md` -- storage layout decisions (md/ prefix,
-  lean-html, arxiv both-formats) and cleanup inventory; open questions awaiting
-  owner.
-- `docs/repertoire/hostfleet.md` -- fleet access, deployment, gotchas.
+- [index.md](./index.md) -- system spec: stores, md contract, doctrine.
+- [parse.md](./parse.md) -- parse routes and converters.
+- [parse-report.md](./parse-report.md) -- failure/quality ledger, next-build
+  playbook.
+- [history.md](./history.md) -- build history and superseded proposals.
 - `repertoire/.cache/notes/repertoire-spike-2026-09-15.md` -- per-publisher
   probe evidence (the era facts above trace here).
-- `repertoire/.cache/notes/repertoire-rebuild-expansion.md` (local memo) --
-  locked decisions D1-D10 and remaining phases 2-5.
-- `docs/repertoire/audit.md` -- why this rebuild happened.

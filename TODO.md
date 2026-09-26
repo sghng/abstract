@@ -1076,3 +1076,14 @@ reports a non-empty agent body as a violation.
   paragraph after a table or image, at any nesting depth) is an annotation,
   not a paragraph start: the filter detects it and wraps it in a no-indent
   div, the writer's continuation suppression under a plainer name.
+
+## 2026-09-26: repertoire manual condensed (owner decision)
+
+- The manual reduced from ten files to five (index, fetch, parse,
+  parse-report, history): dated records (audit, rebuild-decisions,
+  cluster-run, rebuild, hostfleet, storage) folded their surviving
+  doctrine into the spec and their narrative into history.md. Standard
+  (owner): keep crucial observations concisely (HTML canonical over tex
+  tarballs, docling's placeholder math, olmOCR verdict); drop logistics
+  (cluster how-tos, audit detail). The tex ladder is recorded as
+  superseded.
