@@ -1,14 +1,16 @@
 /**
- * scan.ts -- the Typst source scanner behind abstract lint: a thin wrapper
- * over the Rust extractor (lint/extract, parser-level typst-syntax, pinned
- * to the lab's installed typst).
+ * scan.ts -- the source scanner behind abstract lint: a thin wrapper over
+ * the Rust extractor (lint/extract; parser-level typst-syntax for .typ,
+ * comrak for .md, both pinned in Cargo.lock).
  *
  * The contract any parser must satisfy is the Block: a paragraph-sized run
- * with its text (kept lines verbatim), its line range, the H1 section it
- * lives under, and a role (abstract, list, or body). All Typst dialect
- * knowledge lives in the extractor; this file only shells out. section and
- * role are optional because the prose route (stdin "-", or the tuning
- * tool's check-prose) lints a bare passage with no document around it.
+ * with its text (kept lines verbatim), its line range, the section it
+ * lives under (H1 on the Typst side, nearest heading on the Markdown
+ * side), and a role (abstract, list, or body). All dialect knowledge
+ * lives in the extractor; this file only shells out, and the binary
+ * dispatches on the path extension. section and role are optional because
+ * the prose route (stdin "-", or the tuning tool's check-prose) lints a
+ * bare passage with no document around it.
  *
  * The binary is built lazily on first use: cargo builds it into the
  * abstract home, a hash of the crate sources stamps it, and a source change

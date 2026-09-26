@@ -6,8 +6,9 @@
 # dialect knowledge lives here; no rules, no API, no thresholds.
 [package]
 name = "abstract-extract"
-version = "0.1.0"
+version = "0.2.0"
 edition = "2024"
 
 [dependencies]
+comrak = "0.55.0"
 typst-syntax = "=0.15.1"

@@ -1,12 +1,14 @@
-//! abstract-extract -- the Typst paragraph extractor behind `abstract lint`.
+//! abstract-extract -- the paragraph extractor behind `abstract lint`.
 //!
-//! Parser-level only (typst-syntax, pinned to the lab's installed typst): a
-//! sidecar, spawned by lint/scan.ts, that turns a .typ source into the Block
-//! contract as JSON on stdout: an array of { text, start, end, section,
-//! role }, where text is the kept source lines verbatim, start/end are
-//! 1-based line numbers, section is the enclosing H1 title ("" before the
-//! first H1, "abstract" for the abstract), and role is abstract | list |
-//! body.
+//! Parser-level only: a sidecar, spawned by lint/scan.ts, that turns a
+//! Typst or Markdown source into the Block contract as JSON on stdout: an
+//! array of { text, start, end, section, role }, where text is the kept
+//! source lines verbatim, start/end are 1-based line numbers, section is
+//! the enclosing H1 title ("" before the first H1, "abstract" for the
+//! abstract), and role is abstract | list | body. The Typst dialect is
+//! typst-syntax (pinned to the lab's installed typst), the Markdown
+//! dialect is comrak; .typ/.md paths dispatch themselves, and --md forces
+//! Markdown on stdin.
 //!
 //! Method: the syntax tree classifies each source line (blank, skipped in
 //! place, flush-and-skip, prose, list item, structural heading), then a line
@@ -27,15 +29,18 @@ use std::ops::Range;
 
 use typst_syntax::{parse, Lines, LinkedNode, SyntaxKind};
 
+mod md;
+
 /** Blocks under this many characters are not paragraphs. */
-const MIN_CHARS: usize = 30;
+pub(crate) const MIN_CHARS: usize = 30;
 
 fn main() {
     let args: Vec<String> = std::env::args().skip(1).collect();
     if args.iter().any(|a| a == "--version") {
         println!(
-            "abstract-extract {} (typst-syntax 0.15.1)",
-            env!("CARGO_PKG_VERSION")
+            "abstract-extract {} (typst-syntax 0.15.1, comrak {})",
+            env!("CARGO_PKG_VERSION"),
+            comrak::version()
         );
         return;
     }
@@ -45,8 +50,19 @@ fn main() {
         dump(&LinkedNode::new(&root), 0);
         return;
     }
-    let source = read_input(args.first());
-    print!("{}", to_json(&extract(&source)));
+    let path = args.iter().find(|a| !a.starts_with("--")).cloned();
+    let source = read_input(path.as_ref());
+    let is_md = args.iter().any(|a| a == "--md")
+        || path.as_ref().is_some_and(|p| {
+            let p = p.to_ascii_lowercase();
+            p.ends_with(".md") || p.ends_with(".markdown")
+        });
+    let blocks = if is_md {
+        md::extract(&source)
+    } else {
+        extract(&source)
+    };
+    print!("{}", to_json(&blocks));
 }
 
 fn read_input(path: Option<&String>) -> String {
@@ -93,14 +109,14 @@ fn dump(node: &LinkedNode, depth: usize) {
 /* -- blocks ---------------------------------------------------------------- */
 
 #[derive(Clone, Copy, PartialEq)]
-enum Role {
+pub(crate) enum Role {
     Abstract,
     List,
     Body,
 }
 
 impl Role {
-    fn as_str(self) -> &'static str {
+    pub(crate) fn as_str(self) -> &'static str {
         match self {
             Role::Abstract => "abstract",
             Role::List => "list",
@@ -109,12 +125,12 @@ impl Role {
     }
 }
 
-struct Block {
-    text: String,
-    start: usize, // 1-based
-    end: usize,   // 1-based
-    section: String,
-    role: Role,
+pub(crate) struct Block {
+    pub(crate) text: String,
+    pub(crate) start: usize, // 1-based
+    pub(crate) end: usize,   // 1-based
+    pub(crate) section: String,
+    pub(crate) role: Role,
 }
 
 fn extract(source: &str) -> Vec<Block> {
@@ -558,12 +574,19 @@ fn dedent(lines: &[&str]) -> String {
 /* -- block assembly ----------------------------------------------------------- */
 
 /** Reference entries are not prose; the references section is not linted. */
-fn section_dropped(section: &str) -> bool {
+pub(crate) fn section_dropped(section: &str) -> bool {
     let s = section.trim();
     s.eq_ignore_ascii_case("references") || s.eq_ignore_ascii_case("bibliography")
 }
 
-fn emit(text: &str, start: usize, end: usize, role: Role, section: &str, blocks: &mut Vec<Block>) {
+pub(crate) fn emit(
+    text: &str,
+    start: usize,
+    end: usize,
+    role: Role,
+    section: &str,
+    blocks: &mut Vec<Block>,
+) {
     if section_dropped(section) {
         return;
     }

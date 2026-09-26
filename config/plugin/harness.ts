@@ -151,7 +151,7 @@ export default Plugin.define({
         description:
           "Check prose against the lab's style rules " +
           "(distilled from real expert manuscript edits), judged by Jev. " +
-          "check-file: lint every paragraph of a Typst manuscript (path). " +
+          "check-file: lint every paragraph of a Typst or Markdown manuscript (path). " +
           "check-prose: lint one passage of plain prose (no Typst markup). " +
           "explain: print the full rule entry for one id. " +
           'Hits print as "R53  p=.78  <rule text>"; p is the probability ' +

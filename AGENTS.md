@@ -17,13 +17,14 @@ agents developing this repository. The lab agents' shared invariants live in
   `lab-reference` reference alias), and `skills/` (the lab's skills, a real
   directory)
 - `lint/` -- `abstract lint`: the rule set (`rules.yaml`, lessons verbatim,
-  distilled from the calibrated expert edits), the Typst extractor (`extract/`,
-  a Rust sidecar on parser-level typst-syntax, pinned to the installed typst; it
-  owns all dialect knowledge and emits the Block contract: text, line range, H1,
-  role), `scan.ts` (the sidecar wrapper: lazy cargo build into the abstract
-  home, stamped by a source hash, no fallback), the Jev client (`jev.ts`), the
-  shared renderer (`format.ts`; one output for the CLI and the tuning tool), and
-  the command (`cli.ts`; `-` lints one plain prose passage from stdin)
+  distilled from the calibrated expert edits), the paragraph extractor
+  (`extract/`, a Rust sidecar that owns all dialect knowledge and emits the
+  Block contract: text, line range, section, role; two fronts, typst-syntax for
+  Typst pinned to the installed typst, comrak for Markdown), `scan.ts` (the
+  sidecar wrapper: lazy cargo build into the abstract home, stamped by a source
+  hash, no fallback), the Jev client (`jev.ts`), the shared renderer
+  (`format.ts`; one output for the CLI and the tuning tool), and the command
+  (`cli.ts`; `-` lints one plain prose passage from stdin)
 - `prompts/` -- the prompt files (Markdown, one file each, descriptive names):
   shared doctrine (`style-guide.md`, `story-doctrine.md`), role doctrine
   (`story-keeping.md`, `writing-craft.md`), and one file per role. Referenced by

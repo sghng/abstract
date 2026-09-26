@@ -20,7 +20,7 @@
  *                         a house reference stock rebuilt fresh from the
  *                         patch series (citeproc, native numbering); no
  *                         server or model involved
- *   abstract lint <file.typ> | -   [--threshold p] [--explain ids]
+ *   abstract lint <file.typ|file.md> | -   [--threshold p] [--explain ids]
  *                         style-check a manuscript (or one plain prose
  *                         passage on stdin) against the style rule set
  *                         via Jev; exit 1 flags violations
@@ -470,9 +470,8 @@ async function doctor(): Promise<void> {
     return `${ids.length} plugins`;
   });
   // Local contract test of the lint extractor (builds it on first run; no
-  // model, no API): one fixture paragraph through parse, classify, machine.
-  // The math sits directly under the paragraph so the flush it must cause
-  // is pinned (a regression to prose would drag line 4 into the block).
+  // model, no API): fixtures through both fronts, pinning the math flush
+  // on the Typst side and the container skip on the Markdown side.
   await check("lint extractor", async () => {
     const { scanText, extractorVersion } = await import("../lint/scan.ts");
     const version = extractorVersion();
@@ -494,7 +493,29 @@ async function doctor(): Promise<void> {
     assert(b.section === "Intro", `section ${JSON.stringify(b.section)}`);
     assert(b.role === "body", `role ${JSON.stringify(b.role)}`);
     assert(b.start === 3 && b.end === 3, `lines ${b.start}-${b.end}`);
-    return `${version}, Block contract round-trip ok`;
+
+    const { scanFile } = await import("../lint/scan.ts");
+    const tmp = join(tmpdir(), `abstract-doctor-${process.pid}.md`);
+    writeFileSync(
+      tmp,
+      "---\ntitle: t\n---\n\n# Title\n\n## Abstract\n\n" +
+        "The abstract paragraph clears the minimum filter with room to spare.\n" +
+        "\n$$\nE = mc^2\n$$\n\n" +
+        "::: center\n+-----+-----+\n| a   | b   |\n+-----+-----+\n:::\n\n" +
+        "## References\n\n" +
+        "Dropped, because reference entries are not prose at all.\n",
+    );
+    const mdBlocks = scanFile(tmp);
+    rmSync(tmp);
+    assert(
+      mdBlocks.length === 1,
+      `expected 1 md block, got ${JSON.stringify(mdBlocks).slice(0, 200)}`,
+    );
+    const m = mdBlocks[0];
+    assert(m.section === "abstract", `md section ${JSON.stringify(m.section)}`);
+    assert(m.role === "abstract", `md role ${JSON.stringify(m.role)}`);
+    assert(m.start === 9 && m.end === 9, `md lines ${m.start}-${m.end}`);
+    return `${version}, Block contract round-trip ok (typ + md)`;
   });
   // Live round trip: a queue-delivered prompt through a real model turn in a
   // throwaway role session. Exercises binder assembly (context hook), prompt
@@ -799,7 +820,7 @@ async function main(): Promise<void> {
         "                     convert Typst to Word beside it (house stock, citeproc)",
       );
       console.log(
-        "       abstract lint <file.typ> | -   [--threshold p] [--explain ids]",
+        "       abstract lint <file.typ|file.md> | -   [--threshold p] [--explain ids]",
       );
       console.log(
         "                     style-check a manuscript, or one prose passage on",

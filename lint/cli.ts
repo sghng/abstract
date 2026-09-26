@@ -1,7 +1,7 @@
 /**
  * lint/cli.ts -- the abstract lint command.
  *
- *   abstract lint <file.typ> [--threshold p, default 0.75] [--explain id,id,...]
+ *   abstract lint <file.typ|file.md> [--threshold p, default 0.75] [--explain id,id,...]
  *   abstract lint -            (stdin: one plain prose passage)
  *
  * Lints every paragraph block of a Typst manuscript against the rules.yaml
@@ -31,7 +31,7 @@ const EDITS = resolve(LINT_DIR, "rules.yaml");
 function usage(message?: string): never {
   if (message) console.error(`abstract lint: ${message}`);
   console.error(
-    "usage: abstract lint <file.typ> [--threshold p] [--explain id,id,...]",
+    "usage: abstract lint <file.typ|file.md> [--threshold p] [--explain id,id,...]",
   );
   console.error("       abstract lint -   (stdin: one plain prose passage)");
   process.exit(2);
@@ -77,7 +77,8 @@ export async function lint(args: string[]): Promise<void> {
 
   if (explainIds) explain(explainIds);
   if (!file) {
-    if (!explainIds) usage("a .typ file or - (prose on stdin) is required");
+    if (!explainIds)
+      usage("a .typ or .md file, or - (prose on stdin), is required");
     return;
   }
 
@@ -92,7 +93,8 @@ export async function lint(args: string[]): Promise<void> {
     header = "prose";
   } else {
     const src = resolve(file);
-    if (!src.endsWith(".typ")) usage(`not a .typ file: ${file}`);
+    if (!/\.(typ|md|markdown)$/.test(src))
+      usage(`not a .typ or .md file: ${file}`);
     if (!existsSync(src)) usage(`not found: ${file}`);
     blocks = scanFile(src);
     header = relative(process.cwd(), src) || src;
