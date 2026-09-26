@@ -59,3 +59,17 @@ us.
 - Transfer aggregates with a single tar stream over ssh; rsync over the same
   tunnel dies the death of 153k per-file handshakes (309 files in six hours vs
   the full 7.6GB tar in under one).
+- Compute-node egress has broken IPv6: urllib waits out the v6 timeout
+  (~80s/request) before v4 fallback; force IPv4 in any fetcher (curl hides the
+  problem with happy-eyeballs).
+- arXiv HTML rescue round (2026-09-24): the tex-failure tier is better served by
+  arXiv's own LaTeXML output (arxiv.org/html 51% coverage, ar5iv most of the
+  rest, 5,873/6,277) than by docling PDF conversion. 4,702 items re-shipped with
+  real LaTeX math, 1,174 kept docling where the per-item contest favored it, 29
+  previously-unparseable orphans recovered. Doctrine going forward: HTML is the
+  canonical arXiv source for new fetch rounds regardless of tarball availability
+  (owner decision 2026-09-24).
+- Operational scar: one careless `qdel -u ghuang3` deleted the owner's running
+  arrays along with my queued jobs (2026-09-24). Rule: delete only explicit job
+  ID lists. Related: wrangler error greps must not match on `[ERROR]` (ANSI
+  codes split the token); match on ERROR.
