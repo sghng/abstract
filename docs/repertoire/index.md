@@ -15,7 +15,9 @@ Reading order for a rebuild:
    route verdicts, graduated converters
 5. `hostfleet.md` -- operating the fetch fleet (access, deployment, gotchas)
 6. `rebuild.md` -- the from-zero runbook: phase order + commands
-7. dated records: `audit.md` (why the rebuild happened), `rebuild-decisions.md`
+7. `cluster-run.md` -- the 2026-09 cluster parse campaign: outcome, tier quality
+   numbers, and the durable operational lessons
+8. dated records: `audit.md` (why the rebuild happened), `rebuild-decisions.md`
    (2026-09-09 serving decisions)
 
 Working state that changes hourly (fleet logs, manifests, upload checkpoints,

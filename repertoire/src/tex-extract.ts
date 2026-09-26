@@ -424,10 +424,16 @@ function dropCommandWithArgs(
   while ((m = re.exec(src))) {
     let i = m.index + m[0].length;
     if (isDef) {
-      const nl = src.indexOf("\n", i);
+      // the body is the first {...} after the parameter text; it may sit on a
+      // later line (\def\x#1\n{..}), so prefer the brace and only fall back to
+      // the newline when the brace is absent or implausibly far
       const br = src.indexOf("{", i);
-      if (br >= 0 && (nl < 0 || br < nl)) i = consumeGroup(src, br, "{", "}");
-      else i = nl < 0 ? src.length : nl + 1;
+      if (br >= 0 && br - i < 2000) {
+        i = consumeGroup(src, br, "{", "}");
+      } else {
+        const nl = src.indexOf("\n", i);
+        i = nl < 0 ? src.length : nl + 1;
+      }
     } else {
       for (;;) {
         let j = i;
@@ -474,24 +480,44 @@ function dropDelimitedDefs(src: string): string {
   return t;
 }
 function definitionBlind(src: string): string {
+  // \def-family only: the isDef pass skips the parameter text (\foo#1) and
+  // consumes the balanced body, prefixes included.
   let t = dropCommandWithArgs(
     src,
-    /\\(?:gdef|edef|xdef|def|newcommand|renewcommand|providecommand|newenvironment|algdef)\b/g,
+    /\\(?:(?:long|global|outer|protected)\s*\\)*(?:gdef|edef|xdef|def)\b/g,
     true,
   );
+  // \newcommand-family and environments: consume EVERY trailing argument
+  // group. The old code ran newenvironment through the isDef pass, which ate
+  // only the {name} group and left both bodies (the "#1" class: 58% of the
+  // 2026-09-18 tex failures).
   t = dropCommandWithArgs(
     t,
-    /\\(?:newcommand|renewcommand|providecommand|newenvironment|algdef)\b/g,
+    /\\(?:newcommand|renewcommand|providecommand|DeclareRobustCommand|newenvironment|renewenvironment|provideenvironment|newtheorem|DeclareMathOperator|algdef)\b/g,
     false,
   );
   return t.replace(/\\let\b[^\n]*\n?/g, "");
 }
-export const LADDER_LEVELS = ["r0", "r1", "r2", "r3"] as const;
-export function preprocess(source: string, level: 0 | 1 | 2 | 3): string {
+// r4, last resort: unresolved \input/\include targets (their content is not in
+// the tarball, so the command has to go), leftover parameter tokens, and any
+// def-family remnant the blind pass could not see.
+function salvage(src: string): string {
+  let t = src
+    .replace(
+      /\\(?:input|include|includeonly|subfile|import|subimport|inputfrom)\s*(?:\{[^{}]*\}\s*){1,2}/g,
+      "",
+    )
+    .replace(/\\(?:input|subfile|include)\b/g, "");
+  t = definitionBlind(t);
+  return t.replace(/#\s*[0-9]/g, "");
+}
+export const LADDER_LEVELS = ["r0", "r1", "r2", "r3", "r4"] as const;
+export function preprocess(source: string, level: 0 | 1 | 2 | 3 | 4): string {
   if (level <= 0) return source;
   let t = stripComments(source);
   if (level >= 2) t = dropDelimitedDefs(t);
   if (level >= 3) t = definitionBlind(t);
+  if (level >= 4) t = salvage(t);
   return t;
 }
 // lowest ladder level that pandoc -f latex accepts, via probe conversion
@@ -501,8 +527,8 @@ export function ladderProbe(
 ): { level: number; name: string; errHead?: string } {
   const inFile = `${dir}/probe-in.tex`;
   let errHead: string | undefined;
-  for (let level = 0; level <= 3; level++) {
-    fs.writeFileSync(inFile, preprocess(text, level as 0 | 1 | 2 | 3));
+  for (let level = 0; level < LADDER_LEVELS.length; level++) {
+    fs.writeFileSync(inFile, preprocess(text, level as 0 | 1 | 2 | 3 | 4));
     const r = spawnSync(
       PANDOC,
       [

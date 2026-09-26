@@ -5,8 +5,9 @@
 # beyond the slices and the md outputs themselves.
 set -u
 R="$HOME/parse-run"; W="$R/work"
-export PATH="$HOME/.bun/bin:$R/bin:$PATH"
+export PATH="$HOME/homebrew/bin:$HOME/.bun/bin:$R/bin:$PATH"
 export PANDOC="$R/bin/pandoc"
+command -v latexmlc >/dev/null 2>&1 && export LATEXMLC="$(command -v latexmlc)"
 set -a; . "$R/.env" 2>/dev/null; set +a
 mkdir -p "$R/out/md" "$R/out/report" "$R/slices"
 cd "$W" || exit 1
@@ -36,17 +37,22 @@ def write(name, items, chunk):
     return n
 tex = ids_for("tex")
 arpdf = ids_for("pdf", "arxiv")
-print("tex slices:", write("tex", tex, 5000))
+ocr = ids_for("ocr")
+# ocr shards across N single-GPU tasks (one A10 needs ~17 GPU-h for the lot)
+n_ocr = int(os.environ.get("OCR_SHARDS", "8")) or 8
+print("tex slices:", write("tex", tex, 2200))
 print("arxiv-pdf slices:", write("arpdf", arpdf, 310))
+print("ocr slices:", write("ocr", ocr, max(1, -(-len(ocr) // n_ocr))))
 PYEOF
 
-NT=$(cat "$R/slices/tex.count"); NP=$(cat "$R/slices/arpdf.count")
+NT=$(cat "$R/slices/tex.count"); NP=$(cat "$R/slices/arpdf.count"); NO=$(cat "$R/slices/ocr.count")
 # concurrent-task caps: REST needs 3/2 (~16 conn ceiling); S3 can go wide
-TC_TEX=${TC_TEX:-3}; TC_ARPDF=${TC_ARPDF:-2}
+TC_TEX=${TC_TEX:-3}; TC_ARPDF=${TC_ARPDF:-2}; TC_OCR=${TC_OCR:-8}
 
 # ---- submit everything ----
 qsub -q long -N p-small -o "$R/logs/small.out" -e "$R/logs/small.err" "$W/src/cluster-parse/job-small.sh"
-qsub -q gpu -l gpu_card=1 -N p-ocr -o "$R/logs/ocr.out" -e "$R/logs/ocr.err" "$W/src/cluster-parse/job-ocr.sh"
+qsub -t 1-$NO -tc $TC_OCR -q gpu -l gpu_card=1 -N p-ocr -o "$R/logs/ocr-\$TASK_ID.out" -e "$R/logs/ocr-\$TASK_ID.err" \
+  "$W/src/cluster-parse/job-ocr.sh"
 qsub -t 1-$NT -tc $TC_TEX -q long -N p-tex -o "$R/logs/tex-\$TASK_ID.out" -e "$R/logs/tex-\$TASK_ID.err" \
   "$W/src/cluster-parse/job-tex.sh"
 qsub -t 1-$NP -tc $TC_ARPDF -q long -N p-arpdf -o "$R/logs/arpdf-\$TASK_ID.out" -e "$R/logs/arpdf-\$TASK_ID.err" \
