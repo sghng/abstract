@@ -3,10 +3,12 @@
  *
  * One systemOne call per block: state is { text, section, role } for
  * document blocks, or just { text } for a bare prose passage (the prose
- * route passes no invented section; applicability rides on the lesson
- * wording). Questions are one noul per rule, keyed by rules.yaml entry id.
- * A rule's instruction is its entry's lesson (or judgement) verbatim; the
- * shared criteria pin the semantics for every rule: true is a violation,
+ * route passes no invented section; applicability rides on the rule
+ * text). Questions are one noul per rule, keyed by rules.yaml entry id.
+ * A rule's instruction is its whole entry: the lesson leads, the
+ * exemplar pair and framing context show the turn, the entry's section
+ * scopes it, the expert's comment carries the original words; the shared
+ * criteria pin the semantics for every rule: true is a violation,
  * false is fine or not applicable. A small pool keeps concurrent calls in
  * flight.
  */
@@ -21,7 +23,16 @@ export interface Rule {
   text: string;
 }
 
-type Entry = { lesson?: string; judgement?: string };
+type Entry = {
+  project?: string;
+  section?: string;
+  prefix?: string | null;
+  before?: string | null;
+  after?: string | null;
+  suffix?: string | null;
+  judgement?: string;
+  lesson?: string;
+};
 
 /** Shared criteria: the same outcome semantics for every rule. */
 const CRITERIA = {
@@ -29,17 +40,50 @@ const CRITERIA = {
   false: "The paragraph is fine, or the rule does not apply to it.",
 } as const;
 
+/**
+ * A rule is its whole entry, not just its lesson: the imperative lesson
+ * leads, the exemplar pair and its framing context show the turn, the
+ * entry's section scopes it, the expert's comment carries the original
+ * words. The project name stays out; it is logistics, not the rule.
+ * lessonOnly is the A/B arm for the context experiment.
+ */
+function instruction(entry: Entry, lessonOnly: boolean): string {
+  const lesson = (entry.lesson ?? entry.judgement ?? "").trim();
+  if (!lesson) return "";
+  if (lessonOnly) return lesson;
+  const parts = [lesson];
+  if (entry.section?.trim())
+    parts.push(`Learned from the ${entry.section.trim()} section.`);
+  const pair = [
+    entry.prefix?.trim() ? `Context before: ${entry.prefix.trim()}` : null,
+    entry.before?.trim() ? `Before: ${entry.before.trim()}` : null,
+    entry.after?.trim() ? `After: ${entry.after.trim()}` : null,
+    entry.suffix?.trim() ? `Context after: ${entry.suffix.trim()}` : null,
+  ].filter((s): s is string => s !== null);
+  if (pair.length)
+    parts.push(
+      `The calibrated edit this rule was distilled from:\n${pair.join("\n")}`,
+    );
+  const judgement = entry.judgement?.trim();
+  if (judgement && judgement !== lesson)
+    parts.push(`The expert's comment: ${judgement}`);
+  return parts.join("\n\n");
+}
+
 /** Concurrent systemOne calls in flight. */
 const CONCURRENCY = 4;
 
-export function loadRules(editsPath: string): Rule[] {
+export function loadRules(
+  editsPath: string,
+  opts: { lessonOnly?: boolean } = {},
+): Rule[] {
   const doc = parseYaml(readFileSync(editsPath, "utf8")) as Record<
     string,
     Entry
   >;
   return Object.entries(doc)
     .map(([key, entry]) => {
-      const text = (entry.lesson ?? entry.judgement ?? "").trim();
+      const text = instruction(entry, opts.lessonOnly ?? false);
       if (!text)
         throw new Error(
           `rules.yaml entry ${key} has neither lesson nor judgement`,
