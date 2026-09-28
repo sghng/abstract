@@ -3,7 +3,7 @@ description:
   Sweep a manuscript for stale numbers; every numeric claim checked against the
   current source values.
 mode: subagent
-model: minimax-cn-coding-plan/MiniMax-M3
+model: kimi-code-plan-global/kimi-for-coding
 permissions:
   - action: cue
     resource: "*"

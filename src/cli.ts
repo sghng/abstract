@@ -420,10 +420,8 @@ async function doctor(): Promise<void> {
       "subagents/nlpatch",
       "subagents/stale-number-sweep",
       "subagents/style-check",
-      "subagents/reviewer-zai",
       "subagents/reviewer-deepseek",
       "subagents/reviewer-kimi",
-      "subagents/reviewer-minimax",
     ];
     const missing = want.filter((r) => !ids.has(r));
     assert(!missing.length, `missing: ${missing.join(", ")}`);

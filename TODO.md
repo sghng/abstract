@@ -128,6 +128,24 @@ Until the harness exists, the `bin/` launchers + file-mediated consult relay
 
 ## Canonical Decisions Log
 
+- **Kimi-first model assignment; reviewer panel cut to two (2026-09-28)**: the
+  lab consolidates on the Kimi coding plan. The trigger: the provider id had
+  changed to `kimi-code-plan-global` in a credential re-sync, so every
+  `kimi-for-coding/k3` pin in the agent files silently stopped resolving
+  (sessions fell back; the session DB showed glm-5.3 and a manual k3-256k
+  override carrying roles the files claimed were on k3). Assignment by shape:
+  `k3` (1M context, 2x plan quota) only where the window earns it, the
+  orchestrator's long-lived sessions and the statistician's derivations;
+  `k3-256k` (same weights, 1x quota) for librarian, writer, literature-review,
+  style-check, and reviewer-kimi; `kimi-for-coding` (K2.8, close to K3 with
+  efficient thinking, cheap) for engineer, scout, nlpatch, citation-check,
+  stale-number-sweep, and the default model that bespoke task spawns inherit.
+  The editor runs deepseek-v4-pro, the coldest read in the loop, sharing lineage
+  with reviewer-deepseek. The reviewer panel drops from four lineages to two
+  (kimi, deepseek-v4-pro); reviewer-zai and reviewer-minimax retired with it,
+  the editor doctrine now spawns both named reviewers. Older Kimi tiers (K2.5,
+  K2.6) were evaluated and skipped: per-token via openrouter loses to K2.8
+  inside the plan for every subagent shape we run.
 - **Reference stock for Word exports (2026-09-20)**: deliverables converted to
   docx now share one house template, and it lives in the codebase, not the
   global abstract state: `~/.local/share/abstract` is the CLI's runtime
@@ -1001,89 +1019,85 @@ reports a non-empty agent body as a violation.
   isolation, criteria paraphrase) is inert. Both flags and the branch were then
   dropped; the stock noul with its bundled false pole is the whole mechanism.
 - 2026-09-24: APA appendices in typ2docx, filter side. The Typst source keeps
-  carrying content only: the reader drops set/show rules anyway (verified in
-  the caption round), so a Typst-side heading style could never reach Word,
-  and hard-typing "Appendix A" would content-ize a write-time numbering
-  artifact. The filter walks the zone after citeproc's empty refs div in
-  order, collecting level-1 headers wherever they open (appendix headings
-  sit at the top level or open a highlight region), and gives each the same
-  page-break run the references header gets, a label line ("Appendix",
-  lettered only when the paper has more than one, per APA 2.14), and a line
-  break before the title. No stock change: the heading stays H1, already
-  centered bold at body size. Labels inside highlighted appendices take the
-  pen with their headings; unmarked ones stay clean.
-- 2026-09-24: typ2docx table proportions, pandoc-side pair. The Typst
-  reader was averaging fractions over auto columns ((auto, 1fr, auto, 1fr)
-  became four explicit 25% columns) and the docx writer would have given
-  the defaults zero-width gridCols anyway, so the pair landed on lab-stack
-  (29d3e8df6 reader, ac097c17a writer): auto stays ColWidthDefault, and a
-  table mixing widths with defaults gets pct 100% plus autofit layout, so
-  Word sizes unspecified columns from content. Layout belongs to the layout
-  engine; the AST carries intent. The frozen-binary convention bit again:
-  a highlight-block PR build had been copied over ~/.local/bin/pandoc, so
-  the rebuild-refresh-verify loop is now explicit after every lab-stack
-  change.
-- 2026-09-24: trailing tables keep the pen. The filter's trailing-table hoist
-  (a workaround from before lab-stack c2daea002 kept first-paragraph state
-  across mark divs) pulled a region's final table out of its mark div, so the
-  writer never penned the cells. The writer already pens tables inside mark
-  divs, tables included; the hoist is deleted and the map branch's captioned()
-  covers what the special case did. Verified: cells pen, the paragraph after a
-  marked table still takes FirstParagraph exactly as after a plain one.
+  carrying content only: the reader drops set/show rules anyway (verified in the
+  caption round), so a Typst-side heading style could never reach Word, and
+  hard-typing "Appendix A" would content-ize a write-time numbering artifact.
+  The filter walks the zone after citeproc's empty refs div in order, collecting
+  level-1 headers wherever they open (appendix headings sit at the top level or
+  open a highlight region), and gives each the same page-break run the
+  references header gets, a label line ("Appendix", lettered only when the paper
+  has more than one, per APA 2.14), and a line break before the title. No stock
+  change: the heading stays H1, already centered bold at body size. Labels
+  inside highlighted appendices take the pen with their headings; unmarked ones
+  stay clean.
+- 2026-09-24: typ2docx table proportions, pandoc-side pair. The Typst reader was
+  averaging fractions over auto columns ((auto, 1fr, auto, 1fr) became four
+  explicit 25% columns) and the docx writer would have given the defaults
+  zero-width gridCols anyway, so the pair landed on lab-stack (29d3e8df6 reader,
+  ac097c17a writer): auto stays ColWidthDefault, and a table mixing widths with
+  defaults gets pct 100% plus autofit layout, so Word sizes unspecified columns
+  from content. Layout belongs to the layout engine; the AST carries intent. The
+  frozen-binary convention bit again: a highlight-block PR build had been copied
+  over ~/.local/bin/pandoc, so the rebuild-refresh-verify loop is now explicit
+  after every lab-stack change.
+- 2026-09-24: trailing tables keep the pen. The filter's trailing-table hoist (a
+  workaround from before lab-stack c2daea002 kept first-paragraph state across
+  mark divs) pulled a region's final table out of its mark div, so the writer
+  never penned the cells. The writer already pens tables inside mark divs,
+  tables included; the hoist is deleted and the map branch's captioned() covers
+  what the special case did. Verified: cells pen, the paragraph after a marked
+  table still takes FirstParagraph exactly as after a plain one.
 - 2026-09-24: air before tables, Word-side. Word applies none of a paragraph's
   line-spacing lead when a table follows, so the caption-cluster zeroing glued
   every caption title to its table rule at 0 in Word (LibreOffice honors the
   lead, which is why the render checks never caught it). TableCaption regains
-  after=120 with contextualSpacing: same-style label and title stay tight,
-  the table side gets the air. Highlighting is innocent here; marked and plain
+  after=120 with contextualSpacing: same-style label and title stay tight, the
+  table side gets the air. Highlighting is innocent here; marked and plain
   tables emit identical paragraphs.
-- 2026-09-24: air after tables, writer-side. The table's bottom boundary is
-  the same Word quirk as its top (no line-spacing lead applies), but the fix
-  could not live in the stock: the paragraph after a table shares
-  FirstParagraph with post-heading paragraphs, which must stay at zero. The
-  docx writer now marks the table boundary itself (lab-stack 76bba4aef) and
-  the next paragraph carries direct before=120; setFirstPara clears the mark,
-  so intervening headings, figures, and lists absorb it, and containers stay
-  transparent so it survives mark divs. Both table sides now carry 120 twips
-  of air, matched.
-- 2026-09-24: display-math continuations carry no indent. fixDisplayMath
-  (shared writer preprocessing) chops a paragraph at its display equations so
-  each centers alone, and the docx writer then indented every following piece
-  as a fresh paragraph. The continuation pieces are now marked at the source
-  of that knowledge (fixDisplayMath wraps them in a math-continuation div,
-  lab-stack b62ac57a7) and the docx writer suppresses the first-line indent
-  with a direct zero ind, rendering the div transparently like mark divs.
-  Highlighted display math never had the bug: the equation sits inside the
-  mark span, past the chop's top-level view, so it stays embedded in one
-  paragraph. The two paths still differ structurally; deferred until it
-  shows.
+- 2026-09-24: air after tables, writer-side. The table's bottom boundary is the
+  same Word quirk as its top (no line-spacing lead applies), but the fix could
+  not live in the stock: the paragraph after a table shares FirstParagraph with
+  post-heading paragraphs, which must stay at zero. The docx writer now marks
+  the table boundary itself (lab-stack 76bba4aef) and the next paragraph carries
+  direct before=120; setFirstPara clears the mark, so intervening headings,
+  figures, and lists absorb it, and containers stay transparent so it survives
+  mark divs. Both table sides now carry 120 twips of air, matched.
+- 2026-09-24: display-math continuations carry no indent. fixDisplayMath (shared
+  writer preprocessing) chops a paragraph at its display equations so each
+  centers alone, and the docx writer then indented every following piece as a
+  fresh paragraph. The continuation pieces are now marked at the source of that
+  knowledge (fixDisplayMath wraps them in a math-continuation div, lab-stack
+  b62ac57a7) and the docx writer suppresses the first-line indent with a direct
+  zero ind, rendering the div transparently like mark divs. Highlighted display
+  math never had the bug: the equation sits inside the mark span, past the
+  chop's top-level view, so it stays embedded in one paragraph. The two paths
+  still differ structurally; deferred until it shows.
 - 2026-09-24: table-boundary spacing corrected to Word's lead model, from the
-  owner's in-Word measurements: the lead of a double-spaced line attaches
-  below its text, so a caption before a table already shows a full lead (the
-  +120 made it slightly more than double) and the paragraph after a table
-  shows none above (the +120 was too small). The caption cluster returns to
-  zero spacing, gap exactly one lead; the writer's after-table air rises to
-  240 twips, half the line pitch (lab-stack 940c45651). Both boundaries now
-  read as one double-spaced lead.
-- 2026-09-24: heading after a table. A heading needs the same air as a
-  paragraph after one (Word gives a heading nothing above it either), so the
-  Header case reads the boundary mark too (lab-stack).
-- 2026-09-24: single-spaced figure lines. An image rides a text line, and
-  the default double spacing multiplied the image height into a doubled line
-  box, a giant gap below the figure; the Figure style pins single spacing,
-  like Compact.
+  owner's in-Word measurements: the lead of a double-spaced line attaches below
+  its text, so a caption before a table already shows a full lead (the +120 made
+  it slightly more than double) and the paragraph after a table shows none above
+  (the +120 was too small). The caption cluster returns to zero spacing, gap
+  exactly one lead; the writer's after-table air rises to 240 twips, half the
+  line pitch (lab-stack 940c45651). Both boundaries now read as one
+  double-spaced lead.
+- 2026-09-24: heading after a table. A heading needs the same air as a paragraph
+  after one (Word gives a heading nothing above it either), so the Header case
+  reads the boundary mark too (lab-stack).
+- 2026-09-24: single-spaced figure lines. An image rides a text line, and the
+  default double spacing multiplied the image height into a doubled line box, a
+  giant gap below the figure; the Figure style pins single spacing, like
+  Compact.
 - 2026-09-24: no-indent float notes. A float note (italic "Note." opening a
-  paragraph after a table or image, at any nesting depth) is an annotation,
-  not a paragraph start: the filter detects it and wraps it in a no-indent
-  div, the writer's continuation suppression under a plainer name.
+  paragraph after a table or image, at any nesting depth) is an annotation, not
+  a paragraph start: the filter detects it and wraps it in a no-indent div, the
+  writer's continuation suppression under a plainer name.
 
 ## 2026-09-26: repertoire manual condensed (owner decision)
 
-- The manual reduced from ten files to five (index, fetch, parse,
-  parse-report, history): dated records (audit, rebuild-decisions,
-  cluster-run, rebuild, hostfleet, storage) folded their surviving
-  doctrine into the spec and their narrative into history.md. Standard
-  (owner): keep crucial observations concisely (HTML canonical over tex
-  tarballs, docling's placeholder math, olmOCR verdict); drop logistics
-  (cluster how-tos, audit detail). The tex ladder is recorded as
-  superseded.
+- The manual reduced from ten files to five (index, fetch, parse, parse-report,
+  history): dated records (audit, rebuild-decisions, cluster-run, rebuild,
+  hostfleet, storage) folded their surviving doctrine into the spec and their
+  narrative into history.md. Standard (owner): keep crucial observations
+  concisely (HTML canonical over tex tarballs, docling's placeholder math,
+  olmOCR verdict); drop logistics (cluster how-tos, audit detail). The tex
+  ladder is recorded as superseded.

@@ -1,7 +1,9 @@
 ---
-description: Read-only recon over project files. Answers where-and-what questions with file and line citations.
+description:
+  Read-only recon over project files. Answers where-and-what questions with file
+  and line citations.
 mode: subagent
-model: zai-coding-plan/glm-5.3
+model: kimi-code-plan-global/kimi-for-coding
 permissions:
   - action: cue
     resource: "*"

@@ -3,7 +3,7 @@ description:
   Verify one citation against its source; venue, year, sample, and whether the
   source supports the claim made of it.
 mode: subagent
-model: minimax-cn-coding-plan/MiniMax-M3
+model: kimi-code-plan-global/kimi-for-coding
 permissions:
   - action: cue
     resource: "*"

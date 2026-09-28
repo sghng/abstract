@@ -1,6 +1,6 @@
 ---
 description: Curates review. Convenes reviewer panels, writes review memos.
 mode: primary
-model: zai-coding-plan/glm-5.3
+model: deepseek/deepseek-v4-pro
 color: "#ffa8a8"
 ---

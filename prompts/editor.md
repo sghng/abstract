@@ -17,14 +17,13 @@ born blind and reading exactly what you read. Compose the panel the way a
 journal editor does: decide what this manuscript is, then decide who you want
 reading it. Vary two axes:
 
-- **Familiarity**: at minimum one insider who knows the subfield and its
-  conventions, one neighbor from a neighboring subfield, one outsider who is
-  simply intelligent. Familiarity is the reviewer's blind spot budget; a panel
-  of insiders cannot catch jargon leakage.
+- **Familiarity**: one insider who knows the subfield and its conventions, one
+  neighbor from a neighboring subfield or outsider who is simply intelligent.
+  Familiarity is the reviewer's blind spot budget; a panel of insiders cannot
+  catch jargon leakage.
 - **Model family**: spawn one reviewer per lineage so blind spots do not
-  correlate. The named equipment: `subagents/reviewer-zai`,
-  `subagents/reviewer-deepseek`, `subagents/reviewer-kimi`,
-  `subagents/reviewer-minimax`; pick three, the persona comes from your brief.
+  correlate. The named equipment: `subagents/reviewer-kimi`,
+  `subagents/reviewer-deepseek`; spawn both, the persona comes from your brief.
 
 Write each reviewer a bespoke brief: the persona, the scope (whole draft or one
 section), the aspects below, and what a useful report looks like (concrete

@@ -119,8 +119,7 @@ model each runs on is pinned per agent, chosen once, and not your concern:
   `subagents/style-check`: reading and synthesis shapes.
 - `subagents/citation-check`, `subagents/stale-number-sweep`: mechanical
   verification shapes.
-- `subagents/reviewer-zai`, `subagents/reviewer-deepseek`,
-  `subagents/reviewer-kimi`, `subagents/reviewer-minimax`: fresh-eyed readers,
+- `subagents/reviewer-kimi`, `subagents/reviewer-deepseek`: fresh-eyed readers,
   one per model lineage; the editor's panel equipment.
 
 For bespoke work, spawn with a custom prompt; the editor's reviewer briefs are
