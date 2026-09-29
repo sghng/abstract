@@ -128,6 +128,16 @@ Until the harness exists, the `bin/` launchers + file-mediated consult relay
 
 ## Canonical Decisions Log
 
+- **`--session` auto-create (v2.0.20) evaluated for bootstrap, rejected
+  (2026-09-29)**: upstream #51405 lets `--session <id>` create a missing
+  session, aimed at hosts that need a stable session ID before the first prompt.
+  It does not fit `src/cli.ts` `ensureSessions`: the TUI only assigns the launch
+  ID to the first home-screen create (one of six role sessions), auto-created
+  sessions carry no `metadata.role` (the cue tool in `config/plugin/harness.ts`
+  routes by it, and `roleSessions` discovery keys on it, so a metadata-less
+  session is both unreachable by cue and duplicated on next launch), and the
+  agent defaults instead of binding the role persona. Bootstrap keeps
+  list-then-create via the SDK.
 - **Kimi-first model assignment; reviewer panel cut to two (2026-09-28)**: the
   lab consolidates on the Kimi coding plan. The trigger: the provider id had
   changed to `kimi-code-plan-global` in a credential re-sync, so every
@@ -1114,18 +1124,18 @@ reports a non-empty agent body as a violation.
 - Kernel rewritten: invariants preamble, ownership prose, and the four-beat
   protocol cut; the team table restored to a clean state; the cue paragraph now
   carries only pointer-or-question plus route-through-orchestrator; the
-  Delegation section collapses to one Never Forget bullet ("use subagents
-  wisely for tasks that can be delegated"), the mechanics and catalog being
-  carried by the tool schema (the binary appends the live catalog to the tool
-  description per request). The graduation rule moved to the orchestrator
-  prompt (Subagent Catalog section).
+  Delegation section collapses to one Never Forget bullet ("use subagents wisely
+  for tasks that can be delegated"), the mechanics and catalog being carried by
+  the tool schema (the binary appends the live catalog to the tool description
+  per request). The graduation rule moved to the orchestrator prompt (Subagent
+  Catalog section).
 - Logistics skill: templates extracted to the reference shelf
   (reference/{ticket,report,memo}.md at the shelf root, no subdirectory), the
   skill now holds procedures plus pointers; the shelf description trimmed to
   "read if needed"; docs updated to match.
 - Residue swept: context.ts tool notes renamed task --> subagent;
-  prompt-hierarchy and writing docs re-pointed. Watch metric (lab DB):
-  subagent calls per role per day, sessionID resumes (baseline zero).
+  prompt-hierarchy and writing docs re-pointed. Watch metric (lab DB): subagent
+  calls per role per day, sessionID resumes (baseline zero).
 
 ## 2026-09-28: logistics graduated to the reference shelf (owner decision)
 
@@ -1134,8 +1144,8 @@ reports a non-empty agent body as a violation.
   reference/logistics.md (placement, wiki-links, amendments, versioning) with
   the ticket, report, and memo templates as sibling files at the shelf root.
 - The reference alias renamed lab-reference --> reference and its description
-  trimmed to "Read if needed": the lab is the only reader, so the prefix and
-  the contents listing added nothing.
+  trimmed to "Read if needed": the lab is the only reader, so the prefix and the
+  contents listing added nothing.
 - abstract doctor: the logistics-skill assert became a reference-shelf check
   (logistics.md, ticket.md, report.md, memo.md). Role prompts and docs
   re-pointed (engineer IMPORTANT block, orchestrator amendments, kernel Skills
@@ -1143,100 +1153,96 @@ reports a non-empty agent body as a violation.
 
 ## 2026-09-29: binder self-amendment (owner decision)
 
-- Roles may amend their own binder prompt files. Scope is BINDERS itself,
-  so the kernel (in no binder) is unamendable by construction. Enforcement
-  is the kernel rule plus git history, no tool-mediated writes: the owner
-  weighed a dedicated plugin tool and chose the footer-only route, since an
-  edit to a repo path from a project session already passes through the
-  external-directory permission prompt, which doubles as the approval gate.
-- The rule is stated once in the kernel (amend only on the user's direct
-  order, show the proposed text first; kernel and out-of-binder prompts are
-  never editable). The per-role paths ride in a new binder footer context
-  piece, assembled from BINDERS by binderFooter() in src/binder.ts and
-  pushed by the context hook after the prompts, so the footer can never
-  drift from the binder. Shared prompts name their co-carriers in the
-  footer, so a proposer sees the blast radius (an edit lands in the peer's
-  context on the peer's next turn).
-- abstract context renders the footer per role (src/context.ts), keeping
-  the static view honest with the hook.
+- Roles may amend their own binder prompt files. Scope is BINDERS itself, so the
+  kernel (in no binder) is unamendable by construction. Enforcement is the
+  kernel rule plus git history, no tool-mediated writes: the owner weighed a
+  dedicated plugin tool and chose the footer-only route, since an edit to a repo
+  path from a project session already passes through the external-directory
+  permission prompt, which doubles as the approval gate.
+- The rule is stated once in the kernel (amend only on the user's direct order,
+  show the proposed text first; kernel and out-of-binder prompts are never
+  editable). The per-role paths ride in a new binder footer context piece,
+  assembled from BINDERS by binderFooter() in src/binder.ts and pushed by the
+  context hook after the prompts, so the footer can never drift from the binder.
+  Shared prompts name their co-carriers in the footer, so a proposer sees the
+  blast radius (an edit lands in the peer's context on the peer's next turn).
+- abstract context renders the footer per role (src/context.ts), keeping the
+  static view honest with the hook.
 
 ## 2026-09-29: context assembly channels surveyed (owner decision)
 
-- Prompted by the owner interrogating a live agent (binder pieces arrived
-  with no provenance; the agent could not tell which file a piece came
-  from), the three context channels of pinned 2.0.18 were mapped against
-  the v2.0.18 tag (the local ../opencode checkout is BEHIND the tag, Sep 20
-  vs Sep 25; verdicts were made against the tag):
-  - config/AGENTS.md: native discovery. Watched, hot-reloaded with
-    mid-epoch diff injection ("The instructions from X changed. Here's the
-    diff:"), "Instructions from:" provenance, survives compaction via the
-    epoch baseline. Directory-scoped, so shared across all six roles: the
-    right home for the kernel, unusable for per-role content.
-  - agent files (config/agents/*.md): system[0], and a custom system
-    REPLACES the base prompt (also opting out of the built-in optimize
-    hooks). Owner's live test: edits are NOT picked up, not even via
-    /reload, despite a watcher existing in the config/agent plugin source.
-    The pinned binary wins: treat the registry as static without restart.
-  - session.context hook (event.system.push): per-agent, per-request, the
-    only per-role channel. User plugins get no handle on
-    InstructionDiscovery/SessionInstructions, and discovery is
-    Location-scoped anyway, so per-role native instructions are
-    impossible.
+- Prompted by the owner interrogating a live agent (binder pieces arrived with
+  no provenance; the agent could not tell which file a piece came from), the
+  three context channels of pinned 2.0.18 were mapped against the v2.0.18 tag
+  (the local ../opencode checkout is BEHIND the tag, Sep 20 vs Sep 25; verdicts
+  were made against the tag):
+  - config/AGENTS.md: native discovery. Watched, hot-reloaded with mid-epoch
+    diff injection ("The instructions from X changed. Here's the diff:"),
+    "Instructions from:" provenance, survives compaction via the epoch baseline.
+    Directory-scoped, so shared across all six roles: the right home for the
+    kernel, unusable for per-role content.
+  - agent files (config/agents/*.md): system[0], and a custom system REPLACES
+    the base prompt (also opting out of the built-in optimize hooks). Owner's
+    live test: edits are NOT picked up, not even via /reload, despite a watcher
+    existing in the config/agent plugin source. The pinned binary wins: treat
+    the registry as static without restart.
+  - session.context hook (event.system.push): per-agent, per-request, the only
+    per-role channel. User plugins get no handle on
+    InstructionDiscovery/SessionInstructions, and discovery is Location-scoped
+    anyway, so per-role native instructions are impossible.
 - Verdict: keep the current split (kernel native, registry in agent files,
-  binder via the hook). The compile-and-let-OpenCode-reload ideas are
-  rejected: compiling into AGENTS.md forks the kernel's single home and is
-  shared-scope only; compiling into agent files needs a restart, rides the
-  cached prefix head, and duplicates shared prompts (the original binder
-  rationale).
+  binder via the hook). The compile-and-let-OpenCode-reload ideas are rejected:
+  compiling into AGENTS.md forks the kernel's single home and is shared-scope
+  only; compiling into agent files needs a restart, rides the cached prefix
+  head, and duplicates shared prompts (the original binder rationale).
 - Adopted from the native pipeline instead: hook pieces now carry the same
-  "Instructions from: <path>" header, so every context piece is
-  attributable to its file. The binder footer slims to stems + co-carriers
-  + rule pointer (paths live in the headers now), and the kernel bullet
-  points at the headers. A live agent sees: kernel (native header) -->
-  skills/MCP baseline --> binder prompts (headers) --> footer.
+  "Instructions from: <path>" header, so every context piece is attributable to
+  its file. The binder footer slims to stems + co-carriers
+  - rule pointer (paths live in the headers now), and the kernel bullet points
+    at the headers. A live agent sees: kernel (native header) --> skills/MCP
+    baseline --> binder prompts (headers) --> footer.
 - Deferred: binder edits land silently on the next request (no native diff
-  injection for hook pieces). A hash-and-announce mechanism is possible in
-  the hook but is machinery without a observed failure; add it when a
-  missed amendment actually hurts. Peers sharing a prompt learn via cue,
-  which the co-carrier annotation in the footer prompts.
+  injection for hook pieces). A hash-and-announce mechanism is possible in the
+  hook but is machinery without a observed failure; add it when a missed
+  amendment actually hurts. Peers sharing a prompt learn via cue, which the
+  co-carrier annotation in the footer prompts.
 - Upgrade watch: #51960 (first in 2.0.19) reorders the system baseline to
-  codemode, mcp, references, skills, discovery, builtins for prompt-cache
-  reuse and drops the session ID from the env block; recheck the perceived
-  piece order (and abstract context's static view) on the next bump.
+  codemode, mcp, references, skills, discovery, builtins for prompt-cache reuse
+  and drops the session ID from the env block; recheck the perceived piece order
+  (and abstract context's static view) on the next bump.
 
 ## 2026-09-29: orchestrator curates the doctrine (owner decision)
 
-- The self-amendment scope is relaxed for one role: the orchestrator may
-  amend any prompt file in prompts/ plus the kernel itself, under the same
-  rule (user's direct order, proposed text first). Other roles remain
-  scoped to their own binders. Rationale: doctrine maintenance is
-  orchestration work (graduations, gradings, post-surgery sweeps), and
-  routing every prompt edit through the owner does not scale.
-- Implementation is footer plus kernel bullet, no new gates (enforcement
-  was always the rule plus the external-directory permission prompt plus
-  git history): binderFooter() special-cases the orchestrator, listing
-  every prompt file with its carriers (whose context changes on an edit)
-  and the kernel's path; the kernel's self-amendment bullet gains the
-  curator exception. The earlier "unamendable by construction" framing in
-  today's entries now reads: unamendable by non-orchestrator roles.
+- The self-amendment scope is relaxed for one role: the orchestrator may amend
+  any prompt file in prompts/ plus the kernel itself, under the same rule
+  (user's direct order, proposed text first). Other roles remain scoped to their
+  own binders. Rationale: doctrine maintenance is orchestration work
+  (graduations, gradings, post-surgery sweeps), and routing every prompt edit
+  through the owner does not scale.
+- Implementation is footer plus kernel bullet, no new gates (enforcement was
+  always the rule plus the external-directory permission prompt plus git
+  history): binderFooter() special-cases the orchestrator, listing every prompt
+  file with its carriers (whose context changes on an edit) and the kernel's
+  path; the kernel's self-amendment bullet gains the curator exception. The
+  earlier "unamendable by construction" framing in today's entries now reads:
+  unamendable by non-orchestrator roles.
 
 ## 2026-09-29: agents curate their own binders (owner decision)
 
-- The binder mapping moves from code to data: prompts/binder.yaml is the
-  single source (role --> ordered stems), re-read from disk on every model
-  request, so a role can create, adopt, or remove a binder piece and see it
-  live next turn, no server restart. The static BINDERS export was evaluated
-  once at plugin load, which made agent binder surgery restart-bound.
-  src/binder.ts keeps the machinery (loadBinders, binderFooter) and ROLES
-  (structural, not agent-curated). Hermes-style skill curation was the
-  inspiration; the lab's version is deliberately lighter: no tool, just the
-  footer naming the mapping plus the plain edit tool.
-- loadBinders is strict (every role present, known roles only, string
-  stems), because agents hand-edit the file, and serves a last-good cache on
-  failure (owner refinement): a malformed mapping never strips doctrine
-  mid-session; instead every role gets a loud error piece in context,
-  self-clearing on fix. abstract context warns and abstract doctor fails on
-  the same error.
+- The binder mapping moves from code to data: prompts/binder.yaml is the single
+  source (role --> ordered stems), re-read from disk on every model request, so
+  a role can create, adopt, or remove a binder piece and see it live next turn,
+  no server restart. The static BINDERS export was evaluated once at plugin
+  load, which made agent binder surgery restart-bound. src/binder.ts keeps the
+  machinery (loadBinders, binderFooter) and ROLES (structural, not
+  agent-curated). Hermes-style skill curation was the inspiration; the lab's
+  version is deliberately lighter: no tool, just the footer naming the mapping
+  plus the plain edit tool.
+- loadBinders is strict (every role present, known roles only, string stems),
+  because agents hand-edit the file, and serves a last-good cache on failure
+  (owner refinement): a malformed mapping never strips doctrine mid-session;
+  instead every role gets a loud error piece in context, self-clearing on fix.
+  abstract context warns and abstract doctor fails on the same error.
 - Scope rules (kernel bullet): amend covers edit, create, adopt (an existing
   stem into your own entry, owner-approved), and remove; file deletion is
   sole-carrier only, shared files are curator work; another role's entry,
@@ -1251,24 +1257,24 @@ reports a non-empty agent body as a violation.
   config/opencode.json) is removed. Survey of the pinned binary showed it is
   guidance text only (a core/reference-guidance baseline piece listing
   name/path/description): it grants no file access, and its change narration
-  covers only the alias list, never the contents. The kernel's Skills
-  paragraph now carries the reference directory's absolute path instead.
-  One less mechanism; every "what exists and who may touch it" fact now
-  lives in the kernel or the footer.
+  covers only the alias list, never the contents. The kernel's Skills paragraph
+  now carries the reference directory's absolute path instead. One less
+  mechanism; every "what exists and who may touch it" fact now lives in the
+  kernel or the footer.
 - The reference shelf joins the self-amendment world: any role may amend
   reference files under the same rule (direct order, proposal first),
   orchestrator curates.
 - Enforcement model flipped from per-edit prompts to pre-authorized scope
-  (owner: the harness is experimental; friction is not worth it). The
-  harness plugin registers an agent-permission transform at setup pushing
+  (owner: the harness is experimental; friction is not worth it). The harness
+  plugin registers an agent-permission transform at setup pushing
   external_directory allow rules for prompts/* and reference/* onto the six
-  roles (evaluate() is findLast, so these beat the default ask). Subagents
-  keep the default ask. The whole gate is now the kernel rule plus git
-  history; prompt-hierarchy's self-amendment section says so explicitly.
+  roles (evaluate() is findLast, so these beat the default ask). Subagents keep
+  the default ask. The whole gate is now the kernel rule plus git history;
+  prompt-hierarchy's self-amendment section says so explicitly.
 - abstract doctor gains a "doctrine scope pre-approved" check asserting the
-  allow rules landed in the registry; abstract context prints the
-  pre-approved scope in its common section.
-- Transient at the next restart: mid-epoch sessions get the native
-  "Project reference guidance is no longer available" narration while the
-  watcher simultaneously broadcasts the kernel diff that carries the path;
+  allow rules landed in the registry; abstract context prints the pre-approved
+  scope in its common section.
+- Transient at the next restart: mid-epoch sessions get the native "Project
+  reference guidance is no longer available" narration while the watcher
+  simultaneously broadcasts the kernel diff that carries the path;
   self-correcting at the next compaction.
