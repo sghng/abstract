@@ -6,14 +6,24 @@ every role's actual assembly; keep it honest.
 
 ## The Layers
 
-The system prompt is reassembled on every model request (kernel auto-load,
-binder assembly, skills index), so it survives compaction by construction; what
-compaction takes is message history. Order per request: OpenCode base prompt,
-then the layers below, then tool schemas.
+The system prompt is reassembled on every model request, so it survives
+compaction by construction; what compaction takes is message history. Order per
+request: the OpenCode base prompt, then the native instruction baseline
+(environment and date, the kernel, the skills index, reference and MCP
+guidance), then the hook-assembled binder pieces (layers 2 and 3, each headed
+`Instructions from: <path>`, then the binder footer), then tool schemas. The
+layer numbers below are conceptual tiers, not the on-the-wire order: the skills
+index rides the native baseline, ahead of the binder.
 
-1. **The kernel (`config/AGENTS.md`, auto-loaded).** Invariants plus the
-   delegation doctrine, for every session: the six roles and every subagent
-   alike. Membership test: forgetting it would be silent and costly.
+1. **The kernel (`config/AGENTS.md`, auto-loaded).** The shared rules, for every
+   session: the six roles and every subagent alike. Membership test: forgetting
+   a rule would be silent and costly. It is the only AGENTS.md the lab loads:
+   the server runs with project config disabled
+   (`OPENCODE_DISABLE_PROJECT_CONFIG` in `src/cli.ts`), so no project AGENTS.md
+   or `.opencode/` can leak foreign doctrine, agents, or plugins into lab
+   sessions. OpenCode watches the file natively: an edit broadcasts a diff to
+   every live session at its next step boundary, and the text is re-baselined
+   fresh at each compaction.
 
 2. **Shared prompts (the all-hands meeting).** Doctrine two roles must reason
    about together earns a file listed in both binders: `style-guide` (writer +
@@ -41,11 +51,12 @@ which prompts a role carries, in order (general --> specific); do not duplicate
 the mapping anywhere. Agent files (`config/agents/<role>.md`) hold registry
 config only, and the binder is why: the body is the agent's `system`, which
 rides in the cached request prefix (`session/runner/llm.ts`), so editing a body
-invalidates the prompt cache, and a prompt shared by two roles would have to
-live in two bodies. The binder re-reads `prompts/` per request and shares by
-reference. `abstract context` reports a non-empty body as a violation, and
-`abstract doctor` checks that every binder stem resolves, because a missing
-prompt is skipped silently.
+invalidates the prompt cache, the registry does not reload without a server
+restart in the pinned binary (owner-tested on 2.0.18), and a prompt shared by
+two roles would have to live in two bodies. The binder re-reads `prompts/` per
+request and shares by reference. `abstract context` reports a non-empty body as
+a violation, and `abstract doctor` checks that every binder stem resolves,
+because a missing prompt is skipped silently.
 
 ## The Rules
 
@@ -79,16 +90,47 @@ prompt is skipped silently.
   belongs to the writing roles; a reference manager to the librarian), as does
   MCP scoping. The current corpus deliberately leaves plugin tools and MCP
   servers ungated while the lab runs; scope by observation, not anticipation.
-- **Compaction mechanics.** The system prompt is rebuilt from disk each request
-  and is never compacted away; a skill body read into message history is. A
-  "read skill X" pointer therefore survives compaction, but the knowledge it
-  pointed at does not; hence the re-read-after-compaction lines and the next
-  rule.
-- **Pointer discipline.** Role prompts may point to skills for episodic
-  procedures ("read the logistics skill when creating reports"). Never put
-  always-on doctrine behind a skill pointer: a two-hop dependency fails silently
-  when the hop is skipped.
+- **Compaction mechanics.** Always-on text is never compacted away: the kernel
+  rides a per-epoch instruction baseline that each compaction re-renders fresh
+  (a mid-epoch kernel edit meanwhile arrives as an in-band "The instructions
+  from X changed" system message), and the binder is re-read from disk on each
+  request. A skill body read into message history compacts away. A "read skill
+  X" pointer therefore survives compaction, but the knowledge it pointed at does
+  not; hence the re-read-after-compaction lines and the next rule.
+- **Pointer discipline.** Role prompts may point to the reference directory or
+  skills for episodic procedures ("read logistics.md when creating reports").
+  Never put always-on doctrine behind a pointer: a two-hop dependency fails
+  silently when the hop is skipped.
 - **No dashes as punctuation.** Not in prompts, not in skills, not in the
   kernel: the `--` pattern in context shifts generation toward the same pattern
   in deliverables, and deliverable prose bans dashes outright (with colons and
   semicolons). CLI flags and markdown table separators are syntax and stay.
+
+## Self-amendment
+
+A role may amend its own prompt files. The kernel states the rule once: amend
+only on the user's direct order, and show the proposed text before editing.
+Scope is the role's binder, named concretely by the binder footer, the last
+context piece the hook pushes; `binderFooter()` in `src/binder.ts` assembles it
+from `BINDERS`, so it can never drift from the mapping, and shared prompts name
+their co-carriers there, so a proposer sees whose context an edit will land in.
+The orchestrator is the doctrine's curator: its scope is every prompt file plus
+the kernel itself, under the same rule. Enforcement is deliberately soft: the
+stated rule, the external-directory permission prompt (`prompts/` sits outside
+every project directory, so each edit asks), and git history. No code gates.
+
+Two placement consequences, settled against pinned 2.0.18:
+
+- **The kernel stays a native AGENTS.md** rather than joining the hook assembly.
+  Its loading path contains no lab code, so a plugin failure cannot strip the
+  invariants; the watcher broadcasts every kernel edit to live sessions as a
+  diff; subagents inherit it for free (born blind: kernel plus own prompt). The
+  one channel the lab does not use is per-session instruction entries
+  (`api/<key>` over HTTP, keyed `^[a-z0-9][a-z0-9._-]*$`, frozen into the epoch
+  baseline with native change narration): surveyed and available for per-session
+  dynamic state that has no file home.
+- **The binder stays in the hook** because it is the only per-role channel the
+  binary offers: user plugins cannot touch instruction discovery, and discovery
+  is directory-scoped anyway. Edits land silently on the next request (no native
+  diff announcement for hook pieces); a hash-and-announce mechanism is deferred
+  until a missed amendment actually hurts.

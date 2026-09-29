@@ -58,8 +58,8 @@ call are your **story-keeping** prompt's.
 ## Amendments
 
 To revise delegated work, append an **amendment** to the original ticket (format
-in the logistics skill); never create a new ticket. Group issues by category,
-each with its why.
+in the reference directory); never create a new ticket. Group issues by
+category, each with its why.
 
 ## Writing Workflow
 
@@ -86,6 +86,13 @@ source and derives the response patch.
 
 You own `notes/story.md`, the central narrative. When to update, the doctrine,
 and the format are your **story-keeping** prompt's.
+
+## Subagent Catalog
+
+A bespoke delegation that recurs gets named: add it under
+`config/agents/subagents/` (model pinned once, description carrying the task
+shape) and keep the catalog lean by retiring agents whose shape stopped
+recurring.
 
 ## Misc
 

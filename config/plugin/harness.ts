@@ -3,7 +3,11 @@
  *
  *   binder assembly  session.context hook appends the calling role's
  *                    prompts (src/binder.ts --> prompts/*.md, read from
- *                    disk on every request, so edits go live next turn)
+ *                    disk on every request, so edits go live next turn),
+ *                    each piece headed "Instructions from: <path>" in the
+ *                    native instruction format (provenance), plus the
+ *                    binder footer naming which of those files are the
+ *                    role's to amend (src/binder.ts binderFooter)
  *   cue              tool: brokerless message exchange between role sessions
  *                    on this server (session.synthetic, delivery "steer";
  *                    wakes an idle recipient, lands mid-turn at the next
@@ -23,7 +27,7 @@ import { homedir } from "node:os";
 import { Plugin } from "@opencode/plugin";
 import { OpenCode } from "@opencode/client";
 import { z } from "zod";
-import { BINDERS, ROLES, type Role } from "../../src/binder.ts";
+import { BINDERS, ROLES, binderFooter, type Role } from "../../src/binder.ts";
 import { scanFile, type Block } from "../../lint/scan.ts";
 import { loadRules, lintBlocks, makeClient } from "../../lint/jev.ts";
 import { explainRule, renderLint } from "../../lint/format.ts";
@@ -70,14 +74,22 @@ export default Plugin.define({
       if (!stems) return; // subagents and ad-hoc agents: kernel only
       for (const stem of stems) {
         try {
-          const text = fs
-            .readFileSync(path.join(PROMPTS_DIR, `${stem}.md`), "utf8")
-            .trim();
-          if (text) event.system.push({ type: "text", text });
+          const file = path.join(PROMPTS_DIR, `${stem}.md`);
+          const text = fs.readFileSync(file, "utf8").trim();
+          // Provenance header in the native instruction format
+          // (session/instructions.ts), so the agent can tell which file
+          // each piece of its context came from.
+          if (text)
+            event.system.push({
+              type: "text",
+              text: `Instructions from: ${file}\n${text}`,
+            });
         } catch {
           // a missing movement is a prompt bug, not a session killer
         }
       }
+      const footer = binderFooter(event.agent as Role);
+      if (footer) event.system.push({ type: "text", text: footer });
       if (process.env.ABSTRACT_DEBUG)
         fs.appendFileSync(
           DEBUG_LOG,

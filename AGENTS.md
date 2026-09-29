@@ -9,13 +9,12 @@ agents developing this repository. The lab agents' shared invariants live in
 ## Repository Layout
 
 - `config/` -- the lab's OpenCode config root (`OPENCODE_CONFIG_DIR`): the
-  kernel `AGENTS.md` (invariants + delegation, auto-loaded into every session),
-  `agents/` (the six role personas at top level; `agents/subagents/` holds the
-  named subagent catalog and reviewer panel, whose IDs carry the `subagents/`
-  prefix), `plugin/harness.ts` (the lab plugin: binder assembly, cue,
-  repertoire, tuning), `opencode.json` (default model, MCP servers, the
-  `lab-reference` reference alias), and `skills/` (the lab's skills, a real
-  directory)
+  kernel `AGENTS.md` (shared rules, auto-loaded into every session), `agents/`
+  (the six role personas at top level; `agents/subagents/` holds the named
+  subagent catalog and reviewer panel, whose IDs carry the `subagents/` prefix),
+  `plugin/harness.ts` (the lab plugin: binder assembly, cue, repertoire,
+  tuning), `opencode.json` (default model, MCP servers, the `reference` alias),
+  and `skills/` (the lab's skills, a real directory)
 - `lint/` -- `abstract lint`: the rule set (`rules.yaml`, lessons verbatim,
   distilled from the calibrated expert edits), the paragraph extractor
   (`extract/`, a Rust sidecar that owns all dialect knowledge and emits the
@@ -32,9 +31,13 @@ agents developing this repository. The lab agents' shared invariants live in
   are dev-facing
 - `src/binder.ts` -- the binders: which prompts each role always carries, in
   order (general --> specific), plus `ROLES`, the full roster the CLI, doctor,
-  and tab seeding iterate. The plugin assembles the binder into the system
-  prompt per model request, re-reading from disk; agent files hold registry
-  config only
+  and tab seeding iterate, plus `binderFooter`, the context piece naming which
+  prompt files a role may amend (the concrete scope of the kernel's
+  self-amendment rule: a role may amend its own binder prompts on the user's
+  direct order, proposal first; the orchestrator is the doctrine's curator and
+  may amend every prompt file plus the kernel itself). The plugin assembles the
+  binder into the system prompt per model request, re-reading from disk; agent
+  files hold registry config only
 - `src/cli.ts` -- the `abstract` CLI (Bun, linked via `package.json` bin):
   ensures the pinned runtime at `~/.local/share/abstract/runtime/`, the central
   lab server (port 4319, own config/state/DB under `~/.local/share/abstract` and
@@ -47,7 +50,7 @@ agents developing this repository. The lab agents' shared invariants live in
   numbering; no server or model involved), `abstract doctor` (contract smoke
   test), `abstract stop`
 - `reference/` -- reference material agents read on request; reaches agents as
-  the `lab-reference` alias (OpenCode references feature, described in
+  the `reference` alias (OpenCode references feature, described in
   `config/opencode.json`)
 - `tools/` -- builds the house reference doc (the pandoc reference doc styling
   every Word export) by applying the numbered `NN-*.patch` series in order to a

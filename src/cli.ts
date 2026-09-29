@@ -439,11 +439,13 @@ async function doctor(): Promise<void> {
   await check("skills discovered", async () => {
     const s = await api.skill.list();
     const names = s.data.map((x: any) => x.name ?? x.id);
-    assert(
-      names.includes("logistics"),
-      `logistics missing; found: ${names.join(",")}`,
-    );
     return `${names.length} skills`;
+  });
+  await check("reference shelf", async () => {
+    const want = ["logistics.md", "ticket.md", "report.md", "memo.md"];
+    const missing = want.filter((f) => !existsSync(join(HARNESS_DIR, "reference", f)));
+    assert(!missing.length, `missing: ${missing.join(", ")}`);
+    return `${want.length} files`;
   });
   await check("credentials synced (providers live)", async () => {
     const m = await api.model.list();

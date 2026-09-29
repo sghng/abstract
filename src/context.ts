@@ -1,10 +1,10 @@
 /**
  * The context report: what each lab agent receives, assembled the same way
  * the harness plugin assembles it (config/AGENTS.md + src/binder.ts -->
- * prompts/*.md, read from disk), plus the on-demand tier (skills index), the
- * delegation tier (subagent catalog), and the tool surface. Agent files hold
- * registry config only; a prompt outside the binder is reported as a
- * violation.
+ * prompts/*.md, read from disk, plus the binder footer), plus the on-demand
+ * tier (skills index), the delegation tier (subagent catalog), and the tool
+ * surface. Agent files hold registry config only; a prompt outside the
+ * binder is reported as a violation.
  *
  * Static by design: works with the server down, because the prompt
  * assembly itself is static (files + score). Live data (agent registry,
@@ -12,7 +12,7 @@
  */
 import * as fs from "node:fs";
 import * as path from "node:path";
-import { BINDERS, ROLES, type Role } from "./binder.ts";
+import { BINDERS, ROLES, binderFooter, type Role } from "./binder.ts";
 
 const REPO = path.resolve(import.meta.dir, "..");
 const CONFIG = path.join(REPO, "config");
@@ -28,7 +28,7 @@ const OPENCODE_JSON = path.join(CONFIG, "opencode.json");
  */
 const PLUGIN_TOOLS = ["cue", "repertoire", "tuning"];
 const BUILTIN_TOOLS_NOTE =
-  "read bash edit write glob grep ls patch task webfetch (curated from the pinned binary)";
+  "read bash edit write glob grep ls patch subagent webfetch (curated from the pinned binary)";
 
 export type Piece = {
   kind: "kernel" | "prompt";
@@ -59,6 +59,7 @@ export type SubagentEntry = {
 export type RoleReport = {
   role: Role;
   pieces: Piece[]; // kernel + prompts, assembly order
+  footer: string; // the binder footer: self-amendment scope, from binder.ts
   totalTokens: number;
   skills: SkillEntry[];
   subagents: SubagentEntry[];
@@ -294,6 +295,7 @@ export function buildReport(live?: {
     return {
       role,
       pieces,
+      footer: binderFooter(role) ?? "",
       totalTokens: pieces.reduce((n, p) => n + p.tokens, 0),
       skills,
       subagents,
@@ -389,7 +391,8 @@ export function renderReport(r: ContextReport, only?: string): string {
       "  skills      index always present; bodies on demand, lost to compaction",
       first.skills,
     );
-  if (sameSubagents) printSubagents("  subagents   task tool", first.subagents);
+  if (sameSubagents)
+    printSubagents("  subagents   subagent tool", first.subagents);
   if (sameTools) printTools("  tools", first.tools);
   out.push("");
 
@@ -402,6 +405,7 @@ export function renderReport(r: ContextReport, only?: string): string {
         `  ${p.stem.padEnd(16)}${p.file.padEnd(28)}${String(p.lines).padStart(5)} ln  ${tok(p.tokens).padStart(9)}  # ${p.heading}${also}`,
       );
     }
+    if (role.footer) out.push(`  footer           ${role.footer}`);
     for (const w of role.warnings) out.push(`  WARNING: ${w}`);
     const doctrine = role.totalTokens - k.tokens;
     out.push(

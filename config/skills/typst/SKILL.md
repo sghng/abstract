@@ -32,6 +32,13 @@ or review Typst source.
 ## Package Policy
 
 - We always use the latest package versions.
+- Typst has no global package environment. The version in the import line
+  (e.g. `#import "@preview/touying:0.7.4"`) is the declaration; the compiler
+  fetches exactly that version on demand. A locally cached older version is
+  irrelevant — never pin to what happens to be cached, and never blame the
+  cache for an API mismatch: a mismatch means you pinned the wrong version
+  while recalling a different one's API. Import the current documented
+  version, and check its documentation for that version.
 - We only use featured packages from Typst Universe:
   <https://typst.app/universe/search/?kind=packages&featured>
 - You are encouraged to use packages when they are helpful. However, always

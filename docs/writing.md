@@ -2,8 +2,9 @@
 
 How the lab produces publishable artifacts -- grants, proposals, manuscripts,
 and similar deliverables. This doc is dev-facing; invariants live in the team
-kernel (`config/AGENTS.md`) and role behavior lives in `config/agents/writer.md`
-and `config/agents/editor.md`.
+kernel (`config/AGENTS.md`) and role doctrine lives in the binder
+(`prompts/writer.md`, `prompts/editor.md`, and their shared prompts; the agent
+files hold registry config only).
 
 ## Roles
 
@@ -117,7 +118,8 @@ NSF IIS with a 15-page limit.
 ```
 
 The editor returns a memo at `notes/memos/memo-NNN-review-proposal-v0.md`. The
-memo follows the standard memo template (see the logistics skill) and includes:
+memo follows the standard memo template (on the reference shelf, `memo.md`) and
+includes:
 
 - summary of the draft's current state;
 - concrete issues with file paths, line references, or wiki links where

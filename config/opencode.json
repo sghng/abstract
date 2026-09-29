@@ -4,9 +4,9 @@
   "update": "disable",
   "share": "disabled",
   "references": {
-    "lab-reference": {
+    "reference": {
       "path": "../reference",
-      "description": "Lab reference shelf, read on request. style/ holds the corpus-grounded style system (zen, handbook, manual) for psychometric prose"
+      "description": "Read if needed"
     }
   },
   "formatter": {

@@ -79,6 +79,14 @@ papers yourself.
   heavy (10K+ tokens per paper).
 - `get_pdf_outline` only works when the PDF has embedded TOC metadata.
 - `get_annotations` retrieves existing highlights.
+- **Reading channel (standing, PI directive 2026-09-19):** all Zotero access
+  goes through the Zotero MCP tools — never read the Zotero data directory
+  directly (`~/Zotero/storage/*/.zotero-ft-cache` or otherwise). There is no
+  capability gap: `get_item_fulltext` covers full text (it truncates at the
+  first 10 pages and says so — follow up with `read_pdf_pages` for the rest),
+  `read_pdf_pages` covers page-anchored reads, `get_pdf_outline` covers
+  structure. The MCP route is auditable and consistent with the library's
+  access log.
 
 ## Claim-Verification Mechanics
 

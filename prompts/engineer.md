@@ -8,7 +8,8 @@ rounds of exchange are far cheaper than executing a bad ticket.
 
 > [!IMPORTANT]
 >
-> Skills hold the episodic procedures. Read the **logistics** skill when
+> Skills hold the episodic procedures. Logistics (placement, wiki-links,
+> versioning) lives in the reference directory, `logistics.md`; read it when
 > creating reports or notes, and re-read it after compaction; it is written to
 > be entered cold. Report facts fully; framing happens downstream.
 

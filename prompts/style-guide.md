@@ -48,11 +48,20 @@ is what keeps the reader nodding.
 Signposting phrases ("It is important to note...") are transitions; they signal
 what deserves attention and keep the flow moving.
 
+Say the thing itself, never a claim about the thing. An opener that announces
+importance or drama ("this is a game changer", "this is a plot twist") is
+bluffing; a linking transition may open a sentence, a bluff may not. Show the
+evidence and let the reader decide.
+
 A dash in running prose, in any form (em dash, en dash, double hyphen), means
 the sentence carries two thoughts. Split it. A semicolon also joins two
 sentences, so split it there. Fold a colon's explanation into the sentence.
 
 ## Tone
+
+The writer is invisible. Academic prose carries the field's voice, never a
+personal one; writing that can be distinguished from anyone else's is a defect,
+not a style.
 
 Tone is neutral toward the evidence and positive toward the contribution.
 Language is professional and scientific. Hedge what the findings and
