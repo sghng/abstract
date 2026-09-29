@@ -2,12 +2,14 @@
  * abstract harness plugin -- the lab's three in-process behaviors:
  *
  *   binder assembly  session.context hook appends the calling role's
- *                    prompts (src/binder.ts --> prompts/*.md, read from
- *                    disk on every request, so edits go live next turn),
- *                    each piece headed "Instructions from: <path>" in the
- *                    native instruction format (provenance), plus the
- *                    binder footer naming which of those files are the
- *                    role's to amend (src/binder.ts binderFooter)
+ *                    prompts (prompts/binder.yaml --> prompts/*.md, both
+ *                    read from disk on every request, so edits and binder
+ *                    surgery go live next turn), each piece headed
+ *                    "Instructions from: <path>" in the native instruction
+ *                    format (provenance), plus the binder footer naming
+ *                    which of those files are the role's to amend
+ *                    (src/binder.ts binderFooter); a malformed mapping
+ *                    serves the last good parse plus a loud error piece
  *   cue              tool: brokerless message exchange between role sessions
  *                    on this server (session.synthetic, delivery "steer";
  *                    wakes an idle recipient, lands mid-turn at the next
@@ -16,6 +18,9 @@
  *                    (see docs/repertoire/index.md for the contract)
  *   tuning           tool: prose checked against the style rule set
  *                    via Jev (lint's agent route; see lint/)
+ *   doctrine scope   agent transform: roles get prompt-free RW access to
+ *                    prompts/ and reference/ (external_directory allow);
+ *                    the kernel's self-amendment rule is the whole gate
  *
  * Runs inside the Abstract server. The server URL and password arrive via
  * env (ABSTRACT_SERVER_URL, OPENCODE_PASSWORD), both set by `abstract`.
@@ -27,13 +32,20 @@ import { homedir } from "node:os";
 import { Plugin } from "@opencode/plugin";
 import { OpenCode } from "@opencode/client";
 import { z } from "zod";
-import { BINDERS, ROLES, binderFooter, type Role } from "../../src/binder.ts";
+import {
+  BINDER_FILE,
+  ROLES,
+  binderFooter,
+  loadBinders,
+  type Role,
+} from "../../src/binder.ts";
 import { scanFile, type Block } from "../../lint/scan.ts";
 import { loadRules, lintBlocks, makeClient } from "../../lint/jev.ts";
 import { explainRule, renderLint } from "../../lint/format.ts";
 
 const REPO = path.resolve(import.meta.dir, "..", "..");
 const PROMPTS_DIR = path.join(REPO, "prompts");
+const REFERENCE_DIR = path.join(REPO, "reference");
 const EDITS = path.join(REPO, "lint", "rules.yaml");
 
 const SERVER_URL = process.env.ABSTRACT_SERVER_URL ?? "http://127.0.0.1:4319";
@@ -65,13 +77,16 @@ export default Plugin.define({
   setup: async (ctx) => {
     // -- binder assembly ---------------------------------------------------
     await ctx.session.hook("context", (event) => {
-      const stems = BINDERS[event.agent as Role];
+      // subagents and ad-hoc agents: kernel only
+      if (!(ROLES as readonly string[]).includes(event.agent)) return;
+      const role = event.agent as Role;
+      const { binders, error } = loadBinders();
+      const stems = binders[role] ?? [];
       if (process.env.ABSTRACT_DEBUG)
         fs.appendFileSync(
           DEBUG_LOG,
-          `context agent=${event.agent} stems=${JSON.stringify(stems ?? null)} system=${event.system.length}\n`,
+          `context agent=${event.agent} stems=${JSON.stringify(stems)} system=${event.system.length}\n`,
         );
-      if (!stems) return; // subagents and ad-hoc agents: kernel only
       for (const stem of stems) {
         try {
           const file = path.join(PROMPTS_DIR, `${stem}.md`);
@@ -88,8 +103,18 @@ export default Plugin.define({
           // a missing movement is a prompt bug, not a session killer
         }
       }
-      const footer = binderFooter(event.agent as Role);
+      const footer = binderFooter(role, binders);
       if (footer) event.system.push({ type: "text", text: footer });
+      // A broken mapping must be loud, not silent: sessions keep the last
+      // good parse, and every role sees what to fix.
+      if (error)
+        event.system.push({
+          type: "text",
+          text:
+            `The binder mapping at ${BINDER_FILE} failed to parse ` +
+            `(${error}). Serving the last good version; fix the file and ` +
+            `this notice clears itself.`,
+        });
       if (process.env.ABSTRACT_DEBUG)
         fs.appendFileSync(
           DEBUG_LOG,
@@ -97,6 +122,25 @@ export default Plugin.define({
             .map((p) => (p.text ?? "").split("\n")[0]?.slice(0, 36))
             .join(" | ")}\n`,
         );
+    });
+
+    // -- doctrine scope ----------------------------------------------------
+    // The lab is an experiment: role agents get prompt-free read/write
+    // access to the doctrine directories (prompts/, reference/). The
+    // kernel's self-amendment rule (direct order, proposal first) plus git
+    // history is the whole gate; the external-directory prompt no longer
+    // asks for these two dirs. evaluate() is findLast, so these rules beat
+    // the default external_directory: ask. Subagents keep the default.
+    await ctx.agent.transform((editor) => {
+      const scope = [PROMPTS_DIR, REFERENCE_DIR].map((dir) => ({
+        action: "external_directory",
+        resource: path.join(dir, "*"),
+        effect: "allow" as const,
+      }));
+      for (const role of ROLES)
+        editor.update(role, (agent) => {
+          agent.permissions.push(...scope);
+        });
     });
 
     // -- cue ---------------------------------------------------------------

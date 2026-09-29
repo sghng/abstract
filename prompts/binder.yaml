@@ -1,0 +1,26 @@
+# The binder mapping: which prompt files each role always carries, in order
+# (general --> specific). Stems reference prompts/<stem>.md in this same
+# directory. This file is the single source for the mapping; src/binder.ts
+# holds the machinery, and the harness re-reads this file on every model
+# request, so edits go live on the next turn, no server restart. Every role
+# must have an entry (an empty list is a valid entry). Roles amend their own
+# entry under the kernel's self-amendment rule; the orchestrator curates all
+# entries. See docs/prompt-hierarchy.md.
+orchestrator:
+  - story-doctrine
+  - story-keeping
+  - orchestrator
+engineer:
+  - engineer
+statistician:
+  - statistician
+librarian:
+  - librarian
+writer:
+  - style-guide
+  - story-doctrine
+  - writing-craft
+  - writer
+editor:
+  - style-guide
+  - editor

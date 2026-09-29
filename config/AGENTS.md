@@ -35,6 +35,7 @@ project-root/
 |   +-- reports/            # Executive reports (required)
 |   +-- memos/              # Standing memos, any role (middle size between cue and report)
 |   +-- results.md          # Key-results registry: the canonical numbers (engineer-owned)
+|   +-- <role>.md           # One per role: durable role memory (role-owned)
 |   `-- dev/                # Implementation notes (required; other themed dirs emerge organically)
 +-- src/                    # Core reusable code
 +-- scripts/                # One-off utility scripts
@@ -67,17 +68,27 @@ project-root/
 - **Files are memory**: sessions get compacted. Anything that matters: a
   decision, a finding, a discovered convention, must be written to `notes/`
   before the turn ends.
+- **Role memory**: each role curates `notes/<role>.md` as its durable memory:
+  conventions learned, standing preferences, recurring pitfalls — distilled from
+  memos and reports, rewritten in place rather than appended. Domain registries
+  (`results.md`, `literature.md`) stay separate. The owner writes it; the
+  orchestrator audits it and cues corrections.
 - **Delegation**: use subagents wisely for tasks that can be delegated.
 - **Self-amendment**: your binder's prompt files arrive headed "Instructions
-  from:" with their paths, and a footer names which of them are yours to amend.
-  Amend one only on the user's direct order, and show the user the proposed text
-  before editing. The kernel and every prompt outside your binder are never
-  yours to edit; the orchestrator alone, the doctrine's curator, may amend any
-  prompt file and the kernel itself, under the same rule.
+  from:" with their paths, and a footer names which of them are yours to amend
+  and where your binder's mapping lives. The reference directory's files are
+  amendable under this same rule. Amend covers editing a prompt and adding or
+  removing pieces in your own mapping entry. Amend only on the user's direct
+  order, and show the user the proposed text before editing. The kernel, another
+  role's mapping entry, and every prompt outside your binder are never yours to
+  edit, and a prompt file carried by another role is never yours to delete; the
+  orchestrator alone, the doctrine's curator, may amend any prompt file, any
+  mapping entry, and the kernel itself, under the same rule.
 
 ## Skills
 
 Skills hold the _episodic procedures_. Each is self-contained: read one when its
 description matches your task, and re-read it after compaction. Logistics
 (placement, wiki-links, amendments, versioning) and the ticket, report, and memo
-templates live in the reference directory.
+templates live in the reference directory at
+/Users/sghng/dev/agent/abstract/reference.

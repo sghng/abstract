@@ -1,6 +1,6 @@
 /**
  * The context report: what each lab agent receives, assembled the same way
- * the harness plugin assembles it (config/AGENTS.md + src/binder.ts -->
+ * the harness plugin assembles it (config/AGENTS.md + prompts/binder.yaml -->
  * prompts/*.md, read from disk, plus the binder footer), plus the on-demand
  * tier (skills index), the delegation tier (subagent catalog), and the tool
  * surface. Agent files hold registry config only; a prompt outside the
@@ -12,7 +12,7 @@
  */
 import * as fs from "node:fs";
 import * as path from "node:path";
-import { BINDERS, ROLES, binderFooter, type Role } from "./binder.ts";
+import { ROLES, binderFooter, loadBinders, type Role } from "./binder.ts";
 
 const REPO = path.resolve(import.meta.dir, "..");
 const CONFIG = path.join(REPO, "config");
@@ -236,11 +236,12 @@ export function buildReport(live?: {
   }));
   const subagents = loadSubagents(live?.agents);
   const mcp = loadMcp().map((s) => ({ ...s, status: live?.mcp.get(s.name) }));
+  const { binders, error: binderError } = loadBinders();
 
   // reverse map: which roles share each prompt
   const shared = new Map<string, Role[]>();
   for (const role of ROLES)
-    for (const stem of BINDERS[role] ?? [])
+    for (const stem of binders[role] ?? [])
       shared.set(stem, [...(shared.get(stem) ?? []), role]);
 
   const pieceFor = (
@@ -271,7 +272,7 @@ export function buildReport(live?: {
   const roles: RoleReport[] = ROLES.map((role) => {
     const pieces: Piece[] = [
       pieceFor(role, "kernel", "config/AGENTS.md", "kernel"),
-      ...(BINDERS[role] ?? []).map((stem) =>
+      ...(binders[role] ?? []).map((stem) =>
         pieceFor(role, stem, `prompts/${stem}.md`, "prompt"),
       ),
     ];
@@ -279,6 +280,10 @@ export function buildReport(live?: {
     // config. Anything else is worth printing, since the plugin silently
     // skips a prompt whose file is missing.
     const warnings: string[] = [];
+    if (binderError)
+      warnings.push(
+        `prompts/binder.yaml: ${binderError} (showing the last good mapping)`,
+      );
     const agentFile = `config/agents/${role}.md`;
     const agent = read(agentFile);
     if (!agent) warnings.push(`${agentFile} missing`);
@@ -295,7 +300,7 @@ export function buildReport(live?: {
     return {
       role,
       pieces,
-      footer: binderFooter(role) ?? "",
+      footer: binderFooter(role, binders) ?? "",
       totalTokens: pieces.reduce((n, p) => n + p.tokens, 0),
       skills,
       subagents,
@@ -394,6 +399,9 @@ export function renderReport(r: ContextReport, only?: string): string {
   if (sameSubagents)
     printSubagents("  subagents   subagent tool", first.subagents);
   if (sameTools) printTools("  tools", first.tools);
+  out.push(
+    "  pre-approved  prompts/* + reference/* RW for roles (harness plugin; no external_directory prompt)",
+  );
   out.push("");
 
   for (const role of roles) {

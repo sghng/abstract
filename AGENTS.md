@@ -24,20 +24,24 @@ agents developing this repository. The lab agents' shared invariants live in
   hash, no fallback), the Jev client (`jev.ts`), the shared renderer
   (`format.ts`; one output for the CLI and the tuning tool), and the command
   (`cli.ts`; `-` lints one plain prose passage from stdin)
-- `prompts/` -- the prompt files (Markdown, one file each, descriptive names):
-  shared doctrine (`style-guide.md`, `story-doctrine.md`), role doctrine
+- `prompts/` -- the prompt files (Markdown, one file each, descriptive names)
+  plus `binder.yaml`, the binder mapping (which stems each role carries, in
+  order; re-read from disk per model request, so binder surgery goes live next
+  turn): shared doctrine (`style-guide.md`, `story-doctrine.md`), role doctrine
   (`story-keeping.md`, `writing-craft.md`), and one file per role. Referenced by
   stem from each role's binder; only file contents enter the context, so names
   are dev-facing
-- `src/binder.ts` -- the binders: which prompts each role always carries, in
-  order (general --> specific), plus `ROLES`, the full roster the CLI, doctor,
-  and tab seeding iterate, plus `binderFooter`, the context piece naming which
-  prompt files a role may amend (the concrete scope of the kernel's
-  self-amendment rule: a role may amend its own binder prompts on the user's
-  direct order, proposal first; the orchestrator is the doctrine's curator and
-  may amend every prompt file plus the kernel itself). The plugin assembles the
-  binder into the system prompt per model request, re-reading from disk; agent
-  files hold registry config only
+- `src/binder.ts` -- the binder machinery: `ROLES`, the full roster the CLI,
+  doctor, and tab seeding iterate, `loadBinders` (strict reader for
+  `prompts/binder.yaml` with a last-good cache, so a malformed mapping serves
+  the previous version plus a loud error piece), and `binderFooter`, the context
+  piece naming which prompt files a role may amend (the concrete scope of the
+  kernel's self-amendment rule: a role may amend its own binder prompts and its
+  own mapping entry on the user's direct order, proposal first; the orchestrator
+  is the doctrine's curator and may amend every prompt file, every mapping
+  entry, and the kernel itself). The plugin assembles the binder into the system
+  prompt per model request, re-reading from disk; agent files hold registry
+  config only
 - `src/cli.ts` -- the `abstract` CLI (Bun, linked via `package.json` bin):
   ensures the pinned runtime at `~/.local/share/abstract/runtime/`, the central
   lab server (port 4319, own config/state/DB under `~/.local/share/abstract` and
@@ -49,9 +53,9 @@ agents developing this repository. The lab agents' shared invariants live in
   house reference stock rebuilt fresh from the patch series; citeproc and native
   numbering; no server or model involved), `abstract doctor` (contract smoke
   test), `abstract stop`
-- `reference/` -- reference material agents read on request; reaches agents as
-  the `reference` alias (OpenCode references feature, described in
-  `config/opencode.json`)
+- `reference/` -- reference material agents read on request (logistics,
+  templates); the kernel carries the absolute path, and the harness plugin
+  pre-approves role RW access alongside prompts/ (no per-edit prompts)
 - `tools/` -- builds the house reference doc (the pandoc reference doc styling
   every Word export) by applying the numbered `NN-*.patch` series in order to a
   pristine pandoc template export, one self-contained style concern per patch;

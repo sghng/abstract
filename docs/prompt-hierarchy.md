@@ -9,8 +9,8 @@ every role's actual assembly; keep it honest.
 The system prompt is reassembled on every model request, so it survives
 compaction by construction; what compaction takes is message history. Order per
 request: the OpenCode base prompt, then the native instruction baseline
-(environment and date, the kernel, the skills index, reference and MCP
-guidance), then the hook-assembled binder pieces (layers 2 and 3, each headed
+(environment and date, the kernel, the skills index, and MCP guidance), then the
+hook-assembled binder pieces (layers 2 and 3, each headed
 `Instructions from: <path>`, then the binder footer), then tool schemas. The
 layer numbers below are conceptual tiers, not the on-the-wire order: the skills
 index rides the native baseline, ahead of the binder.
@@ -46,17 +46,19 @@ index rides the native baseline, ahead of the binder.
    every prose reference uses the full ID. Named agents cover recurring task
    shapes; model pins live in their frontmatter.
 
-Layers 2 and 3 are each role's binder. `src/binder.ts` is the single source for
-which prompts a role carries, in order (general --> specific); do not duplicate
-the mapping anywhere. Agent files (`config/agents/<role>.md`) hold registry
-config only, and the binder is why: the body is the agent's `system`, which
-rides in the cached request prefix (`session/runner/llm.ts`), so editing a body
+Layers 2 and 3 are each role's binder. `prompts/binder.yaml` is the single
+source for which prompts a role carries, in order (general --> specific); do not
+duplicate the mapping anywhere. The harness re-reads it (and the prompt files)
+from disk on every request, so binder surgery goes live on the next turn;
+`src/binder.ts` holds the machinery (`loadBinders`, `binderFooter`) and the
+roster (`ROLES`). Agent files (`config/agents/<role>.md`) hold registry config
+only, and the binder is why: the body is the agent's `system`, which rides in
+the cached request prefix (`session/runner/llm.ts`), so editing a body
 invalidates the prompt cache, the registry does not reload without a server
 restart in the pinned binary (owner-tested on 2.0.18), and a prompt shared by
-two roles would have to live in two bodies. The binder re-reads `prompts/` per
-request and shares by reference. `abstract context` reports a non-empty body as
-a violation, and `abstract doctor` checks that every binder stem resolves,
-because a missing prompt is skipped silently.
+two roles would have to live in two bodies. `abstract context` reports a
+non-empty body as a violation, and `abstract doctor` checks that every binder
+stem resolves, because a missing prompt is skipped silently.
 
 ## The Rules
 
@@ -108,16 +110,30 @@ because a missing prompt is skipped silently.
 
 ## Self-amendment
 
-A role may amend its own prompt files. The kernel states the rule once: amend
-only on the user's direct order, and show the proposed text before editing.
-Scope is the role's binder, named concretely by the binder footer, the last
-context piece the hook pushes; `binderFooter()` in `src/binder.ts` assembles it
-from `BINDERS`, so it can never drift from the mapping, and shared prompts name
-their co-carriers there, so a proposer sees whose context an edit will land in.
-The orchestrator is the doctrine's curator: its scope is every prompt file plus
-the kernel itself, under the same rule. Enforcement is deliberately soft: the
-stated rule, the external-directory permission prompt (`prompts/` sits outside
-every project directory, so each edit asks), and git history. No code gates.
+A role may amend its own prompt files and its own binder. The kernel states the
+rule once: amend only on the user's direct order, and show the proposed text
+before editing. Amend covers editing a prompt file, creating a piece (a new
+`prompts/<stem>.md`, kebab-case and descriptive, plus the stem in the role's own
+`prompts/binder.yaml` entry), pulling an existing stem into the role's entry,
+and removing a piece; deleting a prompt _file_ is sole-carrier only, everything
+shared is curator work. The reference directory's files (logistics, templates)
+are amendable by any role under the same rule. Scope is named concretely by the
+binder footer, the last context piece the hook pushes; `binderFooter()` in
+`src/binder.ts` assembles it from the freshly read mapping, so it can never
+drift, and shared prompts name their co-carriers there, so a proposer sees whose
+context an edit will land in. The orchestrator is the doctrine's curator: its
+scope is every prompt file, every mapping entry, and the kernel itself, under
+the same rule. Enforcement is the stated rule plus git history, nothing else:
+the harness pre-approves role read/write on `prompts/` and `reference/` (both
+outside every project directory) via an agent-permission transform at server
+start, so not even a permission prompt gates an edit. Subagents keep the default
+`external_directory: ask`.
+
+The mapping is data, not code, because the static import was evaluated once at
+plugin load: a binder edit would have needed a server restart. The reader is
+strict (every role present, known roles only, string stems), because agents
+hand-edit the file, and a malformed mapping serves the last good parse plus a
+loud error piece in every role's context, self-clearing on fix.
 
 Two placement consequences, settled against pinned 2.0.18:
 

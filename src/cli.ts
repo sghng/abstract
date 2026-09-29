@@ -48,7 +48,7 @@ import { homedir, tmpdir } from "node:os";
 import { basename, dirname, join, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 import { OpenCode } from "@opencode/client";
-import { BINDERS, ROLES } from "./binder.ts";
+import { ROLES, loadBinders } from "./binder.ts";
 import { buildReport, renderReport } from "./context.ts";
 
 const CLI_PATH = resolve(fileURLToPath(import.meta.url));
@@ -428,13 +428,36 @@ async function doctor(): Promise<void> {
     return `${want.length} agents`;
   });
   await check("binder resolves", async () => {
+    const { binders, error } = loadBinders();
+    assert(!error, `prompts/binder.yaml: ${error}`);
     const missing: string[] = [];
     for (const role of ROLES)
-      for (const stem of BINDERS[role] ?? [])
+      for (const stem of binders[role])
         if (!existsSync(join(HARNESS_DIR, "prompts", `${stem}.md`)))
           missing.push(`${role}:${stem}`);
     assert(!missing.length, `unresolved prompts: ${missing.join(", ")}`);
-    return ROLES.map((r) => `${r}(${(BINDERS[r] ?? []).length})`).join(" ");
+    return ROLES.map((r) => `${r}(${binders[r].length})`).join(" ");
+  });
+  await check("doctrine scope pre-approved", async () => {
+    const a = await api.agent.list();
+    const want = ["prompts", "reference"].map((d) => join(HARNESS_DIR, d, "*"));
+    const missing: string[] = [];
+    for (const role of ROLES) {
+      const rules: any[] =
+        a.data.find((x: any) => x.id === role)?.permissions ?? [];
+      for (const w of want)
+        if (
+          !rules.some(
+            (r) =>
+              r.action === "external_directory" &&
+              r.resource === w &&
+              r.effect === "allow",
+          )
+        )
+          missing.push(`${role}:${w}`);
+    }
+    assert(!missing.length, `missing allow rules: ${missing.join(", ")}`);
+    return "roles RW prompts/*, reference/* with no prompt";
   });
   await check("skills discovered", async () => {
     const s = await api.skill.list();
@@ -443,7 +466,9 @@ async function doctor(): Promise<void> {
   });
   await check("reference shelf", async () => {
     const want = ["logistics.md", "ticket.md", "report.md", "memo.md"];
-    const missing = want.filter((f) => !existsSync(join(HARNESS_DIR, "reference", f)));
+    const missing = want.filter(
+      (f) => !existsSync(join(HARNESS_DIR, "reference", f)),
+    );
     assert(!missing.length, `missing: ${missing.join(", ")}`);
     return `${want.length} files`;
   });

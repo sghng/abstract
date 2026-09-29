@@ -3,22 +3,10 @@
   "default_agent": "orchestrator",
   "update": "disable",
   "share": "disabled",
-  "references": {
-    "reference": {
-      "path": "../reference",
-      "description": "Read if needed"
-    }
-  },
   "formatter": {
     "typstyle": {
-      "command": [
-        "typstyle",
-        "--inplace",
-        "$FILE"
-      ],
-      "extensions": [
-        ".typ"
-      ]
+      "command": ["typstyle", "--inplace", "$FILE"],
+      "extensions": [".typ"]
     }
   },
   "mcp": {
@@ -33,12 +21,7 @@
       },
       "zotero": {
         "type": "local",
-        "command": [
-          "uvx",
-          "--from",
-          "zotero-mcp-server",
-          "zotero-mcp"
-        ],
+        "command": ["uvx", "--from", "zotero-mcp-server", "zotero-mcp"],
         "environment": {
           "ZOTERO_LOCAL": "true",
           "ZOTERO_EMBEDDING_MODEL": "openai",

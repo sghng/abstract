@@ -1219,3 +1219,56 @@ reports a non-empty agent body as a violation.
   and the kernel's path; the kernel's self-amendment bullet gains the
   curator exception. The earlier "unamendable by construction" framing in
   today's entries now reads: unamendable by non-orchestrator roles.
+
+## 2026-09-29: agents curate their own binders (owner decision)
+
+- The binder mapping moves from code to data: prompts/binder.yaml is the
+  single source (role --> ordered stems), re-read from disk on every model
+  request, so a role can create, adopt, or remove a binder piece and see it
+  live next turn, no server restart. The static BINDERS export was evaluated
+  once at plugin load, which made agent binder surgery restart-bound.
+  src/binder.ts keeps the machinery (loadBinders, binderFooter) and ROLES
+  (structural, not agent-curated). Hermes-style skill curation was the
+  inspiration; the lab's version is deliberately lighter: no tool, just the
+  footer naming the mapping plus the plain edit tool.
+- loadBinders is strict (every role present, known roles only, string
+  stems), because agents hand-edit the file, and serves a last-good cache on
+  failure (owner refinement): a malformed mapping never strips doctrine
+  mid-session; instead every role gets a loud error piece in context,
+  self-clearing on fix. abstract context warns and abstract doctor fails on
+  the same error.
+- Scope rules (kernel bullet): amend covers edit, create, adopt (an existing
+  stem into your own entry, owner-approved), and remove; file deletion is
+  sole-carrier only, shared files are curator work; another role's entry,
+  another role's prompts, and the kernel stay off-limits; the orchestrator
+  curates all entries, all files, and the kernel. All under the same gate:
+  direct order, proposal first. Discoverability rides in the footer (one
+  sentence naming binder.yaml and the two-step mechanics).
+
+## 2026-09-29: references feature ditched; doctrine dirs pre-approved (owner decision)
+
+- The OpenCode references feature (the "reference" alias in
+  config/opencode.json) is removed. Survey of the pinned binary showed it is
+  guidance text only (a core/reference-guidance baseline piece listing
+  name/path/description): it grants no file access, and its change narration
+  covers only the alias list, never the contents. The kernel's Skills
+  paragraph now carries the reference directory's absolute path instead.
+  One less mechanism; every "what exists and who may touch it" fact now
+  lives in the kernel or the footer.
+- The reference shelf joins the self-amendment world: any role may amend
+  reference files under the same rule (direct order, proposal first),
+  orchestrator curates.
+- Enforcement model flipped from per-edit prompts to pre-authorized scope
+  (owner: the harness is experimental; friction is not worth it). The
+  harness plugin registers an agent-permission transform at setup pushing
+  external_directory allow rules for prompts/* and reference/* onto the six
+  roles (evaluate() is findLast, so these beat the default ask). Subagents
+  keep the default ask. The whole gate is now the kernel rule plus git
+  history; prompt-hierarchy's self-amendment section says so explicitly.
+- abstract doctor gains a "doctrine scope pre-approved" check asserting the
+  allow rules landed in the registry; abstract context prints the
+  pre-approved scope in its common section.
+- Transient at the next restart: mid-epoch sessions get the native
+  "Project reference guidance is no longer available" narration while the
+  watcher simultaneously broadcasts the kernel diff that carries the path;
+  self-correcting at the next compaction.
