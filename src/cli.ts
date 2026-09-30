@@ -286,6 +286,10 @@ async function roleSessions(dir: string): Promise<Map<string, Session>> {
   });
   const byRole = new Map<string, Session>();
   for (const s of listed.data) {
+    // A fork carries its parent's role metadata (parent_id is null and
+    // metadata is copied verbatim), so without this filter the fork and the
+    // live session both claim the role and list order decides the winner.
+    if (s.fork) continue;
     const role = (s.metadata as Record<string, unknown> | undefined)?.role;
     if (typeof role === "string") byRole.set(role, s);
   }

@@ -21,6 +21,11 @@
  *   doctrine scope   agent transform: roles get prompt-free RW access to
  *                    prompts/ and reference/ (external_directory allow);
  *                    the kernel's self-amendment rule is the whole gate
+ *   reflect          command: /reflect (orchestrator session only) forks
+ *                    every role session for an independent reflection,
+ *                    then a curator pass that recommends; the report is
+ *                    delivered to the live orchestrator for the owner to
+ *                    ratify (src/reflect.ts)
  *
  * Runs inside the Abstract server. The server URL and password arrive via
  * env (ABSTRACT_SERVER_URL, OPENCODE_PASSWORD), both set by `abstract`.
@@ -42,6 +47,7 @@ import {
 import { scanFile, type Block } from "../../lint/scan.ts";
 import { loadRules, lintBlocks, makeClient } from "../../lint/jev.ts";
 import { explainRule, renderLint } from "../../lint/format.ts";
+import { reflectCommand } from "../../src/reflect.ts";
 
 const REPO = path.resolve(import.meta.dir, "..", "..");
 const PROMPTS_DIR = path.join(REPO, "prompts");
@@ -143,6 +149,17 @@ export default Plugin.define({
         });
     });
 
+    // -- reflect -------------------------------------------------------------
+    await ctx.command.transform((editor) => {
+      editor.add(
+        reflectCommand({
+          client,
+          promptsDir: PROMPTS_DIR,
+          referenceDir: REFERENCE_DIR,
+        }),
+      );
+    });
+
     // -- cue ---------------------------------------------------------------
     await ctx.tool.transform((tools) => {
       tools.add({
@@ -167,6 +184,14 @@ export default Plugin.define({
           const caller = await api.session.get({
             sessionID: context.sessionID,
           });
+          // A fork (reflection branch) is never a cue peer, in either
+          // direction: it carries its parent's role metadata, so routing by
+          // role would be ambiguous between the fork and the live session.
+          if (caller.fork)
+            return {
+              content:
+                "cue is unavailable in a forked session; it is a live-lab channel",
+            };
           const from =
             (caller.metadata?.role as string | undefined) ?? context.agent;
           if (from === target)
@@ -175,7 +200,10 @@ export default Plugin.define({
             directory: caller.location.directory,
           });
           const hit = listed.data.find(
-            (s) => s.metadata?.role === target && s.parentID === undefined,
+            (s) =>
+              s.metadata?.role === target &&
+              s.parentID === undefined &&
+              !s.fork,
           );
           if (!hit)
             return {

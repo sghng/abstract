@@ -1278,3 +1278,47 @@ reports a non-empty agent body as a violation.
   reference guidance is no longer available" narration while the watcher
   simultaneously broadcasts the kernel diff that carries the path;
   self-correcting at the next compaction.
+
+## 2026-09-29: forks are never role sessions (reflection prerequisite)
+
+- Empirically verified against the live pinned server: a forked session has
+  parent_id null, inherits metadata.role verbatim, and lists ahead of its
+  parent, so both cue's target lookup (first match) and the CLI's roleSessions
+  (last write wins) could resolve a role to its fork. Cue delivery is steer
+  (wakes an idle recipient), so a misrouted cue could even wake a finished
+  reflection fork later.
+- Invariant adopted: a role session is a top-level session with no fork lineage.
+  cue refuses forked callers ("cue is unavailable in a forked session") and
+  excludes forks from target lookup; roleSessions skips forks. Session info
+  exposes the lineage intrinsically (session.fork), so no metadata bookkeeping
+  is needed. This hardens the lab against ANY fork (a manual TUI fork included),
+  independent of the reflection design.
+
+## 2026-09-29: reflection batches via /reflect (owner decision)
+
+- Semi-automatic reflection, deliberately less automated than Hermes's per-turn
+  background review: the owner types /reflect in the orchestrator session
+  (gated), the batch runs detached, and the owner ratifies the result. One
+  decision point.
+- Shape: snapshot prompts/ + reference/, fork each non-orchestrator role at its
+  tip for an INDEPENDENT reflection (phase 1, concurrent, 15-min timeout with
+  interrupt), diff the doctrine, fork the orchestrator for a curator pass that
+  RECOMMENDS but never amends on another role's behalf (phase 2), report to
+  ~/.local/share/abstract/reflections/reflect-NNN.md, deliver a steer synthetic
+  to the live orchestrator, which presents the proposals. Ratification = what
+  stays gets committed.
+- Gate reframe for unattended forks: /reflect IS the owner's direct order, so
+  forks edit directly but only what they are confident about; the proposal
+  ceremony is replaced by the curator review plus the owner's ratification of
+  the diff.
+- The nested-children variant (role reflections as sub-sessions of the
+  orchestrator fork) was rejected: forks cannot be children (fork API hardcodes
+  parent_id null), and fresh children plus export/import replay raw
+  pre-compaction history, cache-cold. Forks carry the context-window-faithful
+  transcript on the same cache prefix.
+- Driver lives in src/reflect.ts (every file in config/plugin/ must itself be a
+  plugin, a startup failure confirmed; the driver is a helper imported by the
+  harness). Design doc docs/reflection.md records the arc (Hermes properties,
+  the fork probe, the no-fork-lineage invariant, deferred items: auto-trigger,
+  generation-aware cue, deny-ruleset containment for project files, fork
+  cleanup).

@@ -12,9 +12,9 @@ agents developing this repository. The lab agents' shared invariants live in
   kernel `AGENTS.md` (shared rules, auto-loaded into every session), `agents/`
   (the six role personas at top level; `agents/subagents/` holds the named
   subagent catalog and reviewer panel, whose IDs carry the `subagents/` prefix),
-  `plugin/harness.ts` (the lab plugin: binder assembly, cue, repertoire,
-  tuning), `opencode.json` (default model, MCP servers, the `reference` alias),
-  and `skills/` (the lab's skills, a real directory)
+  `plugin/harness.ts` (the lab plugin: binder assembly, cue, repertoire, tuning,
+  doctrine scope, and /reflect via src/reflect.ts), `opencode.json` (default
+  model, MCP servers), and `skills/` (the lab's skills, a real directory)
 - `lint/` -- `abstract lint`: the rule set (`rules.yaml`, lessons verbatim,
   distilled from the calibrated expert edits), the paragraph extractor
   (`extract/`, a Rust sidecar that owns all dialect knowledge and emits the
