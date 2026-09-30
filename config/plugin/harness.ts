@@ -44,6 +44,7 @@ import {
   loadBinders,
   type Role,
 } from "../../src/binder.ts";
+import { Desk, DeskItem } from "../../src/desk.ts";
 import { scanFile, type Block } from "../../lint/scan.ts";
 import { loadRules, lintBlocks, makeClient } from "../../lint/jev.ts";
 import { explainRule, renderLint } from "../../lint/format.ts";
@@ -316,6 +317,85 @@ export default Plugin.define({
           }
         },
       });
+    });
+
+    // -- desk ---------------------------------------------------------------
+    // The desk is the user's persistent review queue. The tool and context
+    // hook live in the harness so the desk is always on, like cue; the RPC
+    // and TUI entry stay in config/plugin/desk/ so the sidebar can read it.
+    const deskKey = `desk/${ctx.location.project.id}`;
+    const deskRead = async (): Promise<DeskItem[]> => {
+      const parsed = z
+        .array(DeskItem)
+        .safeParse((await ctx.storage.get(deskKey)) ?? []);
+      return parsed.success ? parsed.data : [];
+    };
+    const rpc = await ctx.rpc.register(Desk, {
+      list: async () => ({ items: await deskRead() }),
+    });
+    const deskWrite = async (items: DeskItem[]) => {
+      await ctx.storage.set(deskKey, items);
+      await rpc.events.emit("changed", { items });
+    };
+    const deskEcho = (items: DeskItem[]): string => {
+      if (!items.length) return "Desk cleared.";
+      return (
+        `Desk (${items.length}):\n` +
+        items.map((item) => `- ${item.title}: ${item.detail}`).join("\n")
+      );
+    };
+    const deskNote = (items: DeskItem[]): string => {
+      return (
+        `\n\nDesk (${items.length} awaiting the user's review):\n` +
+        items.map((item) => `- ${item.title}`).join("\n") +
+        "\nThe desk is the user's persistent review queue, visible in their " +
+        "sidebar. Keep it current with the desk tool."
+      );
+    };
+
+    await ctx.tool.transform((tools) => {
+      tools.add({
+        name: "desk",
+        description:
+          "The user's desk: the persistent list of items awaiting the " +
+          "user's review, confirmation, or decision, shown in the user's " +
+          "sidebar. Pass the FULL list on every call: raise an item by " +
+          "including it (a short title plus a detail note telling the " +
+          "user what to examine), settle one by omitting it, clear the " +
+          "desk with an empty list.",
+        options: { codemode: false },
+        input: z.object({
+          items: z
+            .array(DeskItem)
+            .describe("The full desk, replacing the current one"),
+        }),
+        execute: async ({ items }, context) => {
+          if (context.agent !== "orchestrator")
+            return {
+              content:
+                "the desk belongs to the orchestrator; cue the orchestrator instead",
+            };
+          const caller = await ctx.session.get({
+            sessionID: context.sessionID,
+          });
+          if (caller.fork)
+            return {
+              content:
+                "the desk is unavailable in a forked session; it is the live user's queue",
+            };
+          await deskWrite(items);
+          return { content: deskEcho(items) };
+        },
+      });
+    });
+
+    await ctx.session.hook("context", async (event) => {
+      if (event.agent !== "orchestrator") return;
+      const items = await deskRead();
+      if (!items.length) return;
+      const user = event.messages.findLast((m) => m.role === "user");
+      if (!user) return;
+      user.content.push({ type: "text", text: deskNote(items) });
     });
   },
 });

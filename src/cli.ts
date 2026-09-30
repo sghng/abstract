@@ -498,6 +498,15 @@ async function doctor(): Promise<void> {
     assert(ids.includes("abstract-harness"), `abstract-harness missing`);
     return `${ids.length} plugins`;
   });
+  await check("desk plugin + rpc", async () => {
+    const p = await api.plugin.list();
+    const ids = p.data.map((x: any) => x.id);
+    assert(ids.includes("abstract-desk"), `abstract-desk missing`);
+    const { Desk } = await import("./desk.ts");
+    const result: any = await api.rpc(Desk).list({});
+    assert(Array.isArray(result?.items), "desk list returned no items array");
+    return `${result.items.length} item(s) on the desk`;
+  });
   // Local contract test of the lint extractor (builds it on first run; no
   // model, no API): fixtures through both fronts, pinning the math flush
   // on the Typst side and the container skip on the Markdown side.

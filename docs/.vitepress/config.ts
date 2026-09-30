@@ -37,6 +37,7 @@ export default defineConfig({
         items: [
           { text: "Multi-agent pattern", link: "/multi-agent" },
           { text: "Implementation plan", link: "/harness" },
+          { text: "Desk", link: "/desk" },
         ],
       },
       {

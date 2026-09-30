@@ -1322,3 +1322,27 @@ reports a non-empty agent body as a violation.
   the fork probe, the no-fork-lineage invariant, deferred items: auto-trigger,
   generation-aware cue, deny-ruleset containment for project files, fork
   cleanup).
+
+## 2026-09-30: the desk, the user's persistent review queue (owner decision)
+
+- Problem: orchestrator review requests die in thread scrollback or in the
+  orchestrator's compactable memory. The desk is a durable queue on the lab
+  server with three surfaces: a desk tool (orchestrator rewrites the whole
+  list, V1 todowrite style, executor rejects non-orchestrator agents and
+  forks), a context part, and a sidebar widget fed by a plugin RPC.
+- Cache decided the injection point: provider caches are prefix-based, and
+  any system part precedes every message, so a desk change there would drop
+  the whole conversation from cache. The desk note rides at the tail of the
+  last user message (V1 SessionReminders pattern), re-rendered from storage
+  per request, never persisted, so compaction neither loses it nor
+  fossilizes it.
+- The desk is its own discovered plugin package (config/plugin/desk/, exports
+  . and ./tui), not part of the harness: the CLI picks up the TUI entrypoint
+  from the server's active plugin list, so no cli.json or
+  OPENCODE_CLI_CONFIG_CONTENT injection is needed. Shared RPC contract lives
+  in src/desk.ts because every file directly under config/plugin/ must be a
+  loadable plugin.
+- Read-only for the user on purpose: settling happens by replying in the
+  thread, the orchestrator settles via the tool. No new approval protocol.
+- Design doc: docs/desk.md. Deferred: timestamps/age, a live non-orchestrator
+  rejection check, attention notifications on raise.

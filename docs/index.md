@@ -17,4 +17,5 @@ proposals.
 How the lab runs: the [multi-agent pattern](/multi-agent) and the
 [implementation plan](/harness) (both describe the retired pi-era harness, kept
 for history), then the [prompt hierarchy](/prompt-hierarchy),
-[writing](/writing), and the [ledger](/ledger).
+[writing](/writing), and the [ledger](/ledger). The [desk](/desk) is the user's
+persistent review queue.
