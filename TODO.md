@@ -1346,3 +1346,27 @@ reports a non-empty agent body as a violation.
   thread, the orchestrator settles via the tool. No new approval protocol.
 - Design doc: docs/desk.md. Deferred: timestamps/age, a live non-orchestrator
   rejection check, attention notifications on raise.
+
+## 2026-10-01: runtime 2.0.20 --> 2.0.21 (owner decision)
+
+- Bump per the deliberate-upgrade convention: package.json pin, npm tarball
+  diffs of @opencode/{client,plugin,sdk} plus the v2.0.20...v2.0.21 commit
+  range (bare tag, no notes), then abstract stop and abstract doctor. Doctor
+  passed 18/18 on the new pin, including binder assembly, cue bus, and desk
+  RPC; the bump stays.
+- Type surface on our packages is unchanged except one additive pair: form
+  cancellation carries an optional message (#52137,
+  SessionFormCancelInput.message, cancelled FormResult variant). The plugin
+  and sdk .d.ts are byte-identical apart from chunk renames; the runtime ships
+  OpenTUI 0.5.14 and the plugin peer floor rose to match, which costs the lab
+  nothing (the desk has no own deps, it imports @opentui/core from the
+  runtime).
+- The two core fixes in range are off our surfaces: #52364 (ancestor
+  instruction reinjection) touches only the plugin read tool, #52368
+  (namespaced session identity headers) touches model-request. The browser
+  tools gating (#52309) is upstream built-ins, not our playwright MCP.
+- Upgrade watch (#51960 baseline order) rechecked against the v2.0.21 tag:
+  packages/core/src/session/context.ts still combines CodeMode, mcp,
+  references, skills, discovery, builtins, entries, unchanged since 2.0.19.
+  The perceived order adopted on 2026-09-29 stands; no hook or context.ts
+  change needed.
