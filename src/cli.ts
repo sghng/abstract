@@ -18,8 +18,8 @@
  *   abstract typ2docx <file.typ>
  *                         convert a Typst source to Word beside it, through
  *                         a house reference stock rebuilt fresh from the
- *                         patch series (citeproc, native numbering); no
- *                         server or model involved
+ *                         patch series (citeproc, native numbering, float
+ *                         placement fixpoint); no server or model involved
  *   abstract lint <file.typ|file.md> | -   [--threshold p] [--explain ids]
  *                         style-check a manuscript (or one plain prose
  *                         passage on stdin) against the style rule set
@@ -36,7 +36,6 @@ import {
   closeSync,
   existsSync,
   mkdirSync,
-  mkdtempSync,
   openSync,
   readFileSync,
   renameSync,
@@ -761,62 +760,8 @@ async function contextCmd(role?: string, json = false): Promise<void> {
 /* -- main ---------------------------------------------------------------- */
 
 /* -- typ2docx ------------------------------------------------------------- */
-
-/** Build the house reference stock into a private temp dir and return the
- *  dir path. Rebuilt on every conversion: the patch series is the single
- *  source of truth and nothing is cached. Quiet on success; the build
- *  log only surfaces when the build fails. */
-function buildReference(): string {
-  const script = join(HARNESS_DIR, "tools", "build-reference.sh");
-  const dir = mkdtempSync(join(tmpdir(), "typ2docx-"));
-  const r = spawnSync(script, ["--out", join(dir, "reference.docx")], {
-    encoding: "utf8",
-  });
-  if (r.error) fail(`build script not runnable: ${script}`);
-  if (r.status !== 0) {
-    process.stdout.write(r.stdout ?? "");
-    process.stderr.write(r.stderr ?? "");
-    process.exit(r.status ?? 1);
-  }
-  return dir;
-}
-
-/** Convert a Typst source to Word beside it, through the house reference
- *  stock rebuilt fresh from the patch series. Runs pandoc from the
- *  source's directory so relative bibliography and asset paths in the
- *  .typ resolve as they do when drafting there. */
-function typeToDocx(args: string[]): void {
-  const arg = args.find((a) => !a.startsWith("--"));
-  if (!arg) fail("usage: abstract typ2docx <file.typ>");
-  const src = resolve(arg);
-  if (!src.endsWith(".typ")) fail(`not a .typ file: ${arg}`);
-  if (!existsSync(src)) fail(`not found: ${arg}`);
-  const stockDir = buildReference();
-  const out = src.slice(0, -4) + ".docx";
-  const r = spawnSync(
-    "pandoc",
-    [
-      src,
-      "-o",
-      out,
-      "--citeproc",
-      "-f",
-      "typst",
-      "-t",
-      "docx+native_numbering",
-      "--figure-caption-position=above",
-      "--reference-doc",
-      join(stockDir, "reference.docx"),
-      "--lua-filter",
-      join(HARNESS_DIR, "tools", "typ2docx.lua"),
-    ],
-    { stdio: "inherit", cwd: dirname(src) },
-  );
-  rmSync(stockDir, { recursive: true, force: true });
-  if (r.error) fail(`pandoc not runnable: ${r.error.message}`);
-  if (r.status !== 0) process.exit(r.status ?? 1);
-  console.log(`wrote ${out}`);
-}
+// The typ2docx command lives in typ2docx/cli.ts (reference stock, pandoc
+// runs, float placement fixpoint); main() imports it lazily.
 
 async function main(): Promise<void> {
   const [cmd, ...rest] = process.argv.slice(2);
@@ -824,9 +769,11 @@ async function main(): Promise<void> {
     case undefined:
       await launch();
       return;
-    case "typ2docx":
-      typeToDocx(rest);
+    case "typ2docx": {
+      const { typeToDocx } = await import("../typ2docx/cli.ts");
+      await typeToDocx(rest);
       return;
+    }
     case "lint": {
       const { lint } = await import("../lint/cli.ts");
       await lint(rest);
@@ -853,9 +800,14 @@ async function main(): Promise<void> {
       console.log(
         "                     print each agent's context, skills, subagents, tools",
       );
-      console.log("       abstract typ2docx <file.typ>");
       console.log(
-        "                     convert Typst to Word beside it (house stock, citeproc)",
+        "       abstract typ2docx <file.typ> [--no-floats] [--max-passes N]",
+      );
+      console.log(
+        "                     convert Typst to Word beside it (house stock, citeproc,",
+      );
+      console.log(
+        "                     float placement fixpoint; --keep-scratch keeps temps)",
       );
       console.log(
         "       abstract lint <file.typ|file.md> | -   [--threshold p] [--explain ids]",

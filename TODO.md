@@ -1327,46 +1327,93 @@ reports a non-empty agent body as a violation.
 
 - Problem: orchestrator review requests die in thread scrollback or in the
   orchestrator's compactable memory. The desk is a durable queue on the lab
-  server with three surfaces: a desk tool (orchestrator rewrites the whole
-  list, V1 todowrite style, executor rejects non-orchestrator agents and
-  forks), a context part, and a sidebar widget fed by a plugin RPC.
-- Cache decided the injection point: provider caches are prefix-based, and
-  any system part precedes every message, so a desk change there would drop
-  the whole conversation from cache. The desk note rides at the tail of the
-  last user message (V1 SessionReminders pattern), re-rendered from storage
-  per request, never persisted, so compaction neither loses it nor
-  fossilizes it.
-- The desk is its own discovered plugin package (config/plugin/desk/, exports
-  . and ./tui), not part of the harness: the CLI picks up the TUI entrypoint
-  from the server's active plugin list, so no cli.json or
-  OPENCODE_CLI_CONFIG_CONTENT injection is needed. Shared RPC contract lives
-  in src/desk.ts because every file directly under config/plugin/ must be a
-  loadable plugin.
-- Read-only for the user on purpose: settling happens by replying in the
-  thread, the orchestrator settles via the tool. No new approval protocol.
+  server with three surfaces: a desk tool (orchestrator rewrites the whole list,
+  V1 todowrite style, executor rejects non-orchestrator agents and forks), a
+  context part, and a sidebar widget fed by a plugin RPC.
+- Cache decided the injection point: provider caches are prefix-based, and any
+  system part precedes every message, so a desk change there would drop the
+  whole conversation from cache. The desk note rides at the tail of the last
+  user message (V1 SessionReminders pattern), re-rendered from storage per
+  request, never persisted, so compaction neither loses it nor fossilizes it.
+- The desk is its own discovered plugin package (config/plugin/desk/, exports .
+  and ./tui), not part of the harness: the CLI picks up the TUI entrypoint from
+  the server's active plugin list, so no cli.json or OPENCODE_CLI_CONFIG_CONTENT
+  injection is needed. Shared RPC contract lives in src/desk.ts because every
+  file directly under config/plugin/ must be a loadable plugin.
+- Read-only for the user on purpose: settling happens by replying in the thread,
+  the orchestrator settles via the tool. No new approval protocol.
 - Design doc: docs/desk.md. Deferred: timestamps/age, a live non-orchestrator
   rejection check, attention notifications on raise.
 
 ## 2026-10-01: runtime 2.0.20 --> 2.0.21 (owner decision)
 
 - Bump per the deliberate-upgrade convention: package.json pin, npm tarball
-  diffs of @opencode/{client,plugin,sdk} plus the v2.0.20...v2.0.21 commit
-  range (bare tag, no notes), then abstract stop and abstract doctor. Doctor
-  passed 18/18 on the new pin, including binder assembly, cue bus, and desk
-  RPC; the bump stays.
+  diffs of @opencode/{client,plugin,sdk} plus the v2.0.20...v2.0.21 commit range
+  (bare tag, no notes), then abstract stop and abstract doctor. Doctor passed
+  18/18 on the new pin, including binder assembly, cue bus, and desk RPC; the
+  bump stays.
 - Type surface on our packages is unchanged except one additive pair: form
   cancellation carries an optional message (#52137,
-  SessionFormCancelInput.message, cancelled FormResult variant). The plugin
-  and sdk .d.ts are byte-identical apart from chunk renames; the runtime ships
+  SessionFormCancelInput.message, cancelled FormResult variant). The plugin and
+  sdk .d.ts are byte-identical apart from chunk renames; the runtime ships
   OpenTUI 0.5.14 and the plugin peer floor rose to match, which costs the lab
-  nothing (the desk has no own deps, it imports @opentui/core from the
-  runtime).
-- The two core fixes in range are off our surfaces: #52364 (ancestor
-  instruction reinjection) touches only the plugin read tool, #52368
-  (namespaced session identity headers) touches model-request. The browser
-  tools gating (#52309) is upstream built-ins, not our playwright MCP.
+  nothing (the desk has no own deps, it imports @opentui/core from the runtime).
+- The two core fixes in range are off our surfaces: #52364 (ancestor instruction
+  reinjection) touches only the plugin read tool, #52368 (namespaced session
+  identity headers) touches model-request. The browser tools gating (#52309) is
+  upstream built-ins, not our playwright MCP.
 - Upgrade watch (#51960 baseline order) rechecked against the v2.0.21 tag:
-  packages/core/src/session/context.ts still combines CodeMode, mcp,
-  references, skills, discovery, builtins, entries, unchanged since 2.0.19.
-  The perceived order adopted on 2026-09-29 stands; no hook or context.ts
-  change needed.
+  packages/core/src/session/context.ts still combines CodeMode, mcp, references,
+  skills, discovery, builtins, entries, unchanged since 2.0.19. The perceived
+  order adopted on 2026-09-29 stands; no hook or context.ts change needed.
+
+## 2026-10-03: float placement for Word export (owner decision)
+
+- Typst's placement: auto now reaches Word: the pandoc lab-stack reader carries
+  float intent as attr keyvals on the floated block (never a Div wrapper, so
+  default AST shape and upstream posture survive), the docx writer turns the
+  keyval into the standard keep-together recipe (cantSplit rows, keepNext chain,
+  caption riding), and a new fixpoint in the typ2docx pipeline (render
+  sentinel-injected AST through soffice, measure token positions, move whole
+  nodes) lands each float unsplit within one page of its authored position.
+  Engine in typ2docx/floats.ts; the design study lives uncommitted in
+  scratch/docx-float-placement.md.
+- The tool outgrew src/cli.ts: typ2docx/ now holds the command (cli.ts), the
+  filter (filter.lua, moved from tools/), and the fixpoint (floats.ts). tools/
+  keeps only the reference stock concern.
+- Two findings of note. LibreOffice honors the keepNext+cantSplit chain on
+  pandoc-generated docx (tdf#34957 semantics confirmed empirically: the plain
+  table splits where the chained one rides whole), so the fixpoint is a
+  blank-minimizer, not a split-fixer. And the loop needs the lock rule checked
+  before any candidate scoring: a cosmetic preference for the origin page
+  oscillates forever because each move drifts the origin page with it (observed
+  as a 7-pass ping-pong).
+- Amendment, same day, from the q-matrix manuscript test: real manuscripts never
+  write placement, so the design's opt-in gating did nothing at all. The filter
+  stamps placement = auto on every table and figure (default float policy). Note
+  paragraphs after floats were out of scope for the converter by owner decision.
+- Amendment, later the same day (owner): the pandoc lab-stack placement commits
+  were dropped entirely. The house policy is float-everything, so the reader has
+  nothing to carry and the chain does not belong in a forked writer; it now
+  lives in typ2docx/chain.ts as XML surgery on the pandoc-produced docx
+  (document.xml of a pandoc docx is a known shape; pandoc emits self-closing
+  tags as `<w:x />`, space-tolerant patterns are load-bearing). Pandoc stays
+  pristine lab-stack. Float notes are bundled source-side: the manuscript's
+  figure wrapper passes note: [...] into std.figure's body (parbreak keeps the
+  note below the content; typst-hs fully evaluates user wrappers, std resolves,
+  ..args passes), the filter re-expresses a note-bearing figure as one movable
+  unit Div [content, note], and the chain binds the unit's tail to the note.
+  Verified on the migrated manuscript: 12 notes attached, 20 floats whole with
+  captions, one honest over-tall unit (caption + 26-row table + note) accepted
+  with the note immediately following. Also fixed: pdftotext -bbox output goes
+  to a file (a full manuscript overflows spawnSync's stdout buffer).
+- Amendment, same day (owner): nested floats are movable after all, as long as
+  the highlight travels with the float. The filter lifts each floated block out
+  of its mark region into its own mark-wrapped unit at the same spot (the region
+  splits into adjacent fragments, identical since the pen is per-run), so the
+  fixpoint repositions all 20 manuscript floats, not just the top-level 7. Also
+  resolved a measurement ambiguity that produced false spill and over-tall
+  reports: the float's end marker is the next block's boundary, which jumps a
+  page when the next block starts a fresh page (pushed following float, heading
+  page break); a marker sitting at its page top no longer counts as spill or
+  over-tall.

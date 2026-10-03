@@ -66,16 +66,24 @@ agents developing this repository. The lab agents' shared invariants live in
   bisects the series (0 is the pristine export; partial builds write
   `reference/reference.debug.docx`); built docx artifacts are never committed:
   `abstract typ2docx` rebuilds a fresh stock into a private temp dir on every
-  conversion, so the patch series is the single source of truth. Also
-  `typ2docx.lua`, the typ2docx filter. The filter normalizes captured block/box
-  fills and `highlight` mark regions onto pandoc's native mark handling, the
-  default text highlight pen, and the writer pens every run inside a mark: text,
-  OMML math, and the caption supplements it builds itself (a marked caption's
-  "Table 9:" label lands inside the mark span). A marked region ending in a
-  table hoists it out (the following paragraph regains its `FirstParagraph`
-  margin). The filter also drops the reader's whitespace-only and anchor-only
-  paragraph artifacts (comment lines and labels) and flattens a figure that
-  wraps only a table
+  conversion, so the patch series is the single source of truth
+- `typ2docx/` -- the Typst-to-Word converter behind `abstract typ2docx`:
+  `cli.ts` (the command: reference stock, pandoc runs, scratch management),
+  `filter.lua` (content adjustments), `floats.ts` (the float placement
+  fixpoint), `chain.ts` (the keep-together chain as a docx post-process). Every
+  table and figure floats by house policy: the filter stamps the placement
+  marking and packs bundled notes and highlight-region floats into movable
+  units, the fixpoint renders sentinel-injected ASTs through soffice and moves
+  floats (whole nodes, never edited) until each lands unsplit within one page of
+  its authored position, and the chain (cantSplit rows, keepNext) keeps each
+  float atomic in Word. The filter also normalizes captured block/box fills and
+  `highlight` mark regions onto pandoc's native mark handling, the default text
+  highlight pen, and the writer pens every run inside a mark: text, OMML math,
+  and the caption supplements it builds itself (a marked caption's "Table 9:"
+  label lands inside the mark span). A marked region ending in a table hoists it
+  out (the following paragraph regains its `FirstParagraph` margin), and the
+  reader's whitespace-only and anchor-only paragraph artifacts (comment lines
+  and labels) are dropped
 - `repertoire/` -- the writer's convention corpus: pipeline scripts (`src/`
   journal-agnostic stages + `src/families/<j>/` fetchers) that turn journal
   articles (six families: psychometrika, jem, jebs, bjmsp, psyarxiv, arxiv stat)
