@@ -53,7 +53,8 @@ agents developing this repository. The lab agents' shared invariants live in
   one TUI (`--server`, `--session`). Also `abstract context [role] [--json]`
   (print what each agent receives: context pieces, skills, subagents, tools),
   `abstract typ2docx <file.typ>` (Typst to Word beside the source, through a
-  house reference stock rebuilt fresh from the patch series; citeproc and native
+  house reference stock rebuilt fresh from the patch series; citeproc under a
+  hash-pinned APA CSL cached in the abstract home; native
   numbering; no server or model involved), `abstract doctor` (contract smoke
   test), `abstract stop`
 - `reference/` -- reference material agents read on request (logistics,
