@@ -54,9 +54,8 @@ agents developing this repository. The lab agents' shared invariants live in
   (print what each agent receives: context pieces, skills, subagents, tools),
   `abstract typ2docx <file.typ>` (Typst to Word beside the source, through a
   house reference stock rebuilt fresh from the patch series; citeproc under a
-  hash-pinned APA CSL cached in the abstract home; native
-  numbering; no server or model involved), `abstract doctor` (contract smoke
-  test), `abstract stop`
+  hash-pinned APA CSL cached in the abstract home; native numbering; no server
+  or model involved), `abstract doctor` (contract smoke test), `abstract stop`
 - `reference/` -- reference material agents read on request (logistics,
   templates); the kernel carries the absolute path, and the harness plugin
   pre-approves role RW access alongside prompts/ (no per-edit prompts)
@@ -84,10 +83,13 @@ agents developing this repository. The lab agents' shared invariants live in
   mark regions onto pandoc's native mark handling, the default text highlight
   pen, and the writer pens every run inside a mark: text, OMML math, and the
   caption supplements it builds itself (a marked caption's "Table 9:" label
-  lands inside the mark span). A marked region ending in a table hoists it out
-  (the following paragraph regains its `FirstParagraph` margin), and the
-  reader's whitespace-only and anchor-only paragraph artifacts (comment lines
-  and labels) are dropped
+  lands inside the mark span). The writer's pen matches bare mark spans only, so
+  every pen span the filter mints is bare, and a marked code block (code has no
+  inlines to wrap) re-voices itself as a Code inline under a Source Code
+  custom-style div, where the same span pens it. A marked region ending in a
+  table hoists it out (the following paragraph regains its `FirstParagraph`
+  margin), and the reader's whitespace-only and anchor-only paragraph artifacts
+  (comment lines and labels) are dropped
 - `repertoire/` -- the writer's convention corpus: pipeline scripts (`src/`
   journal-agnostic stages + `src/families/<j>/` fetchers) that turn journal
   articles (six families: psychometrika, jem, jebs, bjmsp, psyarxiv, arxiv stat)
