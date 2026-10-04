@@ -73,15 +73,18 @@ agents developing this repository. The lab agents' shared invariants live in
   fixpoint), `chain.ts` (the keep-together chain as a docx post-process). Every
   table and figure floats by house policy: the filter stamps the placement
   marking and packs bundled notes and highlight-region floats into movable
-  units, the fixpoint renders sentinel-injected ASTs through soffice and moves
-  floats (whole nodes, never edited) until each lands unsplit within one page of
-  its authored position, and the chain (cantSplit rows, keepNext) keeps each
-  float atomic in Word. The filter also normalizes captured block/box fills and
-  `highlight` mark regions onto pandoc's native mark handling, the default text
-  highlight pen, and the writer pens every run inside a mark: text, OMML math,
-  and the caption supplements it builds itself (a marked caption's "Table 9:"
-  label lands inside the mark span). A marked region ending in a table hoists it
-  out (the following paragraph regains its `FirstParagraph` margin), and the
+  units, the fixpoint renders token-injected AST copies through soffice and
+  moves floats (whole nodes, never edited) until each lands unsplit within one
+  page of its authored position, and the chain (cantSplit rows, keepNext) keeps
+  each float atomic in Word. Measurement uses inline token runs, never sentinel
+  paragraphs: a scaffolding paragraph changes LibreOffice's keepNext page-break
+  arithmetic, so the measured layout must contain no object the delivered docx
+  lacks. The filter also normalizes captured block/box fills and `highlight`
+  mark regions onto pandoc's native mark handling, the default text highlight
+  pen, and the writer pens every run inside a mark: text, OMML math, and the
+  caption supplements it builds itself (a marked caption's "Table 9:" label
+  lands inside the mark span). A marked region ending in a table hoists it out
+  (the following paragraph regains its `FirstParagraph` margin), and the
   reader's whitespace-only and anchor-only paragraph artifacts (comment lines
   and labels) are dropped
 - `repertoire/` -- the writer's convention corpus: pipeline scripts (`src/`

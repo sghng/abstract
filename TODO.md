@@ -1417,3 +1417,23 @@ reports a non-empty agent body as a violation.
   page when the next block starts a fresh page (pushed following float, heading
   page break); a marker sitting at its page top no longer counts as spill or
   over-tall.
+- Amendment, same day (owner report: large empty spaces with a float that
+  would fit sitting at the next page top). Root cause: the sentinel
+  paragraphs used for measurement changed LibreOffice's keepNext break
+  arithmetic (stripping the plain sentinels from a settled pass docx and
+  re-rendering flipped a near-fit float across a page; the fixpoint
+  optimized a 68-page layout while the delivered docx rendered 69 pages).
+  The measurement redesign: inline token runs (white 12pt at w:w=30, the
+  pdftotext wholeness floor; matched as substrings since pdftotext merges
+  them into neighbor words) prepended/appended inside existing paragraphs
+  of per-pass render copies only, so no render contains an object the
+  delivered docx lacks. The float's end token rides inside it (spill and
+  over-tall now read the float's own tail; the next-block ambiguity is
+  gone), gapAfter is honest, origin anchors attach to the nearest
+  non-float block, and the delivered docx is token-free by construction.
+  Swap cycles (each move strictly improving for its mover) are cut by
+  full-block-order signatures, and the cheapest layout measured is kept.
+  On the grown RNRV1 manuscript: the phantom 440pt blanks are gone, one
+  honest 440pt blank remains where a 576pt unit cannot fit the free
+  space inside the +/-1 page rule, and references/appendix breaks stay
+  structural by design.
