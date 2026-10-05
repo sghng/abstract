@@ -86,7 +86,11 @@ agents developing this repository. The lab agents' shared invariants live in
   lands inside the mark span). The writer's pen matches bare mark spans only, so
   every pen span the filter mints is bare, and a marked code block (code has no
   inlines to wrap) re-voices itself as a Code inline under a Source Code
-  custom-style div, where the same span pens it. A marked region ending in a
+  custom-style div, where the same span pens it. Display math hidden from the
+  writer's own chopper (inside a mark span, or inside a marked region, whose
+  paragraphs the pen pass later spans) is lifted into its own paragraph (Word
+  displays an oMathPara only when its w:p holds no other run), post-equation
+  text pieces riding in math-continuation divs. A marked region ending in a
   table hoists it out (the following paragraph regains its `FirstParagraph`
   margin), and the reader's whitespace-only and anchor-only paragraph artifacts
   (comment lines and labels) are dropped
