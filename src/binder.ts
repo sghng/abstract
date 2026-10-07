@@ -45,7 +45,7 @@ import * as path from "node:path";
 import { parse } from "yaml";
 
 /**
- * Every role the lab runs: each gets a session, a TUI tab, and a doctor check.
+ * Every role the lab runs: each gets a session and a TUI tab.
  * Structural (not agent-curated), so it stays code.
  */
 export const ROLES = [
@@ -71,12 +71,13 @@ let lastGood: Binders | null = null;
 
 /**
  * Read the binder mapping from prompts/binder.yaml. Called per model request
- * by the harness hook and statically by `abstract context` / `abstract
- * doctor`. Validation is strict, because agents hand-edit the file: every
- * role must be present, unknown roles are rejected, and each entry must be a
- * list of stems. On any failure the last good parse is served (an empty
- * mapping if the file was already broken at server start) and the error
- * rides along for the caller to surface loudly.
+ * by the harness hook and statically by `abstract context`. Validation is
+ * strict, because agents hand-edit the file: every role must be present,
+ * unknown roles are rejected, each entry must be a list of stems, and every
+ * stem must resolve to a prompt file (a missing prompt would otherwise be
+ * skipped silently downstream). On any failure the last good parse is served
+ * (an empty mapping if the file was already broken at server start) and the
+ * error rides along for the caller to surface loudly.
  */
 export function loadBinders(): { binders: Binders; error?: string } {
   try {
@@ -93,6 +94,13 @@ export function loadBinders(): { binders: Binders; error?: string } {
     }
     for (const role of ROLES)
       if (!(role in binders)) throw new Error(`missing entry for "${role}"`);
+    for (const [role, stems] of Object.entries(binders))
+      for (const stem of stems)
+        if (!fs.existsSync(path.join(PROMPTS_DIR, `${stem}.md`)))
+          throw new Error(
+            `unresolved stem "${stem}" in "${role}" ` +
+              `(no such file prompts/${stem}.md)`,
+          );
     lastGood = binders as Binders;
     return { binders: lastGood };
   } catch (e) {

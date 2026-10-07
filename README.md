@@ -35,7 +35,6 @@ Then, inside a research project directory:
 abstract              # ensure runtime, server, and role sessions; attach the TUI
 abstract context      # what each agent receives: context, skills, subagents, tools
 abstract lint <f.typ> # style-check a manuscript against the expert edits (Jev)
-abstract doctor       # contract smoke test against the pinned runtime
 abstract stop         # stop the lab server
 ```
 

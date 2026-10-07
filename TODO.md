@@ -1367,6 +1367,49 @@ reports a non-empty agent body as a violation.
   skills, discovery, builtins, entries, unchanged since 2.0.19. The perceived
   order adopted on 2026-09-29 stands; no hook or context.ts change needed.
 
+## 2026-10-06: hindsight memory joins the lab (owner decision)
+
+- Long-term memory runs through @vectorize-io/hindsight-coding-agents, pinned as
+  an exact dependency and loaded by v2's config/plugin discovery via the
+  config/plugin/hindsight symlink into node_modules. The bare npm name in
+  opencode.json's plugin array never loads (v2 resolves plugin entries as paths
+  and fetches nothing), so no config entry exists: discovery only.
+- HINDSIGHT_CONFIG is injected by serverEnv() whenever config/hindsight.json
+  exists, lab-owned like OPENCODE_CONFIG_DIR (wins over inherited shell
+  exports); the plugin resolves its config path from the env at process start,
+  so the wiring goes live only after abstract stop + relaunch. The file pins
+  apiUrl (self-hosted memory.sgh.ng) and a static bankId "research" (one
+  lab-wide bank, not per-repo dynamics), with injectTimeoutMs capped at 5s so
+  prompt admission never blocks long behind the memory server's per-bank op
+  queue (observed 20s stalls while the fresh bank's initial git ingestion
+  drained).
+- v2 exposes the plugin's tools natively (no MCP child; the mcpServers block in
+  its plugin.json is v1 machinery), so the hindsight surface shows up as the
+  hindsight-coding-agent skill plus hindsight_* tools, verified in the plugin's
+  own log (bank "research", git in sync, reflects landing).
+- The config/plugin/hindsight symlink is gitignored machine plumbing: the
+  package pin in package.json is the durable record, and the symlink is
+  recreated per machine after bun install.
+- The server spawns with cwd anchored to the abstract home (no git repo there):
+  hindsight adopts the server's cwd repo for git-log ingestion and its codebase
+  survey, and a server launched from the harness directory ingested the
+  harness's whole commit history into the research bank (174 memory units, five
+  auto-generated knowledge pages; deleted after audit). Role sessions still
+  retain into the bank from their own project dirs.
+
+## 2026-10-06: doctor deleted (owner decision)
+
+- `abstract doctor` is gone, command and checks. It grew into a minutes-long run
+  (two live model-turn checks on leashes, extractor build, polling), and the
+  owner judges daily use the better test: the lab either serves turns or the
+  break is obvious in the TUI. The upgrade protocol is now abstract stop and
+  relaunch; keep the bump only when the lab comes up and serves turns.
+- One guard was worth re-homing rather than losing: binder stem resolution moved
+  into loadBinders (strict reader, last-good cache, loud error piece), where it
+  fires per model request instead of per doctor run; a missing prompt file was
+  otherwise skipped silently downstream. lint/scan.ts lost its extractorVersion
+  export, which existed only for doctor output.
+
 ## 2026-10-03: float placement for Word export (owner decision)
 
 - Typst's placement: auto now reaches Word: the pandoc lab-stack reader carries

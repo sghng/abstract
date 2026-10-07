@@ -24,7 +24,6 @@
  *                         style-check a manuscript (or one plain prose
  *                         passage on stdin) against the style rule set
  *                         via Jev; exit 1 flags violations
- *   abstract doctor       contract smoke test against the pinned runtime
  *   abstract stop         stop the lab server
  *
  * Files are memory; sessions are a lossy cache. The server is the only
@@ -39,20 +38,22 @@ import {
   openSync,
   readFileSync,
   renameSync,
-  rmSync,
   writeFileSync,
 } from "node:fs";
 import { randomBytes } from "node:crypto";
-import { homedir, tmpdir } from "node:os";
+import { homedir } from "node:os";
 import { basename, dirname, join, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 import { OpenCode } from "@opencode/client";
-import { ROLES, loadBinders } from "./binder.ts";
+import { ROLES } from "./binder.ts";
 import { buildReport, renderReport } from "./context.ts";
 
 const CLI_PATH = resolve(fileURLToPath(import.meta.url));
 const HARNESS_DIR = resolve(CLI_PATH, "..", "..");
 const CONFIG_DIR = join(HARNESS_DIR, "config");
+// The hindsight plugin resolves its config file from the env at process
+// start; the lab's copy sits with the lab config, committed with the repo.
+const HINDSIGHT_CONFIG_FILE = join(CONFIG_DIR, "hindsight.json");
 
 const PKG = JSON.parse(
   readFileSync(join(HARNESS_DIR, "package.json"), "utf8"),
@@ -118,6 +119,11 @@ function serverEnv(): Record<string, string> {
     OPENCODE_DISABLE_AUTOUPDATE: "1",
     OPENCODE_PASSWORD: pw,
     ABSTRACT_SERVER_URL: URL,
+    // Lab-owned, so it wins over any inherited shell export; set only when
+    // the lab ships the file, else the plugin keeps its per-user default.
+    ...(existsSync(HINDSIGHT_CONFIG_FILE)
+      ? { HINDSIGHT_CONFIG: HINDSIGHT_CONFIG_FILE }
+      : {}),
   };
 }
 
@@ -189,6 +195,11 @@ async function ensureServer(): Promise<void> {
     ["serve", "--hostname", "127.0.0.1", "--port", String(PORT)],
     {
       env: { ...process.env, ...serverEnv() },
+      // The server's cwd is the repo hindsight adopts for git ingestion and
+      // its codebase survey; the harness repo must never be that (the lab
+      // memory bank would fill with harness commits), so anchor it to the
+      // lab home, which is no repo at all.
+      cwd: ABSTRACT_HOME,
       stdio: ["ignore", logFd, logFd],
       detached: true,
     },
@@ -353,341 +364,6 @@ async function stop(): Promise<void> {
   }
 }
 
-/* -- doctor -------------------------------------------------------------- */
-
-/** Live model checks get a leash: a hung turn must not hang doctor. */
-function withTimeout<T>(p: Promise<T>, ms: number, label: string): Promise<T> {
-  return Promise.race([
-    p,
-    new Promise<T>((_, reject) =>
-      setTimeout(() => reject(new Error(`${label} timed out`)), ms),
-    ),
-  ]);
-}
-
-type Check = { name: string; run: () => Promise<string | false> };
-
-async function doctor(): Promise<void> {
-  ensurePassword();
-  ensureRuntime();
-  await ensureServer();
-  syncCredentials();
-  await awaitDiscovery();
-  const api = client();
-  let failures = 0;
-  const check = async (name: string, run: () => Promise<string>) => {
-    try {
-      const detail = await run();
-      console.log(`pass  ${name}  ${detail}`);
-    } catch (e) {
-      failures++;
-      console.log(
-        `FAIL  ${name}  ${e instanceof Error ? e.message : String(e)}`,
-      );
-    }
-  };
-  const assert = (cond: unknown, message: string): void => {
-    if (!cond) throw new Error(message);
-  };
-
-  await check("runtime pin", async () => {
-    const v = spawnSync(BIN, ["--version"], { encoding: "utf8" }).stdout.trim();
-    assert(v.includes(PIN), `binary ${v} != pin ${PIN}`);
-    return v;
-  });
-  await check("server healthy", async () => {
-    const s = await api.server.info();
-    assert(s.version.includes(PIN), `server ${s.version} != pin ${PIN}`);
-    return s.version;
-  });
-  await check("config dir read (model default)", async () => {
-    const m = await api.model.default();
-    assert(m.data, "no default model (config/opencode.json not read?)");
-    return `${m.data!.providerID}/${m.data!.id}`;
-  });
-  await check("role agents present", async () => {
-    const a = await api.agent.list();
-    const ids = new Set(a.data.map((x: any) => x.id));
-    const missing = ROLES.filter((r) => !ids.has(r));
-    assert(!missing.length, `missing: ${missing.join(", ")}`);
-    return ROLES.join(",");
-  });
-  await check("subagent catalog present", async () => {
-    const a = await api.agent.list();
-    const ids = new Set(a.data.map((x: any) => x.id));
-    // Nested under config/agents/subagents/, so each ID carries the prefix.
-    const want = [
-      "subagents/scout",
-      "subagents/citation-check",
-      "subagents/literature-review",
-      "subagents/nlpatch",
-      "subagents/stale-number-sweep",
-      "subagents/style-check",
-      "subagents/reviewer-deepseek",
-      "subagents/reviewer-kimi",
-    ];
-    const missing = want.filter((r) => !ids.has(r));
-    assert(!missing.length, `missing: ${missing.join(", ")}`);
-    return `${want.length} agents`;
-  });
-  await check("binder resolves", async () => {
-    const { binders, error } = loadBinders();
-    assert(!error, `prompts/binder.yaml: ${error}`);
-    const missing: string[] = [];
-    for (const role of ROLES)
-      for (const stem of binders[role])
-        if (!existsSync(join(HARNESS_DIR, "prompts", `${stem}.md`)))
-          missing.push(`${role}:${stem}`);
-    assert(!missing.length, `unresolved prompts: ${missing.join(", ")}`);
-    return ROLES.map((r) => `${r}(${binders[r].length})`).join(" ");
-  });
-  await check("doctrine scope pre-approved", async () => {
-    const a = await api.agent.list();
-    const want = ["prompts", "reference"].map((d) => join(HARNESS_DIR, d, "*"));
-    const missing: string[] = [];
-    for (const role of ROLES) {
-      const rules: any[] =
-        a.data.find((x: any) => x.id === role)?.permissions ?? [];
-      for (const w of want)
-        if (
-          !rules.some(
-            (r) =>
-              r.action === "external_directory" &&
-              r.resource === w &&
-              r.effect === "allow",
-          )
-        )
-          missing.push(`${role}:${w}`);
-    }
-    assert(!missing.length, `missing allow rules: ${missing.join(", ")}`);
-    return "roles RW prompts/*, reference/* with no prompt";
-  });
-  await check("skills discovered", async () => {
-    const s = await api.skill.list();
-    const names = s.data.map((x: any) => x.name ?? x.id);
-    return `${names.length} skills`;
-  });
-  await check("reference shelf", async () => {
-    const want = ["logistics.md", "ticket.md", "report.md", "memo.md"];
-    const missing = want.filter(
-      (f) => !existsSync(join(HARNESS_DIR, "reference", f)),
-    );
-    assert(!missing.length, `missing: ${missing.join(", ")}`);
-    return `${want.length} files`;
-  });
-  await check("credentials synced (providers live)", async () => {
-    const m = await api.model.list();
-    const providers = new Set(m.data.map((x: any) => x.providerID));
-    assert(
-      providers.has("minimax-cn-coding-plan"),
-      "minimax provider missing (credential sync failed?)",
-    );
-    return [...providers].join(",");
-  });
-  await check("mcp servers connected", async () => {
-    const m = await api.mcp.list();
-    const names = m.data.map((x: any) => x.name);
-    for (const want of ["web", "context7", "zotero"])
-      assert(names.includes(want), `mcp ${want} missing (${names.join(",")})`);
-    return names.join(",");
-  });
-  await check("harness plugin loaded", async () => {
-    const p = await api.plugin.list();
-    const ids = p.data.map((x: any) => x.id);
-    assert(ids.includes("abstract-harness"), `abstract-harness missing`);
-    return `${ids.length} plugins`;
-  });
-  await check("desk plugin + rpc", async () => {
-    const p = await api.plugin.list();
-    const ids = p.data.map((x: any) => x.id);
-    assert(ids.includes("abstract-desk"), `abstract-desk missing`);
-    const { Desk } = await import("./desk.ts");
-    const result: any = await api.rpc(Desk).list({});
-    assert(Array.isArray(result?.items), "desk list returned no items array");
-    return `${result.items.length} item(s) on the desk`;
-  });
-  // Local contract test of the lint extractor (builds it on first run; no
-  // model, no API): fixtures through both fronts, pinning the math flush
-  // on the Typst side and the container skip on the Markdown side.
-  await check("lint extractor", async () => {
-    const { scanText, extractorVersion } = await import("../lint/scan.ts");
-    const version = extractorVersion();
-    const blocks = scanText(
-      "= Intro\n" +
-        "\n" +
-        "A paragraph of reasonable length, so it survives the minimum filter.\n" +
-        "$ x + y $\n" +
-        "\n" +
-        "= References\n" +
-        "\n" +
-        "This section is dropped because reference entries are not prose.\n",
-    );
-    assert(
-      blocks.length === 1,
-      `expected 1 block, got ${JSON.stringify(blocks).slice(0, 200)}`,
-    );
-    const b = blocks[0];
-    assert(b.section === "Intro", `section ${JSON.stringify(b.section)}`);
-    assert(b.role === "body", `role ${JSON.stringify(b.role)}`);
-    assert(b.start === 3 && b.end === 3, `lines ${b.start}-${b.end}`);
-
-    const { scanFile } = await import("../lint/scan.ts");
-    const tmp = join(tmpdir(), `abstract-doctor-${process.pid}.md`);
-    writeFileSync(
-      tmp,
-      "---\ntitle: t\n---\n\n# Title\n\n## Abstract\n\n" +
-        "The abstract paragraph clears the minimum filter with room to spare.\n" +
-        "\n$$\nE = mc^2\n$$\n\n" +
-        "::: center\n+-----+-----+\n| a   | b   |\n+-----+-----+\n:::\n\n" +
-        "## References\n\n" +
-        "Dropped, because reference entries are not prose at all.\n",
-    );
-    const mdBlocks = scanFile(tmp);
-    rmSync(tmp);
-    assert(
-      mdBlocks.length === 1,
-      `expected 1 md block, got ${JSON.stringify(mdBlocks).slice(0, 200)}`,
-    );
-    const m = mdBlocks[0];
-    assert(m.section === "abstract", `md section ${JSON.stringify(m.section)}`);
-    assert(m.role === "abstract", `md role ${JSON.stringify(m.role)}`);
-    assert(m.start === 9 && m.end === 9, `md lines ${m.start}-${m.end}`);
-    return `${version}, Block contract round-trip ok (typ + md)`;
-  });
-  // Live round trip: a queue-delivered prompt through a real model turn in a
-  // throwaway role session. Exercises binder assembly (context hook), prompt
-  // admission, and wait/drain.
-  const scratch = join(ABSTRACT_HOME, "doctor-scratch");
-  mkdirSync(scratch, { recursive: true });
-  const ephemeral: string[] = [];
-  await check("tui tab seeding", async () => {
-    const s = await api.session.create({
-      title: "doctor-tabs",
-      agent: "orchestrator",
-      location: { directory: scratch },
-      metadata: { role: "orchestrator", ephemeral: true },
-    });
-    ephemeral.push(s.id);
-    seedTabs(scratch, new Map([["orchestrator", s]]));
-    const file = JSON.parse(readFileSync(TUI_TABS_FILE, "utf8"));
-    const tabs = file.cwd?.[scratch]?.tabs ?? [];
-    assert(
-      tabs.some((t: any) => t.sessionID === s.id),
-      "seeded tab missing from tabs.json",
-    );
-    delete file.cwd[scratch]; // doctor leaves no scratch scopes behind
-    writeFileSync(TUI_TABS_FILE, JSON.stringify(file));
-    return "role tabs land in the persisted tab bar";
-  });
-  await check("binder assembly + queue round trip", async () => {
-    const s = await api.session.create({
-      title: "doctor",
-      agent: "orchestrator",
-      location: { directory: scratch },
-      metadata: { role: "orchestrator", ephemeral: true },
-    });
-    ephemeral.push(s.id);
-    await withTimeout(
-      api.session.prompt({
-        sessionID: s.id,
-        text: "Reply with exactly one word: ok",
-        delivery: "queue",
-      }),
-      15_000,
-      "prompt",
-    );
-    await withTimeout(
-      api.session.wait({ sessionID: s.id }),
-      90_000,
-      "model turn",
-    );
-    const messages = await api.message.list({
-      sessionID: s.id,
-      order: "desc",
-      limit: 5,
-      type: "assistant",
-    });
-    const text = JSON.stringify(messages);
-    assert(
-      text.toLowerCase().includes("ok"),
-      `unexpected reply: ${text.slice(0, 160)}`,
-    );
-    return "model replied";
-  });
-
-  // Cue bus end to end: a real role session calls the cue tool; the peer
-  // session's transcript must contain the delivered cue as a synthetic
-  // message (steer delivery: an idle recipient wakes on it).
-  await check("cue bus end to end", async () => {
-    const a = await api.session.create({
-      title: "doctor-a",
-      agent: "orchestrator",
-      location: { directory: scratch },
-      metadata: { role: "orchestrator", ephemeral: true },
-    });
-    const b = await api.session.create({
-      title: "doctor-b",
-      agent: "engineer",
-      location: { directory: scratch },
-      metadata: { role: "engineer", ephemeral: true },
-    });
-    ephemeral.push(a.id, b.id);
-    await withTimeout(
-      api.session.prompt({
-        sessionID: a.id,
-        text:
-          'Call the cue tool exactly once with target "engineer" and message "doctor ping" ' +
-          "(calling the tool is the whole point of this task). Then reply with exactly: done",
-        delivery: "queue",
-      }),
-      15_000,
-      "prompt",
-    );
-    await withTimeout(
-      api.session.wait({ sessionID: a.id }),
-      120_000,
-      "orchestrator turn",
-    );
-    const ma = await api.message.list({ sessionID: a.id, order: "asc" });
-    const ta = JSON.stringify(ma);
-    const toolResults = ma.data
-      .flatMap((m: any) =>
-        (m.content ?? []).filter((p: any) => p.type === "tool"),
-      )
-      .map(
-        (p: any) =>
-          `${p.name}: ${JSON.stringify(p.state?.content ?? p.state ?? {}).slice(0, 200)}`,
-      )
-      .join(" ;; ");
-    assert(
-      ta.includes("cue sent to engineer"),
-      `cue tool did not succeed; results: ${toolResults || "no tool calls"}`,
-    );
-    await withTimeout(
-      api.session.wait({ sessionID: b.id }),
-      120_000,
-      "engineer cue turn",
-    );
-    const messages = await api.message.list({ sessionID: b.id, order: "asc" });
-    const cue = messages.data.find(
-      (m: any) =>
-        m.type === "synthetic" &&
-        (m.text ?? "").includes("[cue from orchestrator] doctor ping"),
-    );
-    assert(
-      cue,
-      `no synthetic cue in engineer transcript: ${JSON.stringify(messages.data).slice(0, 160)}`,
-    );
-    return "cue delivered (synthetic, steer)";
-  });
-
-  for (const id of ephemeral)
-    await api.session.remove({ sessionID: id }).catch(() => {});
-
-  if (failures) fail(`${failures} check(s) failed`);
-  console.log("abstract: all checks passed");
-}
-
 /* -- context -------------------------------------------------------------- */
 
 /**
@@ -785,9 +461,6 @@ async function main(): Promise<void> {
         rest.includes("--json"),
       );
       return;
-    case "doctor":
-      await doctor();
-      return;
     case "stop":
       await stop();
       return;
@@ -817,9 +490,6 @@ async function main(): Promise<void> {
       );
       console.log(
         "                     stdin, against the style rules (R53 p=.78 hits)",
-      );
-      console.log(
-        "       abstract doctor   contract smoke test against the pinned runtime",
       );
       console.log("       abstract stop     stop the lab server");
       return;

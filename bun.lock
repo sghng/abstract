@@ -8,6 +8,7 @@
         "@opencode/plugin": "2.0.21",
         "@opencode/sdk": "2.0.21",
         "@typesafe-ai/sdk": "0.6.0",
+        "@vectorize-io/hindsight-coding-agents": "0.8.0",
         "cheerio": "^1.2.0",
         "cloudflare": "^7.1.0",
         "playwright": "^1.63.0",
@@ -557,6 +558,8 @@
     "@typesafe-ai/sdk": ["@typesafe-ai/sdk@0.6.0", "", {}, "sha512-IddX+Q0XM+VagOUZFeP7wZjaO4SHMdvnh2zEBdrZZnXedWI3BNK1lKhMx3ayrkFWvVLbVcUHJy6AVZlY+e6Jaw=="],
 
     "@ungap/structured-clone": ["@ungap/structured-clone@1.4.0", "", {}, "sha512-1mEZtMKPM09vDmQt5y7YvmN2+DFTP7Tg0EWXdic8/C6VRnpb33e4ghisCIE3WZjsE2N8mf+QV1Zqh7ZFYLWInQ=="],
+
+    "@vectorize-io/hindsight-coding-agents": ["@vectorize-io/hindsight-coding-agents@0.8.0", "", { "bin": { "hindsight-grok-hook": "dist/grok-hook.js", "hindsight-kimi-hook": "dist/kimi-hook.js", "hindsight-qwen-hook": "dist/qwen-hook.js", "hindsight-codex-hook": "dist/codex-hook.js", "hindsight-dcode-hook": "dist/dcode-hook.js", "hindsight-devin-hook": "dist/devin-hook.js", "hindsight-droid-hook": "dist/droid-hook.js", "hindsight-zcode-hook": "dist/zcode-hook.js", "hindsight-claude-hook": "dist/claude-hook.js", "hindsight-cursor-hook": "dist/cursor-hook.js", "hindsight-copilot-hook": "dist/copilot-hook.js", "hindsight-coding-agents": "dist/installer.js", "hindsight-traecode-hook": "dist/traecode-hook.js", "hindsight-grok-stop-hook": "dist/grok-stop-hook.js", "hindsight-kimi-stop-hook": "dist/kimi-stop-hook.js", "hindsight-qwen-stop-hook": "dist/qwen-stop-hook.js", "hindsight-dcode-stop-hook": "dist/dcode-stop-hook.js", "hindsight-droid-stop-hook": "dist/droid-stop-hook.js", "hindsight-zcode-stop-hook": "dist/zcode-stop-hook.js", "hindsight-antigravity-hook": "dist/antigravity-hook.js", "hindsight-cursor-stop-hook": "dist/cursor-stop-hook.js", "hindsight-copilot-stop-hook": "dist/copilot-stop-hook.js", "hindsight-traecode-stop-hook": "dist/traecode-stop-hook.js", "hindsight-antigravity-statusline": "dist/antigravity-statusline.js", "hindsight-grok-sessionstart-hook": "dist/grok-sessionstart-hook.js", "hindsight-kimi-sessionstart-hook": "dist/kimi-sessionstart-hook.js", "hindsight-qwen-sessionstart-hook": "dist/qwen-sessionstart-hook.js", "hindsight-dcode-sessionstart-hook": "dist/dcode-sessionstart-hook.js", "hindsight-droid-sessionstart-hook": "dist/droid-sessionstart-hook.js", "hindsight-zcode-sessionstart-hook": "dist/zcode-sessionstart-hook.js", "hindsight-cursor-sessionstart-hook": "dist/cursor-sessionstart-hook.js", "hindsight-copilot-sessionstart-hook": "dist/copilot-sessionstart-hook.js", "hindsight-traecode-sessionstart-hook": "dist/traecode-sessionstart-hook.js" } }, "sha512-CViWmh2fnVjhQM8kqOJ2GIGC0kp/Gv4t5X+j+kzpzP+T54PiKQPsrQOunvmluEE3JCGnRQOIcz91Vu/0QUcZow=="],
 
     "@vercel/oidc": ["@vercel/oidc@3.2.0", "", {}, "sha512-UycprH3T6n3jH0k44NHMa7pnFHGu/N05MjojYr+Mc6I7obkoLIJujSWwin1pCvdy/eOxrI/l3uDLQsmcrOb4ug=="],
 

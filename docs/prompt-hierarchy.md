@@ -57,8 +57,8 @@ the cached request prefix (`session/runner/llm.ts`), so editing a body
 invalidates the prompt cache, the registry does not reload without a server
 restart in the pinned binary (owner-tested on 2.0.18), and a prompt shared by
 two roles would have to live in two bodies. `abstract context` reports a
-non-empty body as a violation, and `abstract doctor` checks that every binder
-stem resolves, because a missing prompt is skipped silently.
+non-empty body as a violation, and `loadBinders` rejects a mapping whose stem
+resolves to no file, because a missing prompt is skipped silently.
 
 ## The Rules
 

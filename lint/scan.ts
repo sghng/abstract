@@ -14,8 +14,7 @@
  *
  * The binary is built lazily on first use: cargo builds it into the
  * abstract home, a hash of the crate sources stamps it, and a source change
- * triggers a rebuild. No TS fallback; cargo is a loud requirement, and
- * `abstract doctor` round-trips the contract.
+ * triggers a rebuild. No TS fallback; cargo is a loud requirement.
  */
 import { spawnSync } from "node:child_process";
 import { createHash } from "node:crypto";
@@ -105,12 +104,6 @@ export function ensureExtract(): string {
   renameSync(tmp, BIN);
   writeFileSync(STAMP, sourceStamp());
   return BIN;
-}
-
-/** The extractor version string (for doctor). */
-export function extractorVersion(): string {
-  const r = spawnSync(ensureExtract(), ["--version"], { encoding: "utf8" });
-  return r.stdout.trim() || "abstract-extract (unknown version)";
 }
 
 /** Scan a Typst source text (stdin to the extractor). */

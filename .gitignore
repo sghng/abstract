@@ -3,6 +3,10 @@ mcp.secrets.json
 .env
 .DS_Store
 node_modules/
+
+# hindsight plugin wiring: symlink into node_modules, recreated per machine
+# after bun install; the package is pinned in package.json
+config/plugin/hindsight
 *.log
 sessions/
 models-store.json

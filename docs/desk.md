@@ -120,9 +120,7 @@ description repeats the write semantics so the contract rides with the tool.
 
 ## Verification
 
-`abstract doctor` checks that the `abstract-desk` plugin is loaded and that the
-RPC round trip returns an items array. The TUI half has no automated check:
-verify by hand that the sidebar section appears after a desk raise, that
+Verify by hand that the sidebar section appears after a desk raise, that
 `<leader>d` opens the detail, and that a settle clears the section.
 
 One discovery note, learned the hard way. When the orchestrator first met the
