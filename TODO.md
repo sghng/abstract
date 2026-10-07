@@ -1501,3 +1501,28 @@ reports a non-empty agent body as a violation.
   highlighted, followers un-indented (29 by the writer's own
   first-paragraph-after-math convention, 2 as true continuations), Compact count
   and page count unchanged at 673 and 72.
+
+## 2026-10-07: runtime 2.0.21 --> 2.0.24 (owner decision)
+
+- Bump per the deliberate-upgrade convention (doctor retired; the gate is now
+  stop and relaunch, kept only when the lab serves turns; the owner runs that
+  test). Reviewed the v2.0.21...v2.0.24 commit range (three releases, bare tags)
+  plus tarball-level .d.ts diffs of @opencode/{client,plugin,sdk}.
+- Nothing on the lab's surfaces broke; every change is additive or widening: the
+  plugin session domain gains remove and compact (#52385), session create gains
+  parent support (#52359), the client gains vcs.init, the TUI dialog gains
+  search and footer actions (#53009, desk could adopt), keymap.layer's parameter
+  is renamed factory with the same call shape, and the only type replacements
+  widen (chunkTimeout/headerTimeout accept false per #49229, capabilities takes
+  the partial ConfigModelCapabilities per #51365).
+- Worth observing after relaunch, no action now: system-update placement fixes
+  (#52426, #52568) touch request shaping the desk note and hook pieces ride;
+  #52382 stops automatic copies of directly read instructions; MCP errors are
+  self-describing with transient-connect retries (#52418, #52614), which should
+  quiet the context7/web/zotero flakiness.
+- Upgrade watch (#51960 baseline order) rechecked against the v2.0.24 tag:
+  packages/core/src/session/context.ts still combines CodeMode, mcp, references,
+  skills, discovery, builtins, entries. The 2026-09-29 perceived order stands.
+- Companion bumps in the same round, all minor/patch within pinned majors:
+  cloudflare 7.1.0 --> 7.3.0, @types/node 26.6.2 --> 26.6.4, prettier 3.9.8 -->
+  3.9.9. Owner verified the lab comes up and serves turns on 2.0.24.

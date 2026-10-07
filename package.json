@@ -11,13 +11,13 @@
     "docs:preview": "vitepress preview docs"
   },
   "dependencies": {
-    "@opencode/client": "2.0.21",
-    "@opencode/plugin": "2.0.21",
-    "@opencode/sdk": "2.0.21",
+    "@opencode/client": "2.0.24",
+    "@opencode/plugin": "2.0.24",
+    "@opencode/sdk": "2.0.24",
     "@typesafe-ai/sdk": "0.6.0",
     "@vectorize-io/hindsight-coding-agents": "0.8.0",
     "cheerio": "^1.2.0",
-    "cloudflare": "^7.1.0",
+    "cloudflare": "^7.3.0",
     "playwright": "^1.63.0",
     "turndown": "^7.2.4",
     "yaml": "^2.9.1",
@@ -25,10 +25,10 @@
   },
   "devDependencies": {
     "@prettier/plugin-xml": "^3.4.2",
-    "@types/node": "^26.6.2",
+    "@types/node": "^26.6.4",
     "@types/turndown": "^5.0.6",
     "bun-types": "^1.4.2",
-    "prettier": "^3.9.8",
+    "prettier": "^3.9.9",
     "vitepress": "^1.6.4"
   }
 }
