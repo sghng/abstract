@@ -101,9 +101,11 @@ OpenTUI scrollbox cannot fit its content under a yoga-level cap: any definite
 bound in the tree becomes the effective height, so a capped scrollbox always
 renders at its cap and a short note floats in a near-fullscreen dialog. The
 plugin therefore measures the markdown (`onSizeChange` fires on every layout,
-rewrap included) and sets the scrollbox height explicitly: the note's own height
-plus its bottom padding row when it fits, the terminal cap (rows minus chrome
-and breathing room) when it does not. With the height following the content, the
+rewrap included) and drives the height from it: auto while the note and its
+bottom padding row fit the terminal cap (auto never scrolls, so the markdown's
+partial first measure cannot flash a scrollbar), the cap (rows minus chrome and
+breathing room) pinned only while the note outgrows it, and auto again clears
+the pin when the terminal grows. With the height following the content, the
 frame's centered anchoring places short notes mid-screen and long notes with
 margin above and below, scrolling when capped (the host-themed scrollbar shows
 then). The wheel and the scrollbar scroll natively; the keys ride a modal-mode
