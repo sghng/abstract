@@ -217,23 +217,28 @@ function showDetail(context: Plugin.Context, item: DeskItem) {
 }
 
 // The dialog frame bounds width only, so the note body must bound itself.
-// OpenTUI scrollboxes cannot fit their content under a yoga-level cap: any
-// definite bound in the tree (maxHeight anywhere) becomes the effective
-// height, so a capped scrollbox always renders at its cap and a short note
-// floats in a near-fullscreen dialog. The body therefore measures the
-// markdown (onSizeChange fires on every layout, rewrap included) and
-// drives the height from it: auto while the note and its bottom padding
-// row fit the screen cap (auto never scrolls, so the markdown's partial
-// first measure cannot flash a scrollbar), the cap (terminal rows minus
-// chrome and breathing room) pinned only while the note outgrows it;
-// returning to auto clears the pin when the terminal grows. The cap
-// budgets a row for the title; titles are authored one line. With
-// the height following the content, the frame's centered anchoring places
-// short notes mid-screen and long notes with margin above and below.
-// Wheel and scrollbar are native to the scrollbox; scroll keys ride a
-// modal-mode keymap layer created inside this tree, so they live exactly
-// as long as the dialog (the dialog stack pushes the modal input mode,
-// which is what makes escape work in host dialogs).
+// An OpenTUI scrollbox cannot fit its content, period: auto (or any
+// yoga-level bound) makes it fill the nearest definite ancestor, so an
+// unset scrollbox in this dialog renders at full screen height, and a
+// maxHeight cap inflates it to the cap. Only an explicit height pins it.
+// The body therefore measures the markdown (onSizeChange fires on every
+// layout, rewrap included) and pins the height from the first measure on:
+// the note's height plus its bottom padding row, at most the screen cap
+// (terminal rows minus chrome and breathing room; the cap budgets a row
+// for the title, and titles are authored one line). The pin lands inside
+// the markdown's first layout pass, before any paint, so the inflated
+// pre-measure state is never shown. With the height following the
+// content, the frame's centered anchoring places short notes mid-screen
+// and long notes with margin above and below.
+// The scrollbar's own auto-visibility is still driven by layout (it
+// reacts while the markdown grows through stale viewport heights, which
+// paints a one-frame bar on notes that end up fitting), so visibility is
+// manual, from the same policy as the height: the bar shows exactly
+// while the note is pinned at the cap. Wheel and scrollbar are native to
+// the scrollbox; scroll keys ride a modal-mode keymap layer created
+// inside this tree, so they live exactly as long as the dialog (the
+// dialog stack pushes the modal input mode, which is what makes escape
+// work in host dialogs).
 function Detail(props: { context: Plugin.Context; item: DeskItem }) {
   const context = props.context;
   const theme = context.theme;
@@ -247,10 +252,18 @@ function Detail(props: { context: Plugin.Context; item: DeskItem }) {
 
   const [noteRows, setNoteRows] = createSignal<number>();
   const cap = () => Math.max(3, rows() - 8);
+  const capped = () => {
+    const note = noteRows();
+    return note !== undefined && note + 1 > cap();
+  };
   const bodyHeight = () => {
     const note = noteRows();
-    return note === undefined || note + 1 <= cap() ? "auto" : cap();
+    return note === undefined ? undefined : Math.min(note + 1, cap());
   };
+
+  createEffect(() => {
+    if (body) body.verticalScrollBar.visible = capped();
+  });
 
   context.keymap.layer(() => ({
     mode: "modal",
@@ -318,6 +331,7 @@ function Detail(props: { context: Plugin.Context; item: DeskItem }) {
           if (url && /^https?:\/\//i.test(url)) openUrl(context, url);
         }}
         verticalScrollbarOptions={{
+          visible: false,
           trackOptions: {
             backgroundColor: theme.surface("dialog").background.base,
             foregroundColor: theme.scrollbar.base,
