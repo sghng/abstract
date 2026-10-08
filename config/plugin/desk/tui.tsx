@@ -211,7 +211,7 @@ async function openUrl(context: Plugin.Context, url: string) {
 
 function showDetail(context: Plugin.Context, item: DeskItem) {
   context.ui.dialog.show(() => {
-    context.ui.dialog.set({ centered: true });
+    context.ui.dialog.set({ centered: true, size: "large" });
     return <Detail context={context} item={item} />;
   });
 }

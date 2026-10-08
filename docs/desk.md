@@ -90,38 +90,39 @@ thread, and the orchestrator rewrites the desk. The sidebar section follows the
 builtin MCP section: a bold "Desk" header, one dot row per item (the title wraps
 to show the whole thing; click opens the detail dialog), and a fold caret once
 the desk holds more than two items, with a muted count when folded. The detail
-dialog renders the detail note as Markdown (the `<markdown>` renderable) and
-centers itself vertically (`ui.dialog.set({ centered: true })` from inside the
-render factory, the same spot the host's own dialogs set their presentation,
-because every show resets it; anchored a quarter from the top, a long note reads
-off). The dialog frame bounds width only, so the note body must bound itself,
-and an OpenTUI scrollbox cannot fit its content under a yoga-level cap: any
-definite bound in the tree becomes the effective height, so a capped scrollbox
-always renders at its cap and a short note floats in a near-fullscreen dialog.
-The plugin therefore measures the markdown (`onSizeChange` fires on every
-layout, rewrap included) and sets the scrollbox height explicitly: the note's
-own height plus its bottom padding row when it fits, the terminal cap (rows
-minus chrome and breathing room) when it does not. With the height following the
-content, the frame's centered anchoring places short notes mid-screen and long
-notes with margin above and below, scrolling when capped (the host-themed
-scrollbar shows then). The wheel and the scrollbar scroll natively; the keys
-ride a modal-mode keymap layer created inside the dialog component's tree (up/k
-and down/j one line, pgup/pgdn one viewport, g/home and shift+g/end the ends),
-so they die with the dialog and can never leak into the prompt. The renderable
-linkifies URLs already and emits OSC 8 hyperlinks where the terminal supports
-them; a plain click opens the link anyway, by resolving
-`renderer.getLinkAt(x, y)` at the pointer's cell (mouse events carry screen
-coordinates) and spawning the platform opener, skipping clicks that ended a text
-selection. One subtlety: markdown styling resolves through `markup.*` scopes in
-the renderable's `SyntaxStyle`, so an empty style renders one plain string; the
-plugin builds the TUI's own markup rule set from the ambient theme
-(`packages/theme/tui/syntax.ts` is the reference). The dialog title is plain:
-bold and word-wrapped, no syntax styling. Interactions beyond the rows:
-`<leader>d` (free among the default leader bindings), the palette, or `/desk`
-for a select list then detail. One loader constraint learned the loud way:
-`keymap.layer` needs the Keymap provider from the UI tree, so it registers
-inside an `app` slot render; calling it at setup top level fails with
-"Keymap.Provider is missing".
+dialog renders the detail note as Markdown (the `<markdown>` renderable), sits
+at the large width (88 columns, a comfortable prose measure, capped by the
+terminal) and centers itself vertically
+(`ui.dialog.set({ centered: true, size: "large" })` from inside the render
+factory, the same spot the host's own dialogs set their presentation, because
+every show resets it; anchored a quarter from the top, a long note reads off).
+The dialog frame bounds width only, so the note body must bound itself, and an
+OpenTUI scrollbox cannot fit its content under a yoga-level cap: any definite
+bound in the tree becomes the effective height, so a capped scrollbox always
+renders at its cap and a short note floats in a near-fullscreen dialog. The
+plugin therefore measures the markdown (`onSizeChange` fires on every layout,
+rewrap included) and sets the scrollbox height explicitly: the note's own height
+plus its bottom padding row when it fits, the terminal cap (rows minus chrome
+and breathing room) when it does not. With the height following the content, the
+frame's centered anchoring places short notes mid-screen and long notes with
+margin above and below, scrolling when capped (the host-themed scrollbar shows
+then). The wheel and the scrollbar scroll natively; the keys ride a modal-mode
+keymap layer created inside the dialog component's tree (up/k and down/j one
+line, pgup/pgdn one viewport, g/home and shift+g/end the ends), so they die with
+the dialog and can never leak into the prompt. The renderable linkifies URLs
+already and emits OSC 8 hyperlinks where the terminal supports them; a plain
+click opens the link anyway, by resolving `renderer.getLinkAt(x, y)` at the
+pointer's cell (mouse events carry screen coordinates) and spawning the platform
+opener, skipping clicks that ended a text selection. One subtlety: markdown
+styling resolves through `markup.*` scopes in the renderable's `SyntaxStyle`, so
+an empty style renders one plain string; the plugin builds the TUI's own markup
+rule set from the ambient theme (`packages/theme/tui/syntax.ts` is the
+reference). The dialog title is plain: bold and word-wrapped, no syntax styling.
+Interactions beyond the rows: `<leader>d` (free among the default leader
+bindings), the palette, or `/desk` for a select list then detail. One loader
+constraint learned the loud way: `keymap.layer` needs the Keymap provider from
+the UI tree, so it registers inside an `app` slot render; calling it at setup
+top level fails with "Keymap.Provider is missing".
 
 One location lesson, also learned the loud way. The desk RPC is location-scoped
 on the server (plugin storage keys by project), and an RPC call that carries no
