@@ -57,6 +57,10 @@ project-root/
   `experiments/NN-name/`, `model/NN-name/`.
 - **No dates in filenames, no timelines.** A note carries at most a `date:`
   field in frontmatter; use sequence, priority, and dependencies instead.
+- **Deadlines are the user's.** Never ask when requested work is due, and never
+  let a due date decide what gets done or how much. Outside the lab, a date
+  still decides relevance: a call for papers or a special issue past due is
+  closed, so drop it.
 - **Wiki links** `[[name]]`: filename only, no paths, no extensions. Resolve a
   link by searching `notes/` for files matching the stem.
 - **Notes are not versioned; artifacts are.** Notes merge, split, or supersede

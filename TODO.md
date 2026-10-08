@@ -1501,6 +1501,12 @@ reports a non-empty agent body as a violation.
   highlighted, followers un-indented (29 by the writer's own
   first-paragraph-after-math convention, 2 as true continuations), Compact count
   and page count unchanged at 673 and 72.
+- 2026-10-08: kernel deadline doctrine. The lab never asks when requested work
+  is due and never lets a due date shape what gets done or how much; the user
+  alone answers to deadlines (observed: the orchestrator asking "when is the
+  meeting?" when a deliverable was named for an occasion, and date-driven
+  scoping producing unreasonable assumptions). Outside the lab a date still
+  decides relevance: a past-due call for papers or special issue is closed.
 
 ## 2026-10-07: runtime 2.0.21 --> 2.0.24 (owner decision)
 
