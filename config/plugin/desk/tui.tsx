@@ -8,13 +8,22 @@
  * desk with its tool.
  *
  * Interactions: the sidebar rows and the command both open a read-only
- * detail view rendered as Markdown. The command is <leader>d (free among
- * the default leader bindings), in the palette, and as /desk. The sidebar
- * folds like the builtin MCP section: a caret appears once the desk holds
- * more than two items.
+ * detail view rendered as Markdown, in a scrollbox so a long note keeps
+ * its head and tail reachable (wheel and scrollbar natively, plus up/k,
+ * down/j, pgup/pgdn, g/home, shift+g/end on a dialog-scoped keymap layer).
+ * The command is <leader>d (free among the default leader bindings), in
+ * the palette, and as /desk. The sidebar folds like the builtin MCP
+ * section: a caret appears once the desk holds more than two items.
  */
 import { Plugin } from "@opencode/plugin/tui";
-import { SyntaxStyle, TextAttributes, type RGBA } from "@opentui/core";
+import {
+  MarkdownRenderable,
+  MouseButton,
+  SyntaxStyle,
+  TextAttributes,
+  type RGBA,
+  type ScrollBoxRenderable,
+} from "@opentui/core";
 import {
   createEffect,
   createMemo,
@@ -179,35 +188,152 @@ function View(props: { context: Plugin.Context; sessionID: string }) {
   );
 }
 
+async function openUrl(context: Plugin.Context, url: string) {
+  const { spawn } = await import("node:child_process");
+  const command =
+    process.platform === "darwin"
+      ? ["open", url]
+      : process.platform === "win32"
+        ? ["cmd", "/c", "start", "", url]
+        : ["xdg-open", url];
+  const child = spawn(command[0], command.slice(1), {
+    stdio: "ignore",
+    detached: true,
+  });
+  child.on("error", () => {
+    context.ui.toast.show({
+      message: `Could not open ${url}`,
+      variant: "error",
+    });
+  });
+  child.unref();
+}
+
 function showDetail(context: Plugin.Context, item: DeskItem) {
+  context.ui.dialog.show(() => {
+    context.ui.dialog.set({ centered: true });
+    return <Detail context={context} item={item} />;
+  });
+}
+
+// The dialog frame bounds width only, so the note body must bound itself.
+// OpenTUI scrollboxes cannot fit their content under a yoga-level cap: any
+// definite bound in the tree (maxHeight anywhere) becomes the effective
+// height, so a capped scrollbox always renders at its cap and a short note
+// floats in a near-fullscreen dialog. The body therefore measures the
+// markdown (onSizeChange fires on every layout, rewrap included) and sets
+// an explicit height: the note's height plus its bottom padding row when
+// it fits, the screen cap (terminal rows minus chrome and breathing room)
+// when it does not. The cap budgets a row for the title; titles are
+// authored one line. With
+// the height following the content, the frame's centered anchoring places
+// short notes mid-screen and long notes with margin above and below.
+// Wheel and scrollbar are native to the scrollbox; scroll keys ride a
+// modal-mode keymap layer created inside this tree, so they live exactly
+// as long as the dialog (the dialog stack pushes the modal input mode,
+// which is what makes escape work in host dialogs).
+function Detail(props: { context: Plugin.Context; item: DeskItem }) {
+  const context = props.context;
   const theme = context.theme;
-  context.ui.dialog.show(() => (
+  let body: ScrollBoxRenderable | undefined;
+
+  const renderer = context.renderer;
+  const [rows, setRows] = createSignal(renderer.height);
+  const resize = () => setRows(renderer.height);
+  renderer.on("resize", resize);
+  onCleanup(() => renderer.off("resize", resize));
+
+  const [noteRows, setNoteRows] = createSignal<number>();
+  const cap = () => Math.max(3, rows() - 8);
+  const bodyHeight = () => {
+    const note = noteRows();
+    return note === undefined ? undefined : Math.min(note + 1, cap());
+  };
+
+  context.keymap.layer(() => ({
+    mode: "modal",
+    commands: [
+      {
+        bind: "up,k",
+        title: "Scroll up",
+        group: "Dialog",
+        run: () => body?.scrollBy(-1),
+      },
+      {
+        bind: "down,j",
+        title: "Scroll down",
+        group: "Dialog",
+        run: () => body?.scrollBy(1),
+      },
+      {
+        bind: "pageup",
+        title: "Page up",
+        group: "Dialog",
+        run: () => body?.scrollBy(-1, "viewport"),
+      },
+      {
+        bind: "pagedown",
+        title: "Page down",
+        group: "Dialog",
+        run: () => body?.scrollBy(1, "viewport"),
+      },
+      {
+        bind: "g,home",
+        title: "Scroll to the top",
+        group: "Dialog",
+        run: () => body?.scrollTo(0),
+      },
+      {
+        bind: "shift+g,end",
+        title: "Scroll to the bottom",
+        group: "Dialog",
+        run: () => {
+          if (body) body.scrollTop = body.scrollHeight;
+        },
+      },
+    ],
+  }));
+
+  return (
     <box paddingLeft={2} paddingRight={2} gap={1}>
-      <box flexDirection="row" justifyContent="space-between">
-        <text
-          attributes={TextAttributes.BOLD}
-          fg={theme.text.base}
-          wrapMode="word"
-          flexGrow={1}
-          flexShrink={1}
-          minWidth={0}
-        >
-          {item.title}
-        </text>
-        <text fg={theme.text.muted} flexShrink={0}>
-          esc
-        </text>
-      </box>
-      <box paddingBottom={1}>
+      <text
+        attributes={TextAttributes.BOLD}
+        fg={theme.text.base}
+        wrapMode="word"
+      >
+        {props.item.title}
+      </text>
+      <scrollbox
+        ref={(el: ScrollBoxRenderable) => {
+          body = el;
+        }}
+        height={bodyHeight()}
+        paddingBottom={1}
+        onMouseUp={(event) => {
+          if (event.button !== MouseButton.LEFT) return;
+          if (renderer.getSelection()?.getSelectedText()) return;
+          const url = renderer.getLinkAt(event.x, event.y);
+          if (url && /^https?:\/\//i.test(url)) openUrl(context, url);
+        }}
+        verticalScrollbarOptions={{
+          trackOptions: {
+            backgroundColor: theme.surface("dialog").background.base,
+            foregroundColor: theme.scrollbar.base,
+          },
+        }}
+      >
         <markdown
-          content={item.detail}
+          ref={(el: MarkdownRenderable) => {
+            el.onSizeChange = () => setNoteRows(el.height);
+          }}
+          content={props.item.detail}
           syntaxStyle={markdownSyntax(context)}
           conceal
           fg={theme.text.base}
         />
-      </box>
+      </scrollbox>
     </box>
-  ));
+  );
 }
 
 export default Plugin.define({
