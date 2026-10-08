@@ -102,30 +102,33 @@ definite ancestor (here the full-screen overlay), and a yoga-level cap inflates
 it to the cap; only an explicit height pins it. The plugin therefore measures
 the markdown (`onSizeChange` fires on every layout, rewrap included) and pins
 the height from the first measure on: the note's height plus its bottom padding
-row, at most the terminal cap (rows minus chrome and breathing room). The pin
-lands inside the markdown's first layout pass, before any paint, so the inflated
-pre-measure state is never shown. The scrollbar's own auto-visibility reacts to
-layout transients while the markdown grows through stale viewport heights (a
-one-frame bar on notes that end up fitting), so its visibility is manual, from
-the same policy as the height: the bar shows exactly while the note is pinned at
-the cap. With the height following the content, the frame's centered anchoring
-places short notes mid-screen and long notes with margin above and below,
-scrolling when capped (the host-themed scrollbar shows then). The wheel and the
-scrollbar scroll natively; the keys ride a modal-mode keymap layer created
-inside the dialog component's tree (up/k and down/j one line, pgup/pgdn one
-viewport, g/home and shift+g/end the ends), so they die with the dialog and can
-never leak into the prompt. The renderable linkifies URLs already and emits OSC
-8 hyperlinks where the terminal supports them; a plain click opens the link
-anyway, by resolving `renderer.getLinkAt(x, y)` at the pointer's cell (mouse
-events carry screen coordinates) and spawning the platform opener, skipping
-clicks that ended a text selection. One subtlety: markdown styling resolves
-through `markup.*` scopes in the renderable's `SyntaxStyle`, so an empty style
-renders one plain string; the plugin builds the TUI's own markup rule set from
-the ambient theme (`packages/theme/tui/syntax.ts` is the reference). The dialog
-title is plain: bold and word-wrapped, no syntax styling. Interactions beyond
-the rows: `<leader>d` (free among the default leader bindings), the palette, or
-`/desk` for a select list then detail. One loader constraint learned the loud
-way: `keymap.layer` needs the Keymap provider from the UI tree, so it registers
+row, at most the terminal cap (rows minus chrome and breathing room). The pin is
+assigned directly inside the onSizeChange callback, within the measuring layout
+pass: routing it through signals and effects defers the update past the frame's
+paint, and the dialog flashes its pre-measure full-screen state for one frame.
+The markdown's first layout already measures the full note, so the pin is final
+at that point. The scrollbar's own auto-visibility reacts to layout transients
+while the markdown grows through stale viewport heights (a one-frame bar on
+notes that end up fitting), so its visibility is manual, from the same policy as
+the height: the bar shows exactly while the note is pinned at the cap. With the
+height following the content, the frame's centered anchoring places short notes
+mid-screen and long notes with margin above and below, scrolling when capped
+(the host-themed scrollbar shows then). The wheel and the scrollbar scroll
+natively; the keys ride a modal-mode keymap layer created inside the dialog
+component's tree (up/k and down/j one line, pgup/pgdn one viewport, g/home and
+shift+g/end the ends), so they die with the dialog and can never leak into the
+prompt. The renderable linkifies URLs already and emits OSC 8 hyperlinks where
+the terminal supports them; a plain click opens the link anyway, by resolving
+`renderer.getLinkAt(x, y)` at the pointer's cell (mouse events carry screen
+coordinates) and spawning the platform opener, skipping clicks that ended a text
+selection. One subtlety: markdown styling resolves through `markup.*` scopes in
+the renderable's `SyntaxStyle`, so an empty style renders one plain string; the
+plugin builds the TUI's own markup rule set from the ambient theme
+(`packages/theme/tui/syntax.ts` is the reference). The dialog title is plain:
+bold and word-wrapped, no syntax styling. Interactions beyond the rows:
+`<leader>d` (free among the default leader bindings), the palette, or `/desk`
+for a select list then detail. One loader constraint learned the loud way:
+`keymap.layer` needs the Keymap provider from the UI tree, so it registers
 inside an `app` slot render; calling it at setup top level fails with
 "Keymap.Provider is missing".
 

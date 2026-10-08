@@ -221,49 +221,41 @@ function showDetail(context: Plugin.Context, item: DeskItem) {
 // yoga-level bound) makes it fill the nearest definite ancestor, so an
 // unset scrollbox in this dialog renders at full screen height, and a
 // maxHeight cap inflates it to the cap. Only an explicit height pins it.
-// The body therefore measures the markdown (onSizeChange fires on every
-// layout, rewrap included) and pins the height from the first measure on:
+// The body therefore pins the height from the markdown's own measure:
+// onSizeChange fires during the layout pass (the first layout already
+// measures the full note), and assigning the height right there, in the
+// same pass, beats the paint. Routing the pin through signals and
+// effects instead defers it past the frame's paint, and the dialog
+// flashes its pre-measure full-screen state for one frame. The pin is
 // the note's height plus its bottom padding row, at most the screen cap
 // (terminal rows minus chrome and breathing room; the cap budgets a row
-// for the title, and titles are authored one line). The pin lands inside
-// the markdown's first layout pass, before any paint, so the inflated
-// pre-measure state is never shown. With the height following the
-// content, the frame's centered anchoring places short notes mid-screen
-// and long notes with margin above and below.
-// The scrollbar's own auto-visibility is still driven by layout (it
-// reacts while the markdown grows through stale viewport heights, which
-// paints a one-frame bar on notes that end up fitting), so visibility is
-// manual, from the same policy as the height: the bar shows exactly
-// while the note is pinned at the cap. Wheel and scrollbar are native to
-// the scrollbox; scroll keys ride a modal-mode keymap layer created
-// inside this tree, so they live exactly as long as the dialog (the
-// dialog stack pushes the modal input mode, which is what makes escape
-// work in host dialogs).
+// for the title, and titles are authored one line). The scrollbar's
+// auto-visibility also reacts to layout transients, so it is manual,
+// from the same pin: the bar shows exactly while the note is capped.
+// Terminal resizes re-apply the pin (the cap moves; the note rewraps and
+// fires onSizeChange again when the width changes). With the height
+// following the content, the frame's centered anchoring places short
+// notes mid-screen and long notes with margin above and below.
+// Wheel and scrollbar are native to the scrollbox; scroll keys ride a
+// modal-mode keymap layer created inside this tree, so they live exactly
+// as long as the dialog (the dialog stack pushes the modal input mode,
+// which is what makes escape work in host dialogs).
 function Detail(props: { context: Plugin.Context; item: DeskItem }) {
   const context = props.context;
   const theme = context.theme;
   let body: ScrollBoxRenderable | undefined;
+  let noteHeight = 0;
 
   const renderer = context.renderer;
-  const [rows, setRows] = createSignal(renderer.height);
-  const resize = () => setRows(renderer.height);
+  const apply = () => {
+    if (!body) return;
+    const cap = Math.max(3, renderer.height - 8);
+    body.height = Math.min(noteHeight + 1, cap);
+    body.verticalScrollBar.visible = noteHeight + 1 > cap;
+  };
+  const resize = () => apply();
   renderer.on("resize", resize);
   onCleanup(() => renderer.off("resize", resize));
-
-  const [noteRows, setNoteRows] = createSignal<number>();
-  const cap = () => Math.max(3, rows() - 8);
-  const capped = () => {
-    const note = noteRows();
-    return note !== undefined && note + 1 > cap();
-  };
-  const bodyHeight = () => {
-    const note = noteRows();
-    return note === undefined ? undefined : Math.min(note + 1, cap());
-  };
-
-  createEffect(() => {
-    if (body) body.verticalScrollBar.visible = capped();
-  });
 
   context.keymap.layer(() => ({
     mode: "modal",
@@ -322,7 +314,6 @@ function Detail(props: { context: Plugin.Context; item: DeskItem }) {
         ref={(el: ScrollBoxRenderable) => {
           body = el;
         }}
-        height={bodyHeight()}
         paddingBottom={1}
         onMouseUp={(event) => {
           if (event.button !== MouseButton.LEFT) return;
@@ -340,7 +331,10 @@ function Detail(props: { context: Plugin.Context; item: DeskItem }) {
       >
         <markdown
           ref={(el: MarkdownRenderable) => {
-            el.onSizeChange = () => setNoteRows(el.height);
+            el.onSizeChange = () => {
+              noteHeight = el.height;
+              apply();
+            };
           }}
           content={props.item.detail}
           syntaxStyle={markdownSyntax(context)}
