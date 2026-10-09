@@ -18,4 +18,6 @@ How the lab runs: the [multi-agent pattern](/multi-agent) and the
 [implementation plan](/harness) (both describe the retired pi-era harness, kept
 for history), then the [prompt hierarchy](/prompt-hierarchy),
 [writing](/writing), and the [ledger](/ledger). The [desk](/desk) is the user's
-persistent review queue.
+persistent review queue, and [remote access](/remote-access) covers the two
+doors from outside the machine: attach for the owner, the A2A gateway for the
+owner's assistant agent.

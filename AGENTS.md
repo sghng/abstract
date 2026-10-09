@@ -46,7 +46,7 @@ agents developing this repository. The lab agents' shared invariants live in
   per model request, re-reading from disk; agent files hold registry config only
 - `src/cli.ts` -- the `abstract` CLI (Bun, linked via `package.json` bin):
   ensures the pinned runtime at `~/.local/share/abstract/runtime/`, the central
-  lab server (port 4319, own config/state/DB under `~/.local/share/abstract` and
+  lab server (port 4657, own config/state/DB under `~/.local/share/abstract` and
   `~/.local/state/abstract`, credentials synced from the daily install), and the
   six role sessions per project (`metadata.role`, created once); then attaches
   one TUI (`--server`, `--session`). Also `abstract context [role] [--json]`
@@ -124,6 +124,10 @@ agents developing this repository. The lab agents' shared invariants live in
   `npm diff` plus release notes for new features to adopt, then `abstract stop`
   and relaunch; keep the bump only when the lab comes up and serves turns. The
   user's daily install is never touched.
+- **Propose first**: when asked to change something important, above all the
+  kernel `config/AGENTS.md` and the prompt files under `prompts/`, show the user
+  the exact proposed text and wait for agreement. Never write the change and
+  commit it in one step.
 - **Commits**: conventional commits. Record architectural decisions in
   `TODO.md`'s decisions log.
 
