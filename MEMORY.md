@@ -103,3 +103,13 @@ better home, it moves and leaves a pointer at most.
   repertoire and pi-era arcs were dropped as superseded by `docs/repertoire/`
   and the history docs. Commit hygiene rule adopted from the owner: a
   change and its documentation land in one commit.
+- **2026-10-11**: the harness restructure direction is set: the
+  infrastructure (central server, persistent roles, binder) is replaced
+  by a skills plus config repo consumed through OpenCode's own discovery
+  (`skills` array, `instructions` array, project config, spawn-time agent
+  briefs). `v1` tags the pre-restructure state. A survey of Anthropic,
+  OpenAI, and community skill publishers and the design judgments on the
+  owner's eight points (no central reference shelf, lint to a `staging/`
+  area, one `literature` skill, nlpatch merges into a `word` skill, no
+  default model pin, subagent defaults as the design surface) live in
+  `docs/prompt-prompting-2026-10-11.md`.
