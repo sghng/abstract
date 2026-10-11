@@ -39,6 +39,10 @@ export default defineConfig({
           { text: "Implementation plan", link: "/harness" },
           { text: "Desk", link: "/desk" },
           { text: "Remote access", link: "/remote-access" },
+          { text: "The lab", link: "/lab" },
+          { text: "Prompt doctrine", link: "/prompts" },
+          { text: "Model pins", link: "/models" },
+          { text: "typ2docx", link: "/typ2docx" },
         ],
       },
       {

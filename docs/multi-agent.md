@@ -3,7 +3,7 @@
 > RETIRED 2026-09-17: the fs inbox and its delivery loop are gone; cues are now
 > the plugin tool `cue` --> `session.synthetic` with `delivery: "steer"` on the
 > lab server. Kept for the message-exchange doctrine (turn discipline, canon
-> detection), which carries over; see `TODO.md`.
+> detection), which carries over; see `MEMORY.md`.
 
 How the lab's sessions talk. Dev-facing: specifies the harness mechanism and the
 conventions role prompts rely on. Lab-facing invariants live in `invariants.md`.
@@ -12,7 +12,7 @@ conventions role prompts rely on. Lab-facing invariants live in `invariants.md`.
 > (`awaiting` cues, `debts`, one-inbound-cue-at-a-time) is disabled. The harness
 > currently delivers cues as fire-and-forget follow-ups and relies on the agents
 > and the human to manage conversation flow. The tracked design is preserved in
-> code and in git history; see `TODO.md`.
+> code and in git history; see `MEMORY.md`.
 
 ## Model: one conversation, several contexts
 

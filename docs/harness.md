@@ -1,7 +1,7 @@
 # Harness Implementation Plan
 
 > RETIRED 2026-09-17: describes the pi-era SDK harness (tmux ensemble, fs cue
-> inbox), replaced by the OpenCode v2 harness. Kept for history; see `TODO.md`
+> inbox), replaced by the OpenCode v2 harness. Kept for history; see `MEMORY.md`
 > and `config/` for the current implementation.
 
 Concrete build plan for the cue-based message exchange specified in
@@ -14,7 +14,7 @@ why.
 > implementation in `extensions/cue/index.ts` delivers every cue as a follow-up
 > and leaves turn management to the agents. The state machine code is preserved
 > in a `DISABLED_STATE_MACHINE` block and in git history for easy re-enable. See
-> `TODO.md` decisions log.
+> `MEMORY.md` decision tail.
 
 ## Architecture
 

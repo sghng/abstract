@@ -5,7 +5,7 @@ lab: persistent, context-isolated role sessions (orchestrator, engineer,
 statistician, librarian, writer, editor) that collaborate through files
 (tickets, reports, memos, models) and cues.
 
-Status: early. See `TODO.md` for the design rationale and roadmap, and
+Status: early. See `MEMORY.md` for the design rationale and roadmap, and
 `manifesto.md` for the philosophy.
 
 ## Layout

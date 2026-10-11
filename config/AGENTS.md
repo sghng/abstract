@@ -94,5 +94,4 @@ project-root/
 Skills hold the _episodic procedures_. Each is self-contained: read one when its
 description matches your task, and re-read it after compaction. Logistics
 (placement, wiki-links, amendments, versioning) and the ticket, report, and memo
-templates live in the reference directory at
-/Users/sghng/dev/agent/abstract/reference.
+templates live in the reference directory beside the kernel (`../reference`).

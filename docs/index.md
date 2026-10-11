@@ -14,10 +14,12 @@ proposals.
 
 ## Harness + prompts
 
-How the lab runs: the [multi-agent pattern](/multi-agent) and the
-[implementation plan](/harness) (both describe the retired pi-era harness, kept
-for history), then the [prompt hierarchy](/prompt-hierarchy),
-[writing](/writing), and the [ledger](/ledger). The [desk](/desk) is the user's
-persistent review queue, and [remote access](/remote-access) covers the two
-doors from outside the machine: attach for the owner, the A2A gateway for the
-owner's assistant agent.
+How the lab runs: [the lab](/lab) condenses the operation; the
+[multi-agent pattern](/multi-agent) and the
+[implementation plan](/harness) describe the retired pi-era harness, kept
+for history. Doctrine references: [prompt hierarchy](/prompt-hierarchy),
+[prompt doctrine](/prompts), [models](/models), [writing](/writing),
+[typ2docx](/typ2docx), and the [ledger](/ledger). The [desk](/desk) is
+the user's persistent review queue, and [remote access](/remote-access)
+covers the two doors from outside the machine: attach for the owner, the
+A2A gateway for the owner's assistant agent.

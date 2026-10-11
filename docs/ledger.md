@@ -12,7 +12,7 @@ traffic verbatim; what it cannot capture is _meaning_ (this write was a ticket
 close; this bash was a failed search). The ledger is the semantic annotation on
 traffic we already have.
 
-Decisions this design encodes (TODO.md decisions log):
+Decisions this design encodes (MEMORY.md decision tail):
 
 - **Own semantics, rent mechanics.** The ledger is semantics; it is ours.
 - **Kernel/skin split.** The ledger schema is domain-neutral; nothing academic
@@ -200,7 +200,7 @@ audience, with no pi session.
 - `skills/logistics/SKILL.md`: ticket template gains the `Status:` line under
   the H1, marked tool-managed; lifecycle (wip/parked/done, reopen) documented.
 - `AGENTS.md`: layout gains the core module and extension; decisions logged in
-  `TODO.md`.
+  `MEMORY.md`.
 
 ## Consumers (later phases; not Phase 1 scope)
 
@@ -236,7 +236,7 @@ Each phase is independently useful and independently revertible (additive files;
 the only edit to an existing tool is one logging line).
 
 - **Phase 1 -- the ledger** (issue #35): core module, extension, CLI
-  subcommands, cue logging, doctrine lines, tests, TODO log. Existing sessions
+  subcommands, cue logging, doctrine lines, tests, MEMORY decision tail. Existing sessions
   pick the tools up on next ensemble restart.
 - **Phase 2 -- observation** (1-2 weeks): run the lab normally. Watch bracket
   adoption and complaint quality manually. Calibrate before building

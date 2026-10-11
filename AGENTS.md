@@ -103,8 +103,9 @@ agents developing this repository. The lab agents' shared invariants live in
 - `docs/` -- design documents, dev-facing, not loaded by lab agents.
   `docs/multi-agent.md` and `docs/harness.md` describe the RETIRED pi-era
   harness (fs inbox, tmux ensemble); keep for history
-- `TODO.md` -- design rationale, roadmap, and decisions log; read before
-  changing the architecture
+- `MEMORY.md` -- design rationale, roadmap, and the decision tail; read
+  before changing the architecture (durable doctrine graduated to
+  `docs/{lab,prompts,models,typ2docx}.md` and the per-system design docs)
 - `manifesto.md` -- human-facing philosophy behind the project
 
 ## Working Conventions
@@ -129,7 +130,8 @@ agents developing this repository. The lab agents' shared invariants live in
   the exact proposed text and wait for agreement. Never write the change and
   commit it in one step.
 - **Commits**: conventional commits. Record architectural decisions in
-  `TODO.md`'s decisions log.
+  `MEMORY.md`'s decision tail. A change and its documentation land in one
+  commit.
 
 ## Instructions for Writing Prompts
 
