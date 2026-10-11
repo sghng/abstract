@@ -124,6 +124,10 @@ agents developing this repository. The lab agents' shared invariants live in
   `npm diff` plus release notes for new features to adopt, then `abstract stop`
   and relaunch; keep the bump only when the lab comes up and serves turns. The
   user's daily install is never touched.
+- **Propose first**: when asked to change something important, above all the
+  kernel `config/AGENTS.md` and the prompt files under `prompts/`, show the user
+  the exact proposed text and wait for agreement. Never write the change and
+  commit it in one step.
 - **Commits**: conventional commits. Record architectural decisions in
   `TODO.md`'s decisions log.
 
