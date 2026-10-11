@@ -38,6 +38,6 @@ abstract lint <f.typ> # style-check a manuscript against the expert edits (Jev)
 abstract stop         # stop the lab server
 ```
 
-The lab runs on a per-host OpenCode server at port 4319 with its own config,
+The lab runs on a per-host OpenCode server at port 4657 with its own config,
 state, and database under `~/.local/share/abstract` and
 `~/.local/state/abstract`. Files are memory; sessions are a cache.

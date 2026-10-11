@@ -55,7 +55,7 @@ const PROMPTS_DIR = path.join(REPO, "prompts");
 const REFERENCE_DIR = path.join(REPO, "reference");
 const EDITS = path.join(REPO, "lint", "rules.yaml");
 
-const SERVER_URL = process.env.ABSTRACT_SERVER_URL ?? "http://127.0.0.1:4319";
+const SERVER_URL = process.env.ABSTRACT_SERVER_URL ?? "http://127.0.0.1:4657";
 const SERVER_PASSWORD = process.env.OPENCODE_PASSWORD ?? "";
 const DEBUG_LOG = path.join(
   homedir(),

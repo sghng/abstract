@@ -42,3 +42,6 @@ lint/extract/target/
 # built docx artifacts are never committed)
 reference/reference.docx
 reference/reference.debug.docx
+
+scratch/
+.wrangler

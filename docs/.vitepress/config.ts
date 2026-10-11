@@ -38,6 +38,7 @@ export default defineConfig({
           { text: "Multi-agent pattern", link: "/multi-agent" },
           { text: "Implementation plan", link: "/harness" },
           { text: "Desk", link: "/desk" },
+          { text: "Remote access", link: "/remote-access" },
         ],
       },
       {

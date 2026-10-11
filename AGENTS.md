@@ -46,7 +46,7 @@ agents developing this repository. The lab agents' shared invariants live in
   per model request, re-reading from disk; agent files hold registry config only
 - `src/cli.ts` -- the `abstract` CLI (Bun, linked via `package.json` bin):
   ensures the pinned runtime at `~/.local/share/abstract/runtime/`, the central
-  lab server (port 4319, own config/state/DB under `~/.local/share/abstract` and
+  lab server (port 4657, own config/state/DB under `~/.local/share/abstract` and
   `~/.local/state/abstract`, credentials synced from the daily install), and the
   six role sessions per project (`metadata.role`, created once); then attaches
   one TUI (`--server`, `--session`). Also `abstract context [role] [--json]`

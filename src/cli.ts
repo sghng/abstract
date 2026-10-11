@@ -74,7 +74,7 @@ const PID_FILE = join(ABSTRACT_HOME, "server.pid");
 const PW_FILE = join(ABSTRACT_HOME, "server.pw");
 
 const DAILY_DB = join(homedir(), ".local", "share", "opencode", "opencode.db");
-const PORT = Number(process.env.ABSTRACT_PORT ?? 4319);
+const PORT = Number(process.env.ABSTRACT_PORT ?? 4657);
 const URL = `http://127.0.0.1:${PORT}`;
 // The TUI persists its tab bar under <state>/<channel>/tui/tabs.json, scoped
 // per cwd. The channel is a build-time constant of the binary ("latest" for
