@@ -45,3 +45,6 @@ reference/reference.debug.docx
 
 scratch/
 .wrangler
+
+# abstract-mcp service state (artifacts, browser profile, audit log)
+service/data/
