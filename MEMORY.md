@@ -112,4 +112,4 @@ better home, it moves and leaves a pointer at most.
   owner's eight points (no central reference shelf, lint to a `staging/`
   area, one `literature` skill, nlpatch merges into a `word` skill, no
   default model pin, subagent defaults as the design surface) live in
-  `docs/prompt-prompting-2026-10-11.md`.
+  `docs/prompting-2026-10-11.md`.

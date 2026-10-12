@@ -1,9 +1,11 @@
 # Logistics
 
 Where notes go and how the artifact types work. The templates sit beside this
-file (`ticket.md`, `report.md`, `memo.md`); copy from them, never retype.
-Decks start from `deck.typ`, governed by `presentation.md`. Verification
-conventions for outgoing artifacts live in `verification.md`.
+file (`../assets/ticket.md`, `../assets/report.md`, `../assets/memo.md`); copy
+from them, never retype. Decks start from the presentation skill's
+`assets/deck.typ`, governed by its `references/presentation.md`. Verification
+conventions for outgoing artifacts live beside this file in
+`verification.md`.
 
 ## Where Do Notes Go?
 

@@ -228,10 +228,11 @@ the durable pointers. Flagged items are things we could not verify.
    plus a trigger-eval pass (the Anthropic methodology: ~20 should-fire
    and near-miss prompts per skill) before any split or merge lands.
 6. This survey.
-7. **No default model pin in the template.** Subagent briefs keep their
-   existing pins (they were chosen by shape and are the attested
-   practice: cheap pins for scan/search, strong pins for review, the
-   vision pin for figure checks). The writer/editor briefs keep theirs.
+7. **No default model pin in the template.** Delegation pins move off the
+   kimi tiers on cost grounds: all delegated sidekicks run GLM 5.3 with
+   reasoning effort maxed, except vision work on GLM 5.3 Flash with max
+   reasoning and the external reviewer on deepseek-v4-pro (a deliberate
+   different-vendor cold read). See the sidekick catalog below.
 8. **Effort levels**: precedents are Claude Code's per-subagent `effort`
    field, Codex's three-layer reasoning-effort resolution, OmO's
    category chains, and OpenCode's per-agent `reasoningEffort`. For us:
@@ -239,12 +240,58 @@ the durable pointers. Flagged items are things we could not verify.
    (scout low, reviewers high), and an effort vocabulary in the
    delegation doctrine for bare spawns. Deferred to its own round.
 
+## The sidekick catalog (settled this round, after reading the full
+## existing setup)
+
+Flat by construction: every sidekick carries `permission: { task: deny }`,
+which removes other agents from its Task tool description entirely, so
+nested delegation is structurally impossible. This replaces the old
+editor --> panel reviewers --> citation-check chain, which had two levels
+of nesting. The primary leads every review directly.
+
+| Brief | Model | Shape |
+| ----- | ----- | ----- |
+| reviewer-internal | glm-5.3, reasoning max | the auditor: validates the artifact against local truths (numbers vs the results registry, citations vs sources, prose vs the repertoire, consistency vs notes/, statistics completeness); aspects named in the spawn brief; read-only |
+| reviewer-external | deepseek-v4-pro | the fresh eye: born blind (no story.md, no notes/), knows only venue and audience; persona, scope, and round (collegial/adversarial) come from the spawn brief; read-only |
+| visual-review | glm-5.3-flash, reasoning max | rendered-figure soundness rubric; generation screening, not manuscript review |
+| literature-lookup | glm-5.3, reasoning max | the quick delegation lane: a compact sourced answer over a topic, never an artifact; lasting facts land in the registry |
+| literature-review | glm-5.3, reasoning max | the full structured corpus pass producing a memo |
+| nlpatch | glm-5.3, reasoning max | mechanical Word round-trip; the protocol lives in the word skill |
+
+Absorbed and retired: citation-check, stale-number-sweep, and style-check
+fold into reviewer-internal as aspects (the old editor's aspects menu
+becomes the spawn-time parameter); the editor is retired (leading the
+panel was nested delegation) and its doctrine (panel composition, rounds,
+aspects menu, the externalization gate, "consultant, not gate") moves to
+the kernel's Review section; scout retires (the built-in Explore covers
+recon; "say what you did not find" moves into the kernel's delegation
+contract). The panel's lineage axis (one reviewer per model family) is
+dropped on cost grounds: a single external reviewer.
+
+The writer dissolves, but the delegation shape for drafting stays in the
+kernel's delegation contract: drafting is delegated in section-sized
+pieces, each spawn carrying the section scope, ticket/story pointers, an
+instruction to load the writing skill, the output path under draft/, and
+the return contract (path plus a short summary). The primary stitches and
+owns voice consistency. No named writer brief: OpenCode agent definitions
+cannot preload a skill, so a brief would just duplicate the writing
+doctrine. If stitched drafts come back uneven in practice, the named
+brief returns then (empiricism rule).
+
+Model pin mechanics: GLM 5.3 via the z.ai coding plan (the RA profile's
+own provider). OpenCode-format pins read `zai-coding-plan/glm-5.3` with
+`reasoningEffort: "max"` as a provider pass-through (the agents doc's
+additional-options mechanism). Verify at build time: the provider id on
+the current daily install (provider renames are a documented failure
+mode, see docs/models.md) and whether reasoningEffort max is accepted for
+glm-5.3 or a variant entry is needed.
+
 ## Revised target structure
 
 ```
 abstract/
 ├── AGENTS.md  MEMORY.md  manifesto.md     # dev-facing, as today
-├── kernel/AGENTS.md                       # invariants + delegation contract
+├── kernel.md                            # the kernel: invariants + delegation contract
 ├── skills/
 │   ├── research/          # notes workflow; assets/ ticket+report+memo
 │   │                      #   templates; references/ verification, logistics
@@ -258,19 +305,35 @@ abstract/
 │   └── grants/ journal-review/ typst/     # as-is, descriptions rewritten
 ├── staging/
 │   └── lint/              # immature; never mounted by the template
-├── agents/                # spawn-time briefs: the 9 subagents + writer/editor
+├── agents/                # sidekick briefs: reviewer-internal, reviewer-external,
+│                          #   visual-review, literature-lookup, literature-review,
+│                          #   nlpatch (cue stripped; subagent denied on all)
 ├── typ2docx/  lint/  tools/  repertoire/  # code and data layers, unchanged
-└── opencode.template.json # skills + instructions + mcp + agents mounts;
-                           # deliberately no model pin
+└── opencode.template.jsonc # skills + instructions + mcp; no model pin
 ```
 
-Mounting (verified mechanisms only): the project opencode.json carries a
-`skills` array entry for `~/dev/abstract/skills`, an `instructions` entry
-for the kernel (flag: issue #4758 reports a silent-load regression on one
-version, verify against the pinned runtime; symlinked AGENTS.md is the
-fallback), the mcp block (zotero remote over the tailnet), and `agent`
-entries whose prompts reference the brief files. `abstract init <dir>`
-writes this file and scaffolds the notes/ skeleton.
+Mounting (v2 mechanics, corrected after reading the v2 agents doc): the
+project opencode.jsonc carries a `skills` array entry for
+`~/dev/abstract/skills`, an `instructions` entry for `kernel.md` (flag:
+issue #4758 reports a silent-load regression on one version, verify against
+the installed runtime; a symlinked project-root AGENTS.md is the fallback),
+and the mcp block (zotero remote over the tailnet). Sidekicks mount as
+markdown files: `init` symlinks the repo's `agents/` into the project's
+`.opencode/agents/` (the v2 markdown format carries model, permissions, and
+the body as the system prompt; there is no config array for agent
+directories, and the v1 `prompt: {file:}` route is deprecated). `abstract
+init <dir>` writes the config and the symlinks and scaffolds the notes/
+skeleton.
+
+Corrections from the v2 docs read during the build: v2 has no built-in
+scout agent (only general and explore; explore covers recon, including web
+sources). The nesting denial is `{action: "subagent", resource: "*",
+effect: "deny"}` in the ordered permissions list (the repo's existing
+briefs already used this format). Model pins are `provider/model` with an
+optional `#variant`; models.dev shows zai-coding-plan glm-5.3 and
+glm-5.3-flash with reasoning support but no predefined variants, so max
+reasoning goes in as a request body overlay (`reasoning_effort: max`) and
+is the first thing to verify at validation.
 
 ## Validation gates (before any harness code is deleted)
 

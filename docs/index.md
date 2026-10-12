@@ -27,6 +27,6 @@ A2A gateway for the owner's assistant agent.
 ## Explorations
 
 Dated design explorations, kept as history: [prompt prompting
-(2026-10-11)](/prompt-prompting-2026-10-11) surveys Anthropic, OpenAI, and
+(2026-10-11)](/prompting-2026-10-11) surveys Anthropic, OpenAI, and
 community skill publishers and records the judgments for the planned
 restructure of the harness into a skills plus config repo.

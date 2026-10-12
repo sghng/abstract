@@ -1,0 +1,30 @@
+{
+  "$schema": "https://opencode.ai/config.json",
+
+  // The research kernel, always on. Verify the instructions array loads on
+  // the installed runtime (issue #4758); the fallback is a symlinked
+  // AGENTS.md at the project root pointing at this file.
+  "instructions": ["~/dev/abstract/kernel.md"],
+
+  // The mounted skill library. staging/ is deliberately not listed.
+  "skills": ["~/dev/abstract/skills"],
+
+  // No "model" key on purpose: the session model is the user's choice.
+  // Sidekick pins live in the agent markdown files.
+
+  "mcp": {
+    "zotero": {
+      "type": "remote",
+      "url": "https://zotero.sgh.ng/mcp"
+    },
+    "context7": {
+      "type": "remote",
+      "url": "https://mcp.context7.com/mcp"
+    }
+  }
+
+  // Sidekicks mount as markdown files: init symlinks ~/dev/abstract/agents/
+  // into the project's .opencode/agents/ (one symlink per file). Model pins:
+  // glm-5.3 with max reasoning for audits and literature work, glm-5.3-flash
+  // with max reasoning for vision, deepseek-v4-pro for the blind read.
+}

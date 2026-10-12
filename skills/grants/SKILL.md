@@ -2,8 +2,8 @@
 name: grants
 description:
   Proposal and grant writing: the compressed-paper form, the visual budget,
-  and citation density. Use when writing a funding application, fellowship
-  proposal, or work-in-progress draft.
+  and citation density. Use when writing or revising a funding application,
+  fellowship proposal, or work-in-progress draft, even a single section.
 ---
 
 # Grants and Fellowship Proposals

@@ -2,7 +2,8 @@
 name: presentation
 description:
   Academic presentations: content curation, storytelling strategy, and Typst
-  (touying) slides. Use when preparing or reviewing a talk or slide deck.
+  (touying) slides from the house starter. Use when preparing, drafting, or
+  reviewing a talk or slide deck, even a single slide's framing.
 ---
 
 # Preparing a Presentation
@@ -16,3 +17,7 @@ following components:
 - `slides.md`: how to create slides.
 - `review-and-iteration.md`: compiling, delegating the visual review, and
   iterating.
+- `references/presentation.md`: the standing doctrine behind the deck (voice,
+  structure, captions, figures, audience discipline, fit).
+- `assets/deck.typ`: the house starter deck (touying simple theme); every new
+  deck starts as a copy of it.

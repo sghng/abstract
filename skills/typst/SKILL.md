@@ -2,7 +2,8 @@
 name: typst
 description:
   Typst syntax guidance, common mistakes, and math typesetting. Use whenever
-  writing or reviewing Typst source or mathematical notation.
+  writing, reviewing, or debugging Typst source or mathematical notation,
+  including manuscripts, slides, and reports.
 ---
 
 # Typst

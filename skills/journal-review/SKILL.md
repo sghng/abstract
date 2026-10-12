@@ -1,9 +1,10 @@
 ---
 name: journal-review
 description:
-  Writing the response letter to journal reviewers - point-by-point format, tone
-  doctrine, reading reviews for severity. Use when preparing a
-  revise-and-resubmit.
+  Response letters to journal reviewers: point-by-point format, tone
+  doctrine, reading reviews for severity. Use when a review arrives, when
+  preparing or revising a revise-and-resubmit response, or when drafting any
+  reply to referees.
 ---
 
 # Journal Review Response
