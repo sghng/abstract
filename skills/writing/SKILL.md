@@ -294,7 +294,8 @@ against a background of met expectations.
 
 ## Tooling
 
-- Draft in Typst. No Typst drawing utilities: plots come from experiments,
-  since the final export is Word.
+- Draft in Typst; the typst skill holds syntax and package doctrine. No Typst
+  drawing utilities: plots come from experiments, since the final export is
+  Word through the word skill's converter.
 - Venue constraints (page limits, required sections, citation style) go in a
   comment at the top of the draft, never in the body.

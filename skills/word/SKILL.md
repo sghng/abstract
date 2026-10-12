@@ -83,7 +83,8 @@ baseline; then:
 When the lab reviews a manuscript whose source it does not own (journal
 review), the patch is the deliverable: compose it hunk by hunk against the
 document text, per the specification below. Delegate the sidekick to refine
-it before delivery.
+it before delivery. The journal-review skill holds the surrounding
+response-letter doctrine.
 
 ### Specification
 

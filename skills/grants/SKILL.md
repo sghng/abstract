@@ -21,5 +21,5 @@ A proposal is a compressed paper, roughly 1,000 words.
   literature ("aligns with Doe (2023)..."). An uncited paragraph reads as
   opinion.
 
-The style guide, story doctrine, and writing craft are always in your context;
-this skill adds the proposal's own constraints.
+The writing and story-keeping skills bind every proposal; load them with
+this one, which adds only the proposal's own constraints.

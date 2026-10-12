@@ -33,7 +33,8 @@ Document each experiment in its `results.md`, a comprehensive lab notebook:
 methods, data, parameters, all results including nulls and failures,
 surprises, dead ends. Write for your future self and for reproducibility. No
 synthesis here. Then synthesize findings into
-`notes/reports/report-NNN-name.md`: the report is the mini paper, what
+`notes/reports/report-NNN-name.md` (the research skill holds the template):
+the report is the mini paper, what
 matters, why it advances the narrative, honest limitations, and recommended
 next steps.
 
@@ -76,7 +77,7 @@ plan, status); a superseded model gets a status line, and history stays in
 place. `checks/` holds one script per check, each stating the claim it
 tests, the pass criterion, and how to run; `figures/` holds check outputs
 worth eyeballing. The Typst source is the artifact; a compiled PDF is a
-build product.
+build product. Typst syntax and package doctrine live in the typst skill.
 
 ### Checks
 

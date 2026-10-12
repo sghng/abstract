@@ -64,11 +64,19 @@ work. A draft never silently forks the story.
 Keep the story short (one to two pages), living, narrative-first,
 impact-oriented, wiki-linked.
 
+The story is the narrative of the whole project, the blueprint the
+manuscript will instantiate; it changes only when the narrative itself
+shifts. `notes/states.md` is its running counterpart, written for the agent
+arriving now: the latest advancements, where the work stands, what is next,
+so any fresh session picks up where the last one left off. A landed report,
+a phase turn, or a submission advances `states.md`.
+
 ## When to Update
 
-- After any report lands: add key findings to Key Facts.
+- After any report lands: add key findings to Key Facts, and record the
+  advancement in `states.md`.
 - When the narrative shifts: rewrite the affected sections.
-- When the phase changes: update Current Stage.
+- When the phase changes: update `states.md`.
 - Before creating tickets: confirm the ticket advances the current stage.
 - When a critical decision is made: record it with its rationale.
 
@@ -119,12 +127,6 @@ The central research question being investigated.
 - Finding 1: brief statement with supporting data reference
 - Finding 2: brief statement with supporting data reference
 
-## Current Stage
-
-**Phase**: [Number] - [Stage Name]
-
-Where we are in the research process and what we are working on now.
-
 ## Critical Decisions
 
 1. **Decision**: what we decided
@@ -138,11 +140,6 @@ Where we are in the research process and what we are working on now.
 ## Open Questions
 
 1. Question 1
-
-## Next Steps
-
-- [ ] Immediate next step
-- [ ] Following step
 
 ## Related Work
 

@@ -13,13 +13,17 @@ conventions for outgoing artifacts live beside this file in
 | -------------------------------------- | ------------------------------- |
 | Executive reports to the orchestrator  | `notes/reports/report-NNN-*.md` |
 | Implementation notes, work-in-progress | `notes/dev/`                    |
-| Literature findings, verified claims   | `notes/literature.md`           |
+| Literature findings, verified claims   | `notes/literature.md` or `notes/literature/` |
 | Standing memos (review, literature)    | `notes/memos/memo-NNN-*.md`     |
 | Key results registry                   | `notes/results.md`              |
 | Story (central narrative)              | `notes/story.md`                |
+| Where the work stands (phases, ticket states, submissions) | `notes/states.md` |
+| Orchestrator working memory (PI preferences, open loops)   | `notes/orchestrator.md` |
 | Note on notes, entry point             | `notes/index.md`                |
 | Tickets                                | `notes/tickets/ticket-NNN-*.md` |
 | Source PDFs                            | `references/`                   |
+| Working files, one-off scripts         | `scratch/`                      |
+| Superseded work, archived with a manifest | `scratch/archive/` + `MANIFEST.md` |
 
 ## Notes Index
 
@@ -82,3 +86,5 @@ ticket-002-psychometrika-revision.md      (parent)
 Only `draft/` artifacts carry version labels (`-v1`, `-v2`, ...); never
 overwrite an artifact, create the next version. Notes never carry versions:
 merge related notes, split overgrown ones, supersede stale ones, edit in place.
+Superseded work that is not a note (old scripts, retired roots, frozen logs)
+moves to `scratch/archive/`, recorded in its `MANIFEST.md`.

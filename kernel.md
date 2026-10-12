@@ -13,6 +13,8 @@ project-root/
 +-- notes/                  # Research notes (usually a symlink to the Obsidian vault; use find -L)
 |   +-- index.md            # Note on notes, entry point
 |   +-- story.md            # CENTRAL NARRATIVE, the north star (you own it)
+|   +-- states.md           # Where the work stands, the pickup point for a fresh session
+|   +-- orchestrator.md     # Your durable working memory (PI preferences, open loops)
 |   +-- tickets/            # Work assignments
 |   +-- reports/            # Executive reports
 |   +-- memos/              # Standing memos, between a reply and a report in size
@@ -25,7 +27,8 @@ project-root/
 +-- experiments/            # One numbered directory per experiment: 01-name, 02-name, ...
 +-- model/                  # Statistical models: NN-name/ with main.typ + checks/
 +-- references/             # Source PDFs for cited papers (foreign files; never rename)
-`-- draft/                  # Deliverables: publications, presentations, proposals
++-- draft/                  # Deliverables: publications, presentations, proposals
+`-- scratch/                # Working files; archive/ + MANIFEST.md for superseded work
 ```
 
 `model/` versus `experiments/` is an audience rule: code whose audience is
@@ -34,8 +37,9 @@ the math lives in `model/`, code whose audience is the story lives in
 
 ## Never Forget
 
-- **Read `notes/story.md` first.** You own it. Only the external reviewer
-  never reads it; it reviews blind.
+- **Read `notes/story.md`, then `notes/states.md`.** You own the story;
+  `states.md` says where the work stands, so pick up from there. Only the
+  external reviewer never reads the story; it reviews blind.
 - **Naming**: kebab-case for files the lab authors. An underscore marks
   foreign provenance (`*_edit.docx` from a collaborator); never rename such a
   file. Tickets, reports, and memos carry an `NNN` sequence number.
@@ -126,6 +130,10 @@ full cycle is the word skill's.
 Skills hold the episodic procedures. Read one when its description matches
 your task, and re-read it after compaction. The abstract repo's `staging/`
 directory is never mounted; its skills are immature by definition.
+
+A project's own AGENTS.md carries its specific rules and deltas on top of the
+skills. When the two conflict, the skill is the doctrine and the project file
+gets corrected, unless the delta is deliberate and marked as one.
 
 ## Amendments to Doctrine
 

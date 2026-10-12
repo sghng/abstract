@@ -139,3 +139,15 @@ better home, it moves and leaves a pointer at most.
   same boundary hindsight routes the research bank on; `abstract init`
   writes the config to `.opencode/opencode.jsonc` and checks the
   workspace-to-home walk for the kernel link, printing the `ln -s` fix.
+- **2026-10-12**: the story/states split becomes doctrine on the LMAG field
+  report. `story.md` is the manuscript's blueprint, narrative only;
+  `notes/states.md` is the affirmative counterpart, where the work stands,
+  so a fresh session picks up cold. The placement table gains `states.md`,
+  `orchestrator.md`, and `scratch/` rows (llm-aig's root-file pollution,
+  cleaned by its ticket-017, is the failure the scratch rows answer), and
+  the literature row licenses the directory form, matching the kernel. The
+  kernel gains the pickup read and the precedence rule (a project's
+  AGENTS.md deltas yield to skills unless marked deliberate). Skills name
+  the owning skill when they touch its domain, so triggers stay
+  predictable; a skill-map paragraph declined, the descriptions are the
+  tier-2 index.

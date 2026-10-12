@@ -96,7 +96,8 @@ situation.
 
 The response letter is your primary deliverable. The updated manuscript matters,
 but the letter is what the editor and reviewers read first. It sets the tone for
-how your revision is evaluated.
+how your revision is evaluated. When the reply must show edits in Word, the
+patch format and the round-trip are the word skill's.
 
 ### Cover Letter to the Editor
 

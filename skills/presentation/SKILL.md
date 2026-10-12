@@ -21,3 +21,6 @@ following components:
   structure, captions, figures, audience discipline, fit).
 - `assets/deck.typ`: the house starter deck (touying simple theme); every new
   deck starts as a copy of it.
+
+Slides are Typst, so the typst skill rides along for syntax and package
+doctrine.

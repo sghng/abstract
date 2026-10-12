@@ -21,7 +21,8 @@ library (Zotero). This skill governs both.
   query, not a ticket.
 - If an answer has lasting value (new papers, verified claims, background
   synthesis), land it: update the literature registry or write a memo at
-  `notes/memos/memo-NNN-short-title.md`, and reference the artifact.
+  `notes/memos/memo-NNN-short-title.md` (the research skill holds the
+  template), and reference the artifact.
 - Never invent citations or claims. Every vouched claim is validated against
   the source: a verbatim supporting passage with page or section number,
   recorded in the registry. No abstract-only citation for a claim headed
