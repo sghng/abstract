@@ -9,7 +9,8 @@ role sessions. This file is for agents developing this repository.
 
 - `kernel.md` -- the always-on layer for research projects: layout
   invariants, the never-forget list, the delegation and review contracts.
-  Mounted per project through the config's `instructions` array.
+  Mounted per project through a tree-level AGENTS.md symlink at the research
+  root; the config `instructions` array is a v2 no-op.
 - `skills/` -- the skill library: research, writing, story-keeping,
   literature, experiments, word, repertoire, presentation, grants,
   journal-review, typst. One directory per skill: `SKILL.md` plus bundled
@@ -19,7 +20,7 @@ role sessions. This file is for agents developing this repository.
   reviewer-internal, reviewer-external, visual-review, literature-lookup,
   literature-review, nlpatch. Mounted per project as symlinks under
   `.opencode/agents/`.
-- `opencode.template.jsonc` -- the project mount: instructions, skills, mcp.
+- `opencode.template.jsonc` -- the project mount: skills and mcp.
   Deliberately no model pin; the session model is the user's choice.
 - `src/cli.ts` -- the `abstract` CLI, init only: `abstract init <dir>`
   scaffolds a research project (config, agent symlinks, notes skeleton).

@@ -1,10 +1,10 @@
 {
   "$schema": "https://opencode.ai/config.json",
 
-  // The research kernel, always on. Verify the instructions array loads on
-  // the installed runtime (issue #4758); the fallback is a symlinked
-  // AGENTS.md at the project root pointing at this file.
-  "instructions": ["~/dev/abstract/kernel.md"],
+  // The kernel is not mounted from config: v2 accepts an instructions array
+  // but never loads it. The kernel rides an AGENTS.md symlink at the
+  // research root; v2 loads every AGENTS.md from the workspace toward $HOME.
+  // abstract init checks that walk and prints the ln -s fix when missing.
 
   // The mounted skill library. staging/ is deliberately not listed.
   "skills": ["~/dev/abstract/skills"],

@@ -130,3 +130,12 @@ better home, it moves and leaves a pointer at most.
   surfaced: D1 chunk spans describe the pre-leakfix md generation (probe
   paper: spans to line 1088, served md has 266 lines), so passage
   extraction needs a span rebuild before query.ts works end to end.
+- **2026-10-12**: two mount repairs. Skill and agent descriptions fold as
+  YAML `>-` block scalars (unquoted multiline plain scalars cannot carry a
+  colon-space, so 10 of 11 skills and 2 of 6 briefs failed frontmatter
+  parsing and OpenCode silently dropped them; typst alone survived). The
+  kernel moves off the config `instructions` array (v2 accepts but never
+  loads it) onto a tree-level `AGENTS.md` symlink at the research root, the
+  same boundary hindsight routes the research bank on; `abstract init`
+  writes the config to `.opencode/opencode.jsonc` and checks the
+  workspace-to-home walk for the kernel link, printing the `ln -s` fix.
