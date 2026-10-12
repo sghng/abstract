@@ -19,7 +19,7 @@
  *   5. Bundle {score, doi, title, journal, year, section, heading,
  *      chunk_no, line_start, line_end, passage}
  *
- * Env (root .env): VOYAGE_API_KEY, CF_API_TOKEN, CF_ACCOUNT_ID optional.
+ * Env (root .env): VOYAGE_API_KEY, CLOUDFLARE_API_TOKEN (CF_API_TOKEN legacy), CF_ACCOUNT_ID optional.
  */
 import Cloudflare from "cloudflare";
 import { mkdir, writeFile } from "node:fs/promises";
@@ -60,9 +60,10 @@ if (!queryText.trim()) {
   process.exit(1);
 }
 
-const { VOYAGE_API_KEY, CF_API_TOKEN } = process.env;
+const { VOYAGE_API_KEY } = process.env;
+const CF_TOKEN = process.env.CLOUDFLARE_API_TOKEN ?? process.env.CF_API_TOKEN;
 if (!VOYAGE_API_KEY) throw new Error("VOYAGE_API_KEY missing (root .env)");
-if (!CF_API_TOKEN) throw new Error("CF_API_TOKEN missing (root .env)");
+if (!CF_TOKEN) throw new Error("CLOUDFLARE_API_TOKEN missing (root .env)");
 
 // ---- 1. embed the query ----
 const vres = await fetch("https://api.voyageai.com/v1/contextualizedembeddings", {
@@ -79,7 +80,7 @@ if (!vres.ok) throw new Error(`voyage ${vres.status}: ${(await vres.text()).slic
 const vector = (await vres.json()).data[0].data[0].embedding as number[];
 
 // ---- 2. vectorize query (filter during traversal) ----
-const cf = new Cloudflare({ apiToken: CF_API_TOKEN });
+const cf = new Cloudflare({ apiToken: CF_TOKEN });
 const filter: Record<string, unknown> = {};
 if (year) filter.year = year;
 if (doiFilter) filter.doi = doiFilter;

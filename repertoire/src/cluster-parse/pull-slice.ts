@@ -15,7 +15,7 @@ const TMP = process.env.TMPDIR ?? "/tmp";
 const env = fs.readFileSync(`${process.env.HOME}/parse-run/.env`, "utf8");
 const cred = (k: string) =>
   env.match(new RegExp(`${k}="?([^"\\n]+)"?`))?.[1]?.trim();
-const TOKEN = cred("CF_API_TOKEN")!;
+const TOKEN = cred("CLOUDFLARE_API_TOKEN") ?? cred("CF_API_TOKEN")!;
 const ACCT = cred("CF_ACCOUNT")!;
 const BUCKET = cred("R2_BUCKET")!;
 

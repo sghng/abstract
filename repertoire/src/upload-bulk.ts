@@ -28,10 +28,11 @@ const FAM = process.argv.includes("--family")
   ? process.argv[process.argv.indexOf("--family") + 1]
   : null;
 
-// Cloudflare REST credentials: CF_API_TOKEN lives in the repo root .env
+// Cloudflare REST credentials: CLOUDFLARE_API_TOKEN (CF_API_TOKEN legacy)
+// lives in the repo root .env
 // (never printed, never committed); account id is not a secret.
 const envFile = fs.readFileSync(`${ROOT}/../.env`, "utf8");
-const CF_API_TOKEN = envFile.match(/^CF_API_TOKEN=(.*)$/m)?.[1]?.trim();
+const CF_API_TOKEN = envFile.match(/^(?:CLOUDFLARE_API_TOKEN|CF_API_TOKEN)=(.*)$/m)?.[1]?.trim();
 const ACCT =
   process.env.CF_ACCOUNT_ID || "931e2de500772326b331964159d3bd2d";
 if (!CF_API_TOKEN) throw new Error("CF_API_TOKEN missing from ../.env");
