@@ -119,9 +119,13 @@ better home, it moves and leaves a pointer at most.
   `skills/` + `staging/` + `agents/` + `opencode.template.jsonc`, with
   `abstract init <dir>` as the only CLI command (config from template with
   clone-resolved paths, sidekick symlinks under `.opencode/agents/`, notes
-  skeleton; verified on a scratch project). `hindsight.json` moved to the
-  repo root; the plugin installs globally with `HINDSIGHT_CONFIG` pointing
-  here from the shell profile. Repertoire serving fixed for the
+  skeleton; verified on a scratch project). Hindsight keeps working without
+  the harness's env injection: the plugin installs per machine (`bun x
+  @vectorize-io/hindsight-coding-agents install opencode2`) and its config
+  is one user-level file (`~/.hindsight/coding-agent.json`), with
+  `hindsight.example.json` holding the lab's stanza (`optInOnly` plus
+  `mapPathToBank` routing `~/projects/research` to the shared research
+  bank; inert everywhere else). Repertoire serving fixed for the
   consolidated bucket (`repertoire/md/<doi_id>.md`), and a corpus desync
   surfaced: D1 chunk spans describe the pre-leakfix md generation (probe
   paper: spans to line 1088, served md has 266 lines), so passage

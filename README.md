@@ -41,3 +41,19 @@ abstract init <dir>   # writes opencode.jsonc, symlinks the sidekick briefs
 Open the project in OpenCode. The kernel and the skill library mount from
 the project's config; sidekicks resolve through the symlink farm. Files are
 memory; sessions are a cache.
+
+## Memory (hindsight)
+
+The hindsight plugin is per-machine and manual:
+
+```sh
+bun x @vectorize-io/hindsight-coding-agents install opencode2
+```
+
+That writes one plugin entry into `~/.config/opencode/opencode.json`. Its
+config is one user-level file, `~/.hindsight/coding-agent.json`; merge in
+the stanza from `hindsight.example.json` (the memory server URL,
+`optInOnly`, and the `mapPathToBank` entry routing `~/projects/research` to
+the shared `research` bank). Memory is then inert outside research projects
+and no per-project env vars are needed. Note: the plugin's autoUpdate
+re-stages itself via npm; set `"autoUpdate": false` to stay bun-only.

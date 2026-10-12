@@ -30,9 +30,9 @@ role sessions. This file is for agents developing this repository.
 - `repertoire/` -- the convention corpus pipeline plus the query path
   (`src/query.ts`) that the repertoire skill wraps. `docs/repertoire/` is the
   corpus manual.
-- `hindsight.json` -- the hindsight memory plugin config (memory server URL
-  plus bank id, no secrets); the plugin installs globally, and
-  `HINDSIGHT_CONFIG` points here from the shell profile.
+- `hindsight.example.json` -- the stanza to merge into the hindsight plugin's
+  user-level config (`~/.hindsight/coding-agent.json`): the memory server URL
+  plus the path-to-bank routing that scopes memory to research projects.
 - `docs/` -- design docs and the manual (local VitePress only).
 - `MEMORY.md` -- design rationale and the decision tail; read before changing
   the architecture.

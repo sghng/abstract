@@ -1,0 +1,7 @@
+{
+  "apiUrl": "https://memory.sgh.ng",
+  "optInOnly": true,
+  "mapPathToBank": {
+    "/home/sghng/projects/research": "research"
+  }
+}
