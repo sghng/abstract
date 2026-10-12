@@ -1,5 +1,5 @@
 ---
-description:
+description: >-
   Audit an artifact against the lab's local truths: numbers against the
   results registry, citations against their sources, prose against the
   repertoire, consistency against the notes, statistics completeness.

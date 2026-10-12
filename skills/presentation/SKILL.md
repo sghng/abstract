@@ -1,6 +1,6 @@
 ---
 name: presentation
-description:
+description: >-
   Academic presentations: content curation, storytelling strategy, and Typst
   (touying) slides from the house starter. Use when preparing, drafting, or
   reviewing a talk or slide deck, even a single slide's framing.

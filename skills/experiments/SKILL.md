@@ -1,6 +1,6 @@
 ---
 name: experiments
-description:
+description: >-
   Executing research tickets: experiment directories, the results notebook,
   reports, the key-results registry, data discipline, figures, and the
   checks doctrine for mathematical claims in model/. Use when running an

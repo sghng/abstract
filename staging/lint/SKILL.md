@@ -1,6 +1,6 @@
 ---
 name: lint
-description:
+description: >-
   EXPERIMENTAL, never mounted by default. Style-checks prose against the
   calibrated house rule set, judged paragraph by paragraph. Use only when the
   user explicitly asks to lint a manuscript or a passage.

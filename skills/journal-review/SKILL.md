@@ -1,6 +1,6 @@
 ---
 name: journal-review
-description:
+description: >-
   Response letters to journal reviewers: point-by-point format, tone
   doctrine, reading reviews for severity. Use when a review arrives, when
   preparing or revising a revise-and-resubmit response, or when drafting any

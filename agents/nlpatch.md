@@ -1,5 +1,5 @@
 ---
-description:
+description: >-
   Mechanical NLPatch work. Extract DOCX tracked changes into a patch, or
   refine a crude patch to minimal spec compliance. No interpretation.
 mode: subagent

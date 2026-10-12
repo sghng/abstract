@@ -1,6 +1,6 @@
 ---
 name: typst
-description:
+description: >-
   Typst syntax guidance, common mistakes, and math typesetting. Use whenever
   writing, reviewing, or debugging Typst source or mathematical notation,
   including manuscripts, slides, and reports.

@@ -1,6 +1,6 @@
 ---
 name: writing
-description:
+description: >-
   Academic writing craft and the house style guide: order, paragraphs,
   sentences, tone, words, formatting, numbers and citations, revision
   workflow. Use when drafting, revising, or reviewing any prose that leaves

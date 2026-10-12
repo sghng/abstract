@@ -1,6 +1,6 @@
 ---
 name: story-keeping
-description:
+description: >-
   The central narrative: what makes the story good and how to keep
   notes/story.md current. Use when a report lands, when the narrative shifts,
   when the phase changes, before framing a ticket, when judging whether a

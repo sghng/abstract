@@ -1,6 +1,6 @@
 ---
 name: word
-description:
+description: >-
   Word interop for the lab's manuscripts: exporting Typst to Word through
   typ2docx, and the NLPatch round-trip for tracked-changes DOCX files from
   collaborators. Use when converting a draft to docx, when an edited DOCX

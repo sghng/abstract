@@ -1,6 +1,6 @@
 ---
 name: repertoire
-description:
+description: >-
   The convention corpus: query published psychometric writing with draft
   prose, filtered by section, venue, year, or paper. Use while drafting or
   reviewing prose to match a venue's register, to settle whether a phrase is

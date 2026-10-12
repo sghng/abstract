@@ -1,5 +1,5 @@
 ---
-description:
+description: >-
   A blind cold read of a draft, knowing only the venue and the audience.
   The brief supplies the persona (insider, neighbor, or hostile referee),
   the scope, the aspects, and the round (collegial or adversarial).

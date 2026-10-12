@@ -1,6 +1,6 @@
 ---
 name: literature
-description:
+description: >-
   Literature work: searching and screening papers, the Zotero import relay
   and post-import verification, reading channels, claim verification, and the
   literature registry. Use for any question about what the field says, any

@@ -1,5 +1,5 @@
 ---
-description:
+description: >-
   Vision-based review of rendered assessment-item figures. Applies the lab's
   soundness rubric per item and returns sound/broken verdicts with
   failure-mode notes, for generation screening and visual-gate calibration.

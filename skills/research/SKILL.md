@@ -1,6 +1,6 @@
 ---
 name: research
-description:
+description: >-
   The lab's project logistics: where notes live, the ticket, report, and memo
   workflow, co-designing tickets, amendments, versioning, and the verification
   rules for outgoing artifacts. Use when creating or updating any note,

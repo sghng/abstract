@@ -1,5 +1,5 @@
 ---
-description:
+description: >-
   A quick, sourced answer over a literature topic: what the field says about
   X, whether claim Y has support, what the library already holds. Compact
   reply with citations, never an artifact. Read-only.
