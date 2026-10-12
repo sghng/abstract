@@ -1,25 +1,27 @@
 # abstract
 
-An OpenCode v2 agent directory that turns the CLI into a small academic research
-lab: persistent, context-isolated role sessions (orchestrator, engineer,
-statistician, librarian, writer, editor) that collaborate through files
-(tickets, reports, memos, models) and cues.
+A config repo that turns OpenCode into a small academic research lab: a
+kernel of invariants, a library of skills (writing, literature, experiments,
+story-keeping, word export, presentations, and more), and a catalog of
+sidekick agent briefs (internal and external reviewers, literature lookup and
+review, visual review, nlpatch). One primary session per project orchestrates
+through files (tickets, reports, memos, models) and flat subagent delegation.
 
-Status: early. See `MEMORY.md` for the design rationale and roadmap, and
+Status: early. See `MEMORY.md` for the design rationale and decision tail,
+`docs/prompting-2026-10-11.md` for the skills-model survey and design, and
 `manifesto.md` for the philosophy.
 
 ## Layout
 
-- `config/` -- the lab's OpenCode config root (`OPENCODE_CONFIG_DIR`): the
-  kernel `AGENTS.md`, `agents/` (role personas and the subagent catalog),
-  `plugin/harness.ts` (the cue and repertoire tools), `skills/`, and
-  `opencode.json`
-- `prompts/` -- role doctrine, assembled into the system prompt by each role's
-  binder
-- `src/` -- the `abstract` CLI, the binders, and the context report
-- `docs/` -- dev-facing design documents; `repertoire/` is the writer's
-  convention corpus (see `docs/repertoire/`)
-- `manifesto.md` -- the philosophy behind the project
+- `kernel.md` -- the always-on instructions mounted per project
+- `skills/` -- the skill library; `staging/` holds the immature (lint)
+- `agents/` -- sidekick briefs (markdown agent files)
+- `opencode.template.jsonc` -- the project mount (instructions + skills + mcp)
+- `src/cli.ts` -- the `abstract` CLI, init only
+- `typ2docx/`, `tools/`, `lint/` -- the Word converter, the reference-stock
+  patches, the experimental style linter
+- `repertoire/` -- the convention corpus pipeline and query path
+- `docs/` -- dev-facing design documents
 
 ## Usage
 
@@ -29,15 +31,13 @@ Install and link once:
 cd /path/to/abstract && bun install && bun link
 ```
 
-Then, inside a research project directory:
+Then scaffold a research project:
 
 ```sh
-abstract              # ensure runtime, server, and role sessions; attach the TUI
-abstract context      # what each agent receives: context, skills, subagents, tools
-abstract lint <f.typ> # style-check a manuscript against the expert edits (Jev)
-abstract stop         # stop the lab server
+abstract init <dir>   # writes opencode.jsonc, symlinks the sidekick briefs
+                      # into .opencode/agents/, scaffolds the notes skeleton
 ```
 
-The lab runs on a per-host OpenCode server at port 4657 with its own config,
-state, and database under `~/.local/share/abstract` and
-`~/.local/state/abstract`. Files are memory; sessions are a cache.
+Open the project in OpenCode. The kernel and the skill library mount from
+the project's config; sidekicks resolve through the symlink farm. Files are
+memory; sessions are a cache.

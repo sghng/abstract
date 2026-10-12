@@ -1,5 +1,5 @@
 // Starter slide deck — touying simple theme. Copy to draft/<artifact>/ and
-// fill in. The doctrine behind these conventions: reference/presentation.md.
+// fill in. The doctrine behind these conventions: ../references/presentation.md.
 //
 // Conventions (settled; change only on directive):
 // 1. `header: none` — no section indicator; a slide title and nothing else.

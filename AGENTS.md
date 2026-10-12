@@ -1,162 +1,77 @@
 # abstract
 
-This repository is an OpenCode v2 agent directory: it defines a small academic
-research lab (orchestrator, engineer, statistician, librarian, writer, editor)
-running as persistent sessions on a lab-owned OpenCode server. This file is for
-agents developing this repository. The lab agents' shared invariants live in
-`config/AGENTS.md`, not here.
+The lab's doctrine and tooling as a config repo: a kernel, a skill library,
+sidekick briefs, and the executables the skills invoke. OpenCode consumes the
+repo through its own discovery mechanisms; there is no harness, no server, no
+role sessions. This file is for agents developing this repository.
 
 ## Repository Layout
 
-- `config/` -- the lab's OpenCode config root (`OPENCODE_CONFIG_DIR`): the
-  kernel `AGENTS.md` (shared rules, auto-loaded into every session), `agents/`
-  (the six role personas at top level; `agents/subagents/` holds the named
-  subagent catalog and reviewer panel, whose IDs carry the `subagents/` prefix),
-  `plugin/harness.ts` (the lab plugin: binder assembly, cue, repertoire, tuning,
-  doctrine scope, and /reflect via src/reflect.ts), `plugin/desk/` (the desk
-  plugin package, server entry plus TUI entrypoint; every file or directory
-  directly under `plugin/` must be a loadable plugin, so shared contracts live
-  in src/, e.g. src/desk.ts), `opencode.json` (default model, MCP servers), and
-  `skills/` (the lab's skills, a real directory)
-- `lint/` -- `abstract lint`: the rule set (`rules.yaml`, lessons verbatim,
-  distilled from the calibrated expert edits), the paragraph extractor
-  (`extract/`, a Rust sidecar that owns all dialect knowledge and emits the
-  Block contract: text, line range, section, role; two fronts, typst-syntax for
-  Typst pinned to the installed typst, comrak for Markdown), `scan.ts` (the
-  sidecar wrapper: lazy cargo build into the abstract home, stamped by a source
-  hash, no fallback), the Jev client (`jev.ts`), the shared renderer
-  (`format.ts`; one output for the CLI and the tuning tool), and the command
-  (`cli.ts`; `-` lints one plain prose passage from stdin)
-- `prompts/` -- the prompt files (Markdown, one file each, descriptive names)
-  plus `binder.yaml`, the binder mapping (which stems each role carries, in
-  order; re-read from disk per model request, so binder surgery goes live next
-  turn): shared doctrine (`style-guide.md`, `story-doctrine.md`), role doctrine
-  (`story-keeping.md`, `writing-craft.md`), and one file per role. Referenced by
-  stem from each role's binder; only file contents enter the context, so names
-  are dev-facing
-- `src/binder.ts` -- the binder machinery: `ROLES`, the full roster the CLI and
-  tab seeding iterate, `loadBinders` (strict reader for `prompts/binder.yaml`
-  with a last-good cache, so a malformed mapping serves the previous version
-  plus a loud error piece), and `binderFooter`, the context piece naming which
-  prompt files a role may amend (the concrete scope of the kernel's
-  self-amendment rule: a role may amend its own binder prompts and its own
-  mapping entry on the user's direct order, proposal first; the orchestrator is
-  the doctrine's curator and may amend every prompt file, every mapping entry,
-  and the kernel itself). The plugin assembles the binder into the system prompt
-  per model request, re-reading from disk; agent files hold registry config only
-- `src/cli.ts` -- the `abstract` CLI (Bun, linked via `package.json` bin):
-  ensures the pinned runtime at `~/.local/share/abstract/runtime/`, the central
-  lab server (port 4657, own config/state/DB under `~/.local/share/abstract` and
-  `~/.local/state/abstract`, credentials synced from the daily install), and the
-  six role sessions per project (`metadata.role`, created once); then attaches
-  one TUI (`--server`, `--session`). Also `abstract context [role] [--json]`
-  (print what each agent receives: context pieces, skills, subagents, tools),
-  `abstract typ2docx <file.typ>` (Typst to Word beside the source, through a
-  house reference stock rebuilt fresh from the patch series; citeproc under a
-  hash-pinned APA CSL cached in the abstract home; native numbering; no server
-  or model involved), `abstract stop`
-- `reference/` -- reference material agents read on request (logistics,
-  templates); the kernel carries the absolute path, and the harness plugin
-  pre-approves role RW access alongside prompts/ (no per-edit prompts)
-- `tools/` -- builds the house reference doc (the pandoc reference doc styling
-  every Word export) by applying the numbered `NN-*.patch` series in order to a
-  pristine pandoc template export, one self-contained style concern per patch;
-  fuzz=0 and a pandoc version pin make drift fail loudly, `--max-patch N`
-  bisects the series (0 is the pristine export; partial builds write
-  `reference/reference.debug.docx`); built docx artifacts are never committed:
-  `abstract typ2docx` rebuilds a fresh stock into a private temp dir on every
-  conversion, so the patch series is the single source of truth
-- `typ2docx/` -- the Typst-to-Word converter behind `abstract typ2docx`:
-  `cli.ts` (the command: reference stock, pandoc runs, scratch management),
-  `filter.lua` (content adjustments), `floats.ts` (the float placement
-  fixpoint), `chain.ts` (the keep-together chain as a docx post-process). Every
-  table and figure floats by house policy: the filter stamps the placement
-  marking and packs bundled notes and highlight-region floats into movable
-  units, the fixpoint renders token-injected AST copies through soffice and
-  moves floats (whole nodes, never edited) until each lands unsplit within one
-  page of its authored position, and the chain (cantSplit rows, keepNext) keeps
-  each float atomic in Word. Measurement uses inline token runs, never sentinel
-  paragraphs: a scaffolding paragraph changes LibreOffice's keepNext page-break
-  arithmetic, so the measured layout must contain no object the delivered docx
-  lacks. The filter also normalizes captured block/box fills and `highlight`
-  mark regions onto pandoc's native mark handling, the default text highlight
-  pen, and the writer pens every run inside a mark: text, OMML math, and the
-  caption supplements it builds itself (a marked caption's "Table 9:" label
-  lands inside the mark span). The writer's pen matches bare mark spans only, so
-  every pen span the filter mints is bare, and a marked code block (code has no
-  inlines to wrap) re-voices itself as a Code inline under a Source Code
-  custom-style div, where the same span pens it. Display math hidden from the
-  writer's own chopper (inside a mark span, or inside a marked region, whose
-  paragraphs the pen pass later spans) is lifted into its own paragraph (Word
-  displays an oMathPara only when its w:p holds no other run), post-equation
-  text pieces riding in math-continuation divs. A marked region ending in a
-  table hoists it out (the following paragraph regains its `FirstParagraph`
-  margin), and the reader's whitespace-only and anchor-only paragraph artifacts
-  (comment lines and labels) are dropped
-- `repertoire/` -- the writer's convention corpus: pipeline scripts (`src/`
-  journal-agnostic stages + `src/families/<j>/` fetchers) that turn journal
-  articles (six families: psychometrika, jem, jebs, bjmsp, psyarxiv, arxiv stat)
-  into raw PDF/HTML/XML/TeX + Markdown/asset stores on Cloudflare R2, a
-  Vectorize index, and D1 papers/sources as source of truth; `legacy/` holds the
-  parked ML stages. Served to sessions as the `repertoire` tool by the lab
-  plugin. See `docs/repertoire/` (the corpus manual)
-- `docs/` -- design documents, dev-facing, not loaded by lab agents.
-  `docs/multi-agent.md` and `docs/harness.md` describe the RETIRED pi-era
-  harness (fs inbox, tmux ensemble); keep for history
-- `MEMORY.md` -- design rationale, roadmap, and the decision tail; read
-  before changing the architecture (durable doctrine graduated to
-  `docs/{lab,prompts,models,typ2docx}.md` and the per-system design docs)
-- `manifesto.md` -- human-facing philosophy behind the project
+- `kernel.md` -- the always-on layer for research projects: layout
+  invariants, the never-forget list, the delegation and review contracts.
+  Mounted per project through the config's `instructions` array.
+- `skills/` -- the skill library: research, writing, story-keeping,
+  literature, experiments, word, repertoire, presentation, grants,
+  journal-review, typst. One directory per skill: `SKILL.md` plus bundled
+  `references/`, `scripts/`, `assets/` per the Agent Skills convention.
+- `staging/` -- skills that have not earned graduation (lint). Never mounted.
+- `agents/` -- the sidekick briefs as markdown agent files:
+  reviewer-internal, reviewer-external, visual-review, literature-lookup,
+  literature-review, nlpatch. Mounted per project as symlinks under
+  `.opencode/agents/`.
+- `opencode.template.jsonc` -- the project mount: instructions, skills, mcp.
+  Deliberately no model pin; the session model is the user's choice.
+- `src/cli.ts` -- the `abstract` CLI, init only: `abstract init <dir>`
+  scaffolds a research project (config, agent symlinks, notes skeleton).
+- `typ2docx/` -- the Typst-to-Word converter, invoked by the word skill;
+  `tools/` holds the reference-stock patch series.
+- `lint/` -- the style linter (Jev-judged rule set), experimental; driven
+  through `staging/lint`.
+- `repertoire/` -- the convention corpus pipeline plus the query path
+  (`src/query.ts`) that the repertoire skill wraps. `docs/repertoire/` is the
+  corpus manual.
+- `hindsight.json` -- the hindsight memory plugin config (memory server URL
+  plus bank id, no secrets); the plugin installs globally, and
+  `HINDSIGHT_CONFIG` points here from the shell profile.
+- `docs/` -- design docs and the manual (local VitePress only).
+- `MEMORY.md` -- design rationale and the decision tail; read before changing
+  the architecture.
+- `manifesto.md` -- the philosophy behind the project.
 
 ## Working Conventions
 
-- **Naming**: nuanced, unusual names are for tokens that live in the agents'
+- **Naming**: nuanced, unusual names are for tokens that live in agent
   context and need markedness against generic prose. File and directory names
   are dev-facing and stay descriptive, since only contents enter the context.
-  Musical names (`binder`, `cue`, `repertoire`) apply exactly when the token
-  will appear in an agent's context, including tool names.
-- **The kernel holds invariants only** (`config/AGENTS.md`). Membership test: if
-  the lab agents forgot it, would the failure be silent and costly? Episodic
-  procedures and templates belong in skills.
-- **Ground truth is the pinned published binary** (`@opencode/cli` at the
-  version of the `@opencode/*` deps in `package.json`), not any source checkout,
-  which may lag.
-- **Upgrades are deliberate**: bump the `@opencode/*` deps in `package.json`,
-  `npm diff` plus release notes for new features to adopt, then `abstract stop`
-  and relaunch; keep the bump only when the lab comes up and serves turns. The
-  user's daily install is never touched.
-- **Propose first**: when asked to change something important, above all the
-  kernel `config/AGENTS.md` and the prompt files under `prompts/`, show the user
-  the exact proposed text and wait for agreement. Never write the change and
-  commit it in one step.
-- **Commits**: conventional commits. Record architectural decisions in
-  `MEMORY.md`'s decision tail. A change and its documentation land in one
-  commit.
+- **The kernel holds invariants only.** Membership test: if the agent forgot
+  it, would the failure be silent and costly? Episodic procedures belong in
+  skills; references and templates bundle inside the owning skill.
+- **Propose first**: `kernel.md`, `skills/`, and `agents/` amend on the
+  user's direct order, with the proposed text shown first. Never write the
+  change and commit it in one step.
+- **Commits**: conventional commits. A change and its documentation land in
+  one commit. Architectural decisions go in `MEMORY.md`'s decision tail.
 
-## Instructions for Writing Prompts
+## Writing Agent-Facing Text
 
 - ASCII only. No emoji, no non-ASCII punctuation; arrows as `-->`.
 - **No dashes as punctuation**: no em dashes and no `--` anywhere in
   agent-facing prose, any form; the pattern in context shifts generation.
-  Rewrite the sentence (split it, use a comma or parentheses). CLI flags and
-  markdown table separators are syntax, not prose, and stay.
-- **Deliverable prose bans colons, semicolons, and dashes** in running text (see
-  `prompts/style-guide.md`); prompt lists may still use colons after bold
-  labels.
-- **Empiricism**: the goal is not a prompt that looks right; it is finding out
-  what is truly needed. Start minimal and observe the agents. A rule earns its
-  place when its absence produces a failure. If a line can be deleted and
-  behavior does not change, it stays deleted; git remembers, so deletion is
-  cheap and reversible.
-- **Economy**: instruct only where the prior is wrong; delete if deletion breaks
-  nothing.
-- **State once**: the context is assembled; give each fact one home, chosen by
-  audience. The kernel (config/AGENTS.md) is the shared layer; role prompt files
-  carry only that role's deviation.
-- **Positive imperatives**: state what to do; cut hedges; prefer a positive rule
-  over a negated one.
-- **Recursion**: prompt writing is iterative. A line is finished not when
-  nothing can be added, but when nothing can be deleted.
-- **Post-surgery checklist**: after moving or graduating prompt content, grep
-  the descriptions, sibling files, and dev docs for the old names; residue is
-  the expected failure mode of every graduation round.
+  CLI flags and markdown table separators are syntax, not prose, and stay.
+- **Deliverable prose bans colons, semicolons, and dashes** in running text
+  (see `skills/writing/SKILL.md`); skill lists may still use colons after
+  bold labels.
+- **Empiricism**: a rule earns its place when its absence produces a failure.
+  If a line can be deleted and behavior does not change, it stays deleted;
+  git remembers, so deletion is cheap and reversible.
+- **Economy**: instruct only where the prior is wrong; delete if deletion
+  breaks nothing.
+- **State once**: each fact gets one home, chosen by audience. The kernel is
+  the shared layer; a skill body carries only that skill's deviation.
+- **Positive imperatives**: state what to do; cut hedges; prefer a positive
+  rule over a negated one.
+- **Recursion**: a line is finished not when nothing can be added, but when
+  nothing can be deleted.
+- **Post-surgery checklist**: after moving or renaming content, grep the
+  descriptions, sibling files, and docs for the old names; residue is the
+  expected failure mode of every reorganization.

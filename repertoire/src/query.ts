@@ -148,7 +148,7 @@ async function mdFor(doiId: string): Promise<string> {
   if (!(await Bun.file(local).exists())) {
     await run(
       "npx",
-      ["wrangler", "r2", "object", "get", `repertoire/${doiId}.md`, "--file", local, "--remote"],
+      ["wrangler", "r2", "object", "get", `repertoire/md/${doiId}.md`, "--file", local, "--remote"],
       { timeout: 60_000 },
     );
   }

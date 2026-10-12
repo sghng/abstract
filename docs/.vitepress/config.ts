@@ -1,12 +1,12 @@
 import { defineConfig } from "vitepress";
 
 // Local manual site. Not deployed: run `bun run docs:dev` and open the
-// printed localhost URL. Structure mirrors the repo docs split:
-// docs/repertoire/ = corpus manual (rebuild-from-zero reference),
-// docs root = harness/prompt docs.
+// printed localhost URL. docs/repertoire/ is the corpus manual
+// (rebuild-from-zero reference); the docs root holds design docs and the
+// dated explorations.
 export default defineConfig({
   title: "abstract",
-  description: "Lab + repertoire manual",
+  description: "Research doctrine + repertoire manual",
   cleanUrls: true,
   ignoreDeadLinks: true, // decision-log prose cites historical paths
   markdown: {
@@ -18,8 +18,7 @@ export default defineConfig({
     nav: [
       { text: "Home", link: "/" },
       { text: "Repertoire", link: "/repertoire/" },
-      { text: "Harness", link: "/multi-agent" },
-      { text: "Prompts", link: "/prompt-hierarchy" },
+      { text: "typ2docx", link: "/typ2docx" },
     ],
     sidebar: [
       {
@@ -33,24 +32,12 @@ export default defineConfig({
         ],
       },
       {
-        text: "Harness",
+        text: "Design + explorations",
         items: [
-          { text: "Multi-agent pattern", link: "/multi-agent" },
-          { text: "Implementation plan", link: "/harness" },
-          { text: "Desk", link: "/desk" },
-          { text: "Remote access", link: "/remote-access" },
-          { text: "The lab", link: "/lab" },
-          { text: "Prompt doctrine", link: "/prompts" },
-          { text: "Model pins", link: "/models" },
           { text: "typ2docx", link: "/typ2docx" },
-        ],
-      },
-      {
-        text: "Prompts + writing",
-        items: [
-          { text: "Prompt hierarchy", link: "/prompt-hierarchy" },
-          { text: "Writing", link: "/writing" },
-          { text: "Ledger", link: "/ledger" },
+          { text: "Prompting (2026-10-11)", link: "/prompting-2026-10-11" },
+          { text: "Stylometer", link: "/stylometer" },
+          { text: "Session audit (q-matrix)", link: "/session-audit-qmatrix-rnr" },
         ],
       },
     ],

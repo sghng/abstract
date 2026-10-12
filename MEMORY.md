@@ -113,3 +113,16 @@ better home, it moves and leaves a pointer at most.
   area, one `literature` skill, nlpatch merges into a `word` skill, no
   default model pin, subagent defaults as the design surface) live in
   `docs/prompting-2026-10-11.md`.
+- **2026-10-11, cutover**: the harness is deleted on branch
+  `skills-restructure` (config/, prompts/, the binder and server CLI, the
+  retired docs; `v1` preserves it all). The repo is now `kernel.md` +
+  `skills/` + `staging/` + `agents/` + `opencode.template.jsonc`, with
+  `abstract init <dir>` as the only CLI command (config from template with
+  clone-resolved paths, sidekick symlinks under `.opencode/agents/`, notes
+  skeleton; verified on a scratch project). `hindsight.json` moved to the
+  repo root; the plugin installs globally with `HINDSIGHT_CONFIG` pointing
+  here from the shell profile. Repertoire serving fixed for the
+  consolidated bucket (`repertoire/md/<doi_id>.md`), and a corpus desync
+  surfaced: D1 chunk spans describe the pre-leakfix md generation (probe
+  paper: spans to line 1088, served md has 266 lines), so passage
+  extraction needs a span rebuild before query.ts works end to end.

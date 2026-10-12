@@ -1,6 +1,6 @@
 # Presentations
 
-The doctrine behind `reference/deck.typ`. It binds every deck that leaves
+The doctrine behind this skill's `../assets/deck.typ`. It binds every deck that leaves
 the lab, alongside the style guide. The style guide rules on tone and words
 apply; this file holds what is specific to slides.
 
