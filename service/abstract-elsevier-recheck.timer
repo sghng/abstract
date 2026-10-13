@@ -1,0 +1,9 @@
+[Unit]
+Description=Fire the abstract Elsevier recheck every 6 h (script self-guards against the 24 h cooldown)
+
+[Timer]
+OnCalendar=*-*-* 00/6:00:00
+Persistent=true
+
+[Install]
+WantedBy=timers.target

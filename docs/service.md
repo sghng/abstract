@@ -74,6 +74,12 @@ line `abstract.sgh.ng -> centurion.sgh.ng`.
 Known limitation: one browser per profile directory; the smoke script
 and the service cannot run a fetch at the same time.
 
+Elsevier cooldown recheck: `service/recheck.ts` behind the
+`abstract-elsevier-recheck` user timer (6 h cadence, self-guarded to
+at most one real attempt per 24 h cooldown cycle); outcomes append to
+`service/data/logs/elsevier-recheck.jsonl`. Disable the timer once a
+run reports ok.
+
 ## Roadmap
 
 The repertoire query lands behind this service after the D1 span
