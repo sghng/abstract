@@ -59,7 +59,7 @@ const TOOLS = [
   {
     name: "paper_find",
     description:
-      "Locate a phrase in a fetched paper; returns page numbers with short snippets. The tool for claim verification before quoting a passage.",
+      "Locate a phrase in a fetched paper; returns page numbers with short snippets. Hyphenation and whitespace are normalized, so quoted phrases match across line breaks. When the exact phrase has no hit, falls back to pages containing all the words (the mode field says which). The tool for claim verification before quoting a passage.",
     inputSchema: {
       type: "object",
       properties: {

@@ -11,7 +11,7 @@ streamable HTTP at `/mcp` on `127.0.0.1:4857`. MCP only; no REST face.
 | `paper_resolve` | DOI to merged metadata (Crossref, OpenAlex, Unpaywall) plus route; cheap |
 | `paper_fetch` | submit-and-poll fetch into the server-side store; states started, queued, ok, failed(code) |
 | `paper_read` | page-anchored text range, the `read_pdf_pages` idiom |
-| `paper_find` | phrase to page hits with snippets, the verification idiom |
+| `paper_find` | phrase to page hits with snippets; hyphenation and whitespace normalized, all-words-per-page fallback (`mode` says which); the verification idiom |
 | `paper_export` | base64 PDF, durable capture into `references/` only |
 
 Error codes: `doi_not_registered` (reserved or typo; the jemd.70061
@@ -51,7 +51,9 @@ per-request MCP with plain JSON Schema tools, `browser.ts` owns the
 one persistent chromium context (full chromium, `channel: "chromium"`,
 UA probed once and persisted, profile under `service/data/profile`),
 `routes/` holds the publisher modules, `fetcher.ts` is the queue and
-artifact writer, `text.ts` the reading tools. Artifacts live under
+artifact writer, `text.ts` the reading tools (extraction is `pdftotext`
+default reading order; `-layout` interleaved columns and was removed
+2026-10-13 after phrase recall measured 43% against 100%). Artifacts live under
 `service/data/artifacts` (gitignored): `<id>.pdf`, `<id>.txt` (pages
 split by form feeds), `<id>.meta.json`.
 

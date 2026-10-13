@@ -8,7 +8,10 @@ export function pdfPages(pdfPath: string): number {
 }
 
 export function pdfToText(pdfPath: string, txtPath: string): void {
-  const r = Bun.spawnSync(["pdftotext", "-layout", pdfPath, txtPath], {
+  // no -layout: it preserves visual geometry and interleaves columns per
+  // visual row, destroying reading order. Default mode keeps phrases
+  // contiguous for paper_find (2026-10-13, recall 43% -> 100% on samples).
+  const r = Bun.spawnSync(["pdftotext", pdfPath, txtPath], {
     stdout: "ignore",
     stderr: "pipe",
   });

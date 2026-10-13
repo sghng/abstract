@@ -31,23 +31,52 @@ export function readPages(artifact: string, from: number, to: number) {
   };
 }
 
+// match surface: line-break hyphens joined, whitespace collapsed, so a
+// phrase spanning layout breaks still matches as typed
+function normText(s: string): string {
+  return s.replace(/(\w)-\s*\n\s*/g, "$1").replace(/\s+/g, " ").trim();
+}
+
 export function findInPaper(artifact: string, query: string) {
   const pages = loadPages(artifact);
-  const q = query.toLowerCase();
+  const normPages = pages.map((t) => normText(t));
+  const q = normText(query).toLowerCase();
   const hits: Array<{ page: number; snippet: string }> = [];
-  pages.forEach((text, i) => {
+  normPages.forEach((text, i) => {
     const lower = text.toLowerCase();
     let at = lower.indexOf(q);
     while (at !== -1 && hits.length < 8) {
-      const start = Math.max(0, at - 160);
       hits.push({
         page: i + 1,
-        snippet: text.slice(start, Math.min(text.length, at + q.length + 160)).replace(/\s+/g, " ").trim(),
+        snippet: text.slice(Math.max(0, at - 160), Math.min(text.length, at + q.length + 160)).trim(),
       });
       at = lower.indexOf(q, at + q.length);
     }
   });
-  return { artifact, query, hits };
+  if (hits.length > 0) return { artifact, query, mode: "phrase", hits };
+  // fallback: pages containing every query word, tightest span first
+  const tokens = [...new Set(q.split(/[^a-z0-9]+/).filter((t) => t.length > 1))];
+  const loose: Array<{ page: number; snippet: string; span: number }> = [];
+  if (tokens.length > 0) {
+    normPages.forEach((text, i) => {
+      const lower = text.toLowerCase();
+      if (!tokens.every((t) => lower.includes(t))) return;
+      const first = Math.min(...tokens.map((t) => lower.indexOf(t)));
+      const last = Math.max(...tokens.map((t) => lower.lastIndexOf(t) + t.length));
+      loose.push({
+        page: i + 1,
+        span: last - first,
+        snippet: text.slice(Math.max(0, first - 80), Math.min(text.length, last + 80)).trim(),
+      });
+    });
+  }
+  loose.sort((a, b) => a.span - b.span);
+  return {
+    artifact,
+    query,
+    mode: "tokens",
+    hits: loose.slice(0, 8).map(({ page, snippet }) => ({ page, snippet })),
+  };
 }
 
 export function exportPdf(artifact: string) {
