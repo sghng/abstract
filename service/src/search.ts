@@ -34,12 +34,20 @@ type Fused = { query: string; merged_from: string[]; hits: SearchHit[] };
 const cache = new Map<string, { at: number; value: Fused }>();
 
 async function getJson(url: string, headers: Record<string, string> = {}): Promise<any> {
-  const r = await fetch(url, {
-    headers: { "user-agent": UA, accept: "application/json", ...headers },
-    signal: AbortSignal.timeout(15_000),
-  });
-  if (!r.ok) throw new Error(`HTTP ${r.status} from ${new URL(url).host}`);
-  return r.json();
+  for (let attempt = 0; attempt < 3; attempt++) {
+    const r = await fetch(url, {
+      headers: { "user-agent": UA, accept: "application/json", ...headers },
+      signal: AbortSignal.timeout(15_000),
+    });
+    if (r.ok) return r.json();
+    // transient throttle (S2 keys get 1 req/s) or upstream error: breathe, retry
+    if ((r.status === 429 || r.status >= 500) && attempt < 2) {
+      await new Promise((res) => setTimeout(res, 1500));
+      continue;
+    }
+    throw new Error(`HTTP ${r.status} from ${new URL(url).host}`);
+  }
+  throw new Error(`unreachable ${new URL(url).host}`);
 }
 
 function yearRange(o: SearchOpts): string {
