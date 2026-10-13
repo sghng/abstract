@@ -2,7 +2,7 @@
 
 The lab's own MCP service: paper fetch (DOI to page-anchored full
 text) over the campus entitlement, later the repertoire query. Serves
-streamable HTTP at `/mcp` on `127.0.0.1:4670`. MCP only; no REST face.
+streamable HTTP at `/mcp` on `127.0.0.1:4857`. MCP only; no REST face.
 
 ## Surface
 
@@ -28,7 +28,7 @@ platform condition, route those to JSTOR or ILL), `not_entitled`,
 | springer | plain HTTP `content/pdf` | implemented, pattern proven |
 | cambridge | landing parse, plain HTTP pdf | verified |
 | wiley | browser landing, then in-page `pdfdirect`; on 403, force a Cloudflare interstitial (headless UA), clear it (clean UA), retry | verified (EM:IP paywalled) |
-| elsevier | PII from the redirect chain, browser funnel when blocked, navigate `pdfft` to the signed CDN url | implemented per the proven experiment; IP-blocked during bring-up, re-verify after cooldown |
+| elsevier | PII from the redirect chain, browser funnel when blocked, navigate `pdfft` to the signed CDN url | implemented per the proven experiment; IP-level block (2026-10-13, outlasted 17 h and hit the MCP browser too), 24 h cooldown, re-verify pending; multagen egress is the fallback if it recurs |
 
 The wiley clearance dance exists because a too-clean profile never
 meets a challenge and so never earns the clearance cookie that
@@ -56,10 +56,13 @@ artifact writer, `text.ts` the reading tools. Artifacts live under
 split by form feeds), `<id>.meta.json`.
 
 Run by hand: `bun service/src/index.ts`. In production the systemd
-user unit `service/abstract-mcp.service` (pattern of `zotero-mcp`),
+user unit `~/.config/systemd/user/abstract-mcp.service` (pattern of
+`zotero-mcp`; the repo copy is `service/abstract-mcp.service`), with
 EnvironmentFile `~/.config/abstract-mcp/env` (`ABSTRACT_PORT`,
 `ABSTRACT_HOST`, `ABSTRACT_TOKEN` optional bearer, `ABSTRACT_UPEMAIL`).
-Deployment (tailnet, TLS at abstract.sgh.ng/mcp) is the owner's side.
+Ingress is Caddy at `https://abstract.sgh.ng/mcp` (`/mcp*` path
+convention, DNS-01); the name resolves via the unbound-back local-data
+line `abstract.sgh.ng -> centurion.sgh.ng`.
 
 Known limitation: one browser per profile directory; the smoke script
 and the service cannot run a fetch at the same time.

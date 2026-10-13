@@ -17,6 +17,13 @@ import { writeFileSync } from "node:fs";
 
 const inflight = new Map<string, number>();
 
+// Elsevier's IP block outlasted 17 h after repeated automated fetches
+// (2026-10-13, verified browser-dependent: no); other publishers get the
+// short cooldown
+const COOLDOWN_MIN: Array<[RegExp, number]> = [[/^10\.1016\//, 1440]];
+const cooldownFor = (doi: string): number =>
+  COOLDOWN_MIN.find(([re]) => re.test(doi))?.[1] ?? 30;
+
 export type FetchState = {
   state: "ok" | "started" | "queued" | "failed";
   artifact: string;
@@ -30,6 +37,11 @@ export type FetchState = {
 export function fetchPaper(doiRaw: string, force = false): FetchState {
   const doi = normalizeDoi(doiRaw);
   const id = doiToId(doi);
+  // in-flight beats stored state: a forced refetch must poll as queued,
+  // not as the stale error it is about to replace
+  if (inflight.has(doi)) {
+    return { state: "queued", artifact: id, doi };
+  }
   if (!force) {
     const meta = readMeta(id);
     if (meta?.complete) {
@@ -37,7 +49,8 @@ export function fetchPaper(doiRaw: string, force = false): FetchState {
     }
     if (meta?.error) {
       if (meta.error.code === "challenge_needs_human") {
-        const minsLeft = 30 - (Date.now() - Date.parse(meta.error.at)) / 60_000;
+        const cd = cooldownFor(doi);
+        const minsLeft = cd - (Date.now() - Date.parse(meta.error.at)) / 60_000;
         if (minsLeft > 0) {
           return {
             state: "failed",
@@ -52,9 +65,6 @@ export function fetchPaper(doiRaw: string, force = false): FetchState {
       }
       return { state: "failed", artifact: id, doi, error: meta.error };
     }
-  }
-  if (inflight.has(doi)) {
-    return { state: "queued", artifact: id, doi };
   }
   inflight.set(doi, Date.now());
   enqueue(() => fetchOne(doi, id)).finally(() => inflight.delete(doi));

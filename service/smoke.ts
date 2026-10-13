@@ -42,7 +42,7 @@ switch (cmd) {
     break;
   }
   case "mcp": {
-    const base = process.env.ABSTRACT_URL ?? "http://127.0.0.1:4670";
+    const base = process.env.ABSTRACT_URL ?? "http://127.0.0.1:4857";
     const post = async (body: unknown) => {
       const r = await fetch(`${base}/mcp`, {
         method: "POST",
