@@ -8,6 +8,7 @@ streamable HTTP at `/mcp` on `127.0.0.1:4857`. MCP only; no REST face.
 
 | Tool | Meaning |
 | --- | --- |
+| `paper_search` | topic to ranked records from Semantic Scholar + OpenAlex, fused and deduped by DOI (reciprocal rank fusion); hits carry doi, year, venue, citations, OA; feeds `paper_fetch`. Grey literature is out of scope |
 | `paper_resolve` | DOI to merged metadata (Crossref, OpenAlex, Unpaywall) plus route; cheap |
 | `paper_fetch` | submit-and-poll fetch into the server-side store; states started, queued, ok, failed(code) |
 | `paper_read` | page-anchored text range, the `read_pdf_pages` idiom |
@@ -61,7 +62,11 @@ Run by hand: `bun service/src/index.ts`. In production the systemd
 user unit `~/.config/systemd/user/abstract-mcp.service` (pattern of
 `zotero-mcp`; the repo copy is `service/abstract-mcp.service`), with
 EnvironmentFile `~/.config/abstract-mcp/env` (`ABSTRACT_PORT`,
-`ABSTRACT_HOST`, `ABSTRACT_TOKEN` optional bearer, `ABSTRACT_UPEMAIL`).
+`ABSTRACT_HOST`, `ABSTRACT_TOKEN` optional bearer, `ABSTRACT_UPEMAIL`;
+for `paper_search`, optional `S2_API_KEY` (free, institutional email,
+1 req/s dedicated) and `OPENALEX_API_KEY` (free, $1/day usage budget;
+keyless works at $0.10/day and DOI singleton lookups stay free).
+Without keys both legs still run on their shared/keyless pools.
 Ingress is Caddy at `https://abstract.sgh.ng/mcp` (`/mcp*` path
 convention, DNS-01); the name resolves via the unbound-back local-data
 line `abstract.sgh.ng -> centurion.sgh.ng`.

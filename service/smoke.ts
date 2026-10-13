@@ -5,6 +5,9 @@
  *   bun service/smoke.ts resolve <doi>
  *   bun service/smoke.ts fetch <doi>      (direct, bypasses MCP)
  *   bun service/smoke.ts read <artifact> <from> <to>
+ *   bun service/smoke.ts find <artifact> <phrase...>
+ *   bun service/smoke.ts search <query> [k=v ...]   (limit=, year_from=,
+ *                                           year_to=, min_citations=)
  *   bun service/smoke.ts mcp <doi>        (full MCP round trip against
  *                                           a running server)
  */
@@ -41,6 +44,21 @@ switch (cmd) {
     console.log(JSON.stringify(readPages(rest[0], Number(rest[1]), Number(rest[2])), null, 1).slice(0, 1500));
     break;
   }
+  case "find": {
+    const { findInPaper } = await import("./src/text.ts");
+    console.log(JSON.stringify(findInPaper(rest[0], rest.slice(1).join(" ")), null, 1).slice(0, 2500));
+    break;
+  }
+  case "search": {
+    const { searchPapers } = await import("./src/search.ts");
+    const o: Record<string, number> = {};
+    for (const kv of rest.slice(1)) {
+      const [k, v] = kv.split("=");
+      if (v !== undefined) o[k] = Number(v);
+    }
+    console.log(JSON.stringify(await searchPapers(rest[0], o), null, 1).slice(0, 4000));
+    break;
+  }
   case "mcp": {
     const base = process.env.ABSTRACT_URL ?? "http://127.0.0.1:4857";
     const post = async (body: unknown) => {
@@ -72,5 +90,5 @@ switch (cmd) {
     break;
   }
   default:
-    console.log("usage: smoke resolve|fetch|read|mcp ...");
+    console.log("usage: smoke resolve|fetch|read|find|search|mcp ...");
 }

@@ -17,8 +17,25 @@ import type { IncomingMessage, ServerResponse } from "node:http";
 import { resolvePaper } from "./resolve.ts";
 import { fetchPaper } from "./fetcher.ts";
 import { readPages, findInPaper, exportPdf } from "./text.ts";
+import { searchPapers } from "./search.ts";
 
 const TOOLS = [
+  {
+    name: "paper_search",
+    description:
+      "Search the scholarly literature by topic or phrase; Semantic Scholar and OpenAlex queried together, results fused and deduplicated by DOI. Each hit carries doi, title, year, venue, citations, OA status; feed a chosen doi into paper_resolve then paper_fetch. DOI-bearing papers only; grey literature (preprint servers' pages, software docs, lecture notes) is out of scope, use web search for that.",
+    inputSchema: {
+      type: "object",
+      properties: {
+        query: { type: "string", description: "topic or phrase, e.g. \"Q-matrix estimation cognitive diagnosis\"" },
+        limit: { type: "integer", description: "max results, default 10" },
+        year_from: { type: "integer" },
+        year_to: { type: "integer" },
+        min_citations: { type: "integer" },
+      },
+      required: ["query"],
+    },
+  },
   {
     name: "paper_resolve",
     description:
@@ -82,7 +99,16 @@ const TOOLS = [
 ] as const;
 
 async function callTool(name: string, args: Record<string, unknown>): Promise<unknown> {
+  const int = (v: unknown): number | undefined =>
+    v === undefined || v === null || v === "" ? undefined : Number(v);
   switch (name) {
+    case "paper_search":
+      return searchPapers(String(args.query), {
+        limit: int(args.limit),
+        year_from: int(args.year_from),
+        year_to: int(args.year_to),
+        min_citations: int(args.min_citations),
+      });
     case "paper_resolve":
       return resolvePaper(String(args.doi));
     case "paper_fetch":
