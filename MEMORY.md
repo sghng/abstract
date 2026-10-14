@@ -164,3 +164,16 @@ better home, it moves and leaves a pointer at most.
   per-agent pins plus a forced default as the cost lever) and OpenAI's
   product tiering (mini positioned for subagents). Session-model choice
   stays the user's.
+- **2026-10-13, follow-up**: the statistician sidekick joins as design
+  arbiter (the recurring consultation shape; graded-response memos 003,
+  008, 009, 010 and q-matrix memo-007 are the trail), pinned to kimi
+  k3-256k on the owner's order: its rulings steer the cheap executors, the
+  highest-leverage seat for model power. The engineer brief gains the
+  cluster-skill clause (loaded when the brief involves compute; its
+  credential rules ride along, which covers the secrets concern the field
+  report raised) and the smoke-locally rule: a stub-driven smoke passes
+  before any cluster submission, simple proof-of-concept compute stays
+  local, anything heavier goes to the cluster. Declined by the owner as
+  unearned: an explicit secrets rule in the engineer brief, and
+  multi-provider spreading of sidekick pins (both hypothetical risks, no
+  observed failure).

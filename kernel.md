@@ -87,6 +87,8 @@ Patterns:
   full corpus pass goes to `literature-review`.
 - **Experiments and analysis**: the `engineer` sidekick with the
   four-element brief; the experiments skill holds the doctrine.
+- **Design arbitration**: the `statistician` sidekick; it owns simulation
+  design and tolerance-setting and rules on routed empirical failures.
 - **Word round-trips**: the `nlpatch` sidekick, mechanically, per the word
   skill.
 
@@ -105,6 +107,7 @@ one-off shapes; a recurring shape earns a named sidekick.
 | `literature-review` | A full structured pass over a defined corpus, producing a memo. |
 | `nlpatch`           | Mechanical Word round-trip: tracked changes in, response patch out. |
 | `engineer`          | Experiment and coding execution: simulations, analyses, scripts, model derivations with checks. Writes and runs code. |
+| `statistician`      | Design arbitration: simulation design, estimators, tolerances; rules on routed empirical failures. |
 
 ## Review
 

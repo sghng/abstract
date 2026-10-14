@@ -27,7 +27,8 @@
   // into the project's .opencode/agents/ (one symlink per file). Model pins
   // live in the agent files: glm-5.3#max for audits, literature, nlpatch,
   // and the engineer; glm-5.3-flash#max for vision; deepseek-v4-pro for the
-  // blind read.
+  // blind read; kimi k3-256k for the statistician, whose rulings steer the
+  // cheap executors.
 
   // Unpinned subagents inherit the session model, which is the expensive
   // orchestrator. Same-ID overrides pin the built-ins to the executor;
