@@ -5,10 +5,7 @@ description: >-
   repertoire, consistency against the notes, statistics completeness.
   Read-only; the brief names the aspects to run.
 mode: subagent
-model: zai-coding-plan/glm-5.3
-request:
-  body:
-    reasoning_effort: max
+model: zai-coding-plan/glm-5.3#max
 permissions:
   - action: subagent
     resource: "*"

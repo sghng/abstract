@@ -151,3 +151,16 @@ better home, it moves and leaves a pointer at most.
   the owning skill when they touch its domain, so triggers stay
   predictable; a skill-map paragraph declined, the descriptions are the
   tier-2 index.
+- **2026-10-13**: subagent cost routing closes the bare-spawn leak (the
+  round the 2026-10-11 survey deferred, point 8). V2 mechanics: unpinned
+  subagents inherit the session model, so the built-ins general and explore
+  ran the expensive session model, and the kernel routed experiments and
+  analysis to bare spawns. Fixes: the engineer sidekick (glm-5.3#max) owns
+  experiment and coding execution; template same-ID overrides pin general
+  to glm-5.3#max and explore to glm-5.3; the five request.body reasoning
+  overlays, which V2 preserves but never sends, migrate to native #max
+  variants (provider-native, confirmed by a test spawn). Pattern verified
+  against Anthropic's published setup (Opus lead, Sonnet subagents,
+  per-agent pins plus a forced default as the cost lever) and OpenAI's
+  product tiering (mini positioned for subagents). Session-model choice
+  stays the user's.

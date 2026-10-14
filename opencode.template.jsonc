@@ -21,10 +21,19 @@
       "type": "remote",
       "url": "https://mcp.context7.com/mcp"
     }
-  }
+  },
 
   // Sidekicks mount as markdown files: init symlinks ~/dev/abstract/agents/
-  // into the project's .opencode/agents/ (one symlink per file). Model pins:
-  // glm-5.3 with max reasoning for audits and literature work, glm-5.3-flash
-  // with max reasoning for vision, deepseek-v4-pro for the blind read.
+  // into the project's .opencode/agents/ (one symlink per file). Model pins
+  // live in the agent files: glm-5.3#max for audits, literature, nlpatch,
+  // and the engineer; glm-5.3-flash#max for vision; deepseek-v4-pro for the
+  // blind read.
+
+  // Unpinned subagents inherit the session model, which is the expensive
+  // orchestrator. Same-ID overrides pin the built-ins to the executor;
+  // scalars merge, so their prompts and tools stay intact.
+  "agents": {
+    "general": { "model": "zai-coding-plan/glm-5.3#max" },
+    "explore": { "model": "zai-coding-plan/glm-5.3" }
+  }
 }

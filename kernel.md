@@ -85,10 +85,14 @@ Patterns:
   and own voice consistency.
 - **Literature**: a quick sourced question goes to `literature-lookup`; a
   full corpus pass goes to `literature-review`.
-- **Experiments and analysis**: bare spawns with the four-element brief; the
-  experiments skill holds the doctrine.
+- **Experiments and analysis**: the `engineer` sidekick with the
+  four-element brief; the experiments skill holds the doctrine.
 - **Word round-trips**: the `nlpatch` sidekick, mechanically, per the word
   skill.
+
+Bare spawns (`general`, `explore`) run on the executor model via template
+pins, so cost never rides on routing discipline. They are the fallback for
+one-off shapes; a recurring shape earns a named sidekick.
 
 ### The Sidekicks
 
@@ -100,6 +104,7 @@ Patterns:
 | `literature-lookup` | A quick, sourced answer over a topic. |
 | `literature-review` | A full structured pass over a defined corpus, producing a memo. |
 | `nlpatch`           | Mechanical Word round-trip: tracked changes in, response patch out. |
+| `engineer`          | Experiment and coding execution: simulations, analyses, scripts, model derivations with checks. Writes and runs code. |
 
 ## Review
 

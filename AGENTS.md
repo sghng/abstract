@@ -20,8 +20,9 @@ role sessions. This file is for agents developing this repository.
   reviewer-internal, reviewer-external, visual-review, literature-lookup,
   literature-review, nlpatch. Mounted per project as symlinks under
   `.opencode/agents/`.
-- `opencode.template.jsonc` -- the project mount: skills and mcp.
-  Deliberately no model pin; the session model is the user's choice.
+- `opencode.template.jsonc` -- the project mount: skills and mcp. No
+  session-model pin, that stays the user's choice; the built-in subagents
+  pin to the executor model so bare spawns never run the session model.
 - `src/cli.ts` -- the `abstract` CLI, init only: `abstract init <dir>`
   scaffolds a research project (config, agent symlinks, notes skeleton).
 - `typ2docx/` -- the Typst-to-Word converter, invoked by the word skill;

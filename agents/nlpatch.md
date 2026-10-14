@@ -3,10 +3,7 @@ description: >-
   Mechanical NLPatch work. Extract DOCX tracked changes into a patch, or
   refine a crude patch to minimal spec compliance. No interpretation.
 mode: subagent
-model: zai-coding-plan/glm-5.3
-request:
-  body:
-    reasoning_effort: max
+model: zai-coding-plan/glm-5.3#max
 permissions:
   - action: subagent
     resource: "*"

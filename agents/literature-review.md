@@ -3,10 +3,7 @@ description: >-
   One structured literature-review pass over a defined corpus; produces a
   structured memo, never prose for the manuscript.
 mode: subagent
-model: zai-coding-plan/glm-5.3
-request:
-  body:
-    reasoning_effort: max
+model: zai-coding-plan/glm-5.3#max
 permissions:
   - action: subagent
     resource: "*"
