@@ -33,21 +33,38 @@ const TTL_MS = 30 * 60 * 1000;
 type Fused = { query: string; merged_from: string[]; hits: SearchHit[] };
 const cache = new Map<string, { at: number; value: Fused }>();
 
+// S2 keys rotate round-robin per call and per retry: dedicated keys are
+// 1 req/s each and reject back-to-back calls, and Ai2 prunes keys idle
+// for ~60 days, so rotation shares the budget and keeps every key warm
+const S2_KEYS = (process.env.S2_API_KEYS ?? process.env.S2_API_KEY ?? "")
+  .split(",")
+  .map((k) => k.trim())
+  .filter(Boolean);
+let s2Cursor = 0;
+
 async function getJson(url: string, headers: Record<string, string> = {}): Promise<any> {
-  for (let attempt = 0; attempt < 3; attempt++) {
-    const r = await fetch(url, {
-      headers: { "user-agent": UA, accept: "application/json", ...headers },
-      signal: AbortSignal.timeout(15_000),
-    });
-    if (r.ok) return r.json();
-    // transient throttle (S2 keys get 1 req/s) or upstream error: breathe, retry
-    if ((r.status === 429 || r.status >= 500) && attempt < 2) {
-      await new Promise((res) => setTimeout(res, 1500));
-      continue;
+  const r = await fetch(url, {
+    headers: { "user-agent": UA, accept: "application/json", ...headers },
+    signal: AbortSignal.timeout(15_000),
+  });
+  if (!r.ok) throw new Error(`HTTP ${r.status} from ${new URL(url).host}`);
+  return r.json();
+}
+
+// one retry on transient throttle or upstream error; S2 rotation
+// (below) usually avoids the throttle in the first place
+async function withTransientRetry<T>(fn: () => Promise<T>): Promise<T> {
+  let lastErr: unknown = new Error("attempts exhausted");
+  for (let i = 0; i < 2; i++) {
+    if (i > 0) await new Promise((res) => setTimeout(res, 800));
+    try {
+      return await fn();
+    } catch (e) {
+      if (!/HTTP (429|5\d\d)/.test(String(e))) throw e;
+      lastErr = e;
     }
-    throw new Error(`HTTP ${r.status} from ${new URL(url).host}`);
   }
-  throw new Error(`unreachable ${new URL(url).host}`);
+  throw lastErr;
 }
 
 function yearRange(o: SearchOpts): string {
@@ -61,23 +78,36 @@ async function searchS2(q: string, o: SearchOpts): Promise<SearchHit[]> {
     fields: "title,year,venue,citationCount,externalIds,openAccessPdf",
   });
   if (o.year_from || o.year_to) params.set("year", yearRange(o));
-  const headers = process.env.S2_API_KEY ? { "x-api-key": process.env.S2_API_KEY } : {};
-  const j = await getJson(`https://api.semanticscholar.org/graph/v1/paper/search?${params}`, headers);
-  return (j.data ?? [])
-    .map((p: any): SearchHit | null => {
-      if (!p.externalIds?.DOI) return null;
-      return {
-        doi: normalizeDoi(p.externalIds.DOI),
-        title: p.title,
-        year: p.year,
-        venue: p.venue || undefined,
-        citations: p.citationCount,
-        oa: Boolean(p.openAccessPdf?.url),
-        oa_pdf: p.openAccessPdf?.url,
-        found_by: ["semantic_scholar"],
-      };
-    })
-    .filter((h: SearchHit | null): h is SearchHit => h !== null);
+  const url = `https://api.semanticscholar.org/graph/v1/paper/search?${params}`;
+  const attempts = Math.max(2, S2_KEYS.length);
+  let lastErr: unknown = new Error("s2 attempts exhausted");
+  for (let i = 0; i < attempts; i++) {
+    if (i > 0) await new Promise((res) => setTimeout(res, 800));
+    const key = S2_KEYS.length ? S2_KEYS[s2Cursor++ % S2_KEYS.length] : undefined;
+    try {
+      const j = await getJson(url, key ? { "x-api-key": key } : {});
+      return (j.data ?? [])
+        .map((p: any): SearchHit | null => {
+          if (!p.externalIds?.DOI) return null;
+          return {
+            doi: normalizeDoi(p.externalIds.DOI),
+            title: p.title,
+            year: p.year,
+            venue: p.venue || undefined,
+            citations: p.citationCount,
+            oa: Boolean(p.openAccessPdf?.url),
+            oa_pdf: p.openAccessPdf?.url,
+            found_by: ["semantic_scholar"],
+          };
+        })
+        .filter((h: SearchHit | null): h is SearchHit => h !== null);
+    } catch (e) {
+      // rotate to the next key; non-transient errors surface immediately
+      if (!/HTTP (429|5\d\d)/.test(String(e))) throw e;
+      lastErr = e;
+    }
+  }
+  throw lastErr;
 }
 
 async function searchOpenAlex(q: string, o: SearchOpts): Promise<SearchHit[]> {
@@ -88,7 +118,7 @@ async function searchOpenAlex(q: string, o: SearchOpts): Promise<SearchHit[]> {
   });
   if (o.year_from || o.year_to) params.set("filter", `publication_year:${yearRange(o)}`);
   if (process.env.OPENALEX_API_KEY) params.set("api_key", process.env.OPENALEX_API_KEY);
-  const j = await getJson(`https://api.openalex.org/works?${params}`);
+  const j = await withTransientRetry(() => getJson(`https://api.openalex.org/works?${params}`));
   return (j.results ?? [])
     .map((w: any): SearchHit | null => {
       if (!w.doi) return null;

@@ -63,9 +63,12 @@ user unit `~/.config/systemd/user/abstract-mcp.service` (pattern of
 `zotero-mcp`; the repo copy is `service/abstract-mcp.service`), with
 EnvironmentFile `~/.config/abstract-mcp/env` (`ABSTRACT_PORT`,
 `ABSTRACT_HOST`, `ABSTRACT_TOKEN` optional bearer, `ABSTRACT_UPEMAIL`;
-for `paper_search`, optional `S2_API_KEY` (free, institutional email,
-1 req/s dedicated) and `OPENALEX_API_KEY` (free, $1/day usage budget;
-keyless works at $0.10/day and DOI singleton lookups stay free).
+for `paper_search`, optional `S2_API_KEYS` (comma-separated free keys,
+rotated round-robin per call and per retry; each key is 1 req/s and
+Ai2 prunes keys idle ~60 days, so rotation shares the budget and keeps
+every key warm; supersedes single-key `S2_API_KEY`) and
+`OPENALEX_API_KEY` (free, $1/day usage budget; keyless works at
+$0.10/day and DOI singleton lookups stay free).
 Without keys both legs still run on their shared/keyless pools.
 Ingress is Caddy at `https://abstract.sgh.ng/mcp` (`/mcp*` path
 convention, DNS-01); the name resolves via the unbound-back local-data
