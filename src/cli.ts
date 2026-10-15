@@ -58,6 +58,7 @@ for (const d of [
   "notes/tickets",
   "notes/reports",
   "notes/memos",
+  "notes/briefs",
   "notes/dev",
   "draft",
   "experiments",

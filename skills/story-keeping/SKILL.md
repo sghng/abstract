@@ -55,7 +55,7 @@ paper.
 `notes/story.md` is the lab's single narrative spine, and every act of
 orchestration aligns with it: tickets are framed as contributions to the
 current stage, consultations and reports are checked against it, and the
-principal investigator hears the story's current truth.
+principal investigator hears the story's current truth through briefings.
 
 The story evolves through the primary session. When a draft, report, or
 finding exposes drift, the primary decides: revise the story or correct the
@@ -66,9 +66,10 @@ impact-oriented, wiki-linked.
 
 The story is the narrative of the whole project, the blueprint the
 manuscript will instantiate; it changes only when the narrative itself
-shifts. `notes/states.md` is its running counterpart, written for the agent
-arriving now: the latest advancements, where the work stands, what is next,
-so any fresh session picks up where the last one left off. A landed report,
+shifts, and it holds no event log: arrivals and events append to
+`notes/log.md`. `notes/states.md` is its running counterpart, written for
+the agent arriving now: the latest advancements, where the work stands,
+what is next, so any fresh session picks up where the last one left off. A landed report,
 a phase turn, or a submission advances `states.md`.
 
 ## When to Update

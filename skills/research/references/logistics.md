@@ -11,7 +11,7 @@ conventions for outgoing artifacts live beside this file in
 
 | Content                                | Location                        |
 | -------------------------------------- | ------------------------------- |
-| Executive reports to the orchestrator  | `notes/reports/report-NNN-*.md` |
+| Closing records of tickets             | `notes/reports/report-NNN-*.md` |
 | Implementation notes, work-in-progress | `notes/dev/`                    |
 | Literature findings, verified claims   | `notes/literature.md` or `notes/literature/` |
 | Standing memos (review, literature)    | `notes/memos/memo-NNN-*.md`     |
@@ -19,11 +19,21 @@ conventions for outgoing artifacts live beside this file in
 | Story (central narrative)              | `notes/story.md`                |
 | Where the work stands (phases, ticket states, submissions) | `notes/states.md` |
 | Orchestrator working memory (PI preferences, open loops)   | `notes/orchestrator.md` |
+| Event journal (what happened, append-only) | `notes/log.md`                  |
+| Briefings (PI-facing checkpoint records)   | `notes/briefs/briefing-NNN-*.md` |
+| Companion (the PI's defense reference)     | beside the deliverable it pairs with |
 | Note on notes, entry point             | `notes/index.md`                |
 | Tickets                                | `notes/tickets/ticket-NNN-*.md` |
 | Source PDFs                            | `references/`                   |
 | Working files, one-off scripts         | `scratch/`                      |
 | Superseded work, archived with a manifest | `scratch/archive/` + `MANIFEST.md` |
+
+The memory files divide by tense. `log.md` holds what happened:
+append-only, dated entries. `states.md` holds where things stand:
+rewritten in place. `story.md` holds the framing: atemporal, no event
+log. `orchestrator.md` holds standing rulings and open loops: distilled
+in place. Events found in the story or the working memory are evicted to
+the log.
 
 ## Notes Index
 

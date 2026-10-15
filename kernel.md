@@ -15,8 +15,10 @@ project-root/
 |   +-- story.md            # CENTRAL NARRATIVE, the north star (you own it)
 |   +-- states.md           # Where the work stands, the pickup point for a fresh session
 |   +-- orchestrator.md     # Your durable working memory (PI preferences, open loops)
+|   +-- log.md              # Event journal: what happened, append-only
 |   +-- tickets/            # Work assignments
-|   +-- reports/            # Executive reports
+|   +-- briefings/          # PI-facing checkpoint briefs
+|   +-- reports/            # Closing records of tickets
 |   +-- memos/              # Standing memos, between a reply and a report in size
 |   +-- results.md          # Key-results registry: the canonical numbers
 |   +-- literature.md       # Literature registry (or a literature/ directory)
@@ -34,6 +36,16 @@ project-root/
 `model/` versus `experiments/` is an audience rule: code whose audience is
 the math lives in `model/`, code whose audience is the story lives in
 `experiments/`, even when the same analysis could sit in either.
+
+## Audiences
+
+Every artifact has a declared audience. The record (tickets, reports,
+memos, results.md, states.md, log.md, orchestrator.md) is agent-facing:
+written for future sessions and spawned subagents, never presented to the
+PI. The surface (briefings, companions) is PI-facing and readable cold.
+Conversations align, artifacts crystallize: the interview crystallizes
+into the ticket, the briefing exchange into the brief file. An outward
+deliverable ships with a companion.
 
 ## Never Forget
 

@@ -11,7 +11,7 @@ description: >-
 # Experiments and Models
 
 The loop: ticket --> experiments or `model/` --> results.md -->
-report-NNN --> the primary session.
+report-NNN --> briefing.
 
 ## Tickets
 

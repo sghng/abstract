@@ -177,3 +177,27 @@ better home, it moves and leaves a pointer at most.
   unearned: an explicit secrets rule in the engineer brief, and
   multi-provider spreading of sidekick pins (both hypothetical risks, no
   observed failure).
+- **2026-10-15**: the audience doctrine. The record (tickets, reports,
+  memos, results.md, states.md, log.md, orchestrator.md) is declared
+  agent-facing; the PI steers through conversation, and the surface
+  instruments are the briefing and the companion. The field diagnosis, from
+  the owner and the three-project audit: the instruments had become of the
+  agent, by the agent, for the agent, but the skills framed them as
+  PI-facing, so briefings leaked jargon and reports were presented as if
+  the PI reads them. New instruments: the briefing (a conversation that
+  crystallizes into `notes/briefs/briefing-NNN` at checkpoints: summary,
+  supplements, rulings; a follow-up question is a defect signal), the
+  companion (a dedicated artifact beside any outward deliverable: the PI's
+  defense reference with provenance, assumptions, methods, anticipated
+  questions; not a memo, since memos are agent-facing), and `notes/log.md`
+  (the append-only event journal; the four memory files divide by tense,
+  draining the logging pressure that bloated story.md and
+  orchestrator.md). Ticket doctrine reverses "never over-specify how": the
+  old rule rested on the PI reading tickets and a long-running engineer
+  holding implementation context; with fresh cheaper subagents executing,
+  tickets may pin the how. Naming verdicts (kept: ticket, report, memo, PI,
+  advisor, orchestrator; "brief" stays reserved for the delegation brief,
+  so files are briefing-NNN) are recorded here rather than in doctrine,
+  per the owner's note: PI encodes the authority gradient (advisor the
+  external oracle, PI the leading investigator, orchestrator the primary
+  agent), and correct naming routes agent attention.
