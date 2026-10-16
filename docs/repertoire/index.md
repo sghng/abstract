@@ -62,8 +62,10 @@ Ordered by fidelity, learned across the build:
   - `parse_report` 164,351 rows: per-paper bytes/headings/math/formula stats,
     quality flags (formula-heavy, no-headings, raw-leak, tiny, ltx-residual),
     normalized failure category.
-  - `chunks` + `assets`: legacy first-build tables, pending the re-embed round
-    (chunks rebuilt) or retirement (assets).
+  - `chunks`: 231,625 rows over the 6,985 journal-family papers (rebuilt
+    2026-10-16 from the current md). The retrieval corpus is journal papers
+    only; preprints stay stored for training but out of the index.
+    `assets`: legacy first-build table, pending retirement.
 - **R2 bucket `repertoire`**: `md/<doi_id>.md` (159,465 objects, 8.2 GiB,
   immutable once uploaded) and `raw/<doi_id>.<fmt>` (39,143 objects, ~47 GiB).
   Keys are derivable from D1 rows; bucket listing is an audit tool, not an
@@ -71,8 +73,8 @@ Ordered by fidelity, learned across the build:
 - **Vectorize index `repertoire`**: 1024 dims (1536 cap), cosine,
   voyage-context-4, self-chunked. Vector id `<doi_id>#cNNN`; metadata is FILTER
   FACETS ONLY (doi, journal, year, section), filtered during ANN traversal.
-  Stale (built from the first-build corpus); the re-embed round rebuilds it from
-  the current md.
+  Rebuilt 2026-10-16 from the current md: 231,625 vectors, journal families
+  only.
 - **HF dataset `sghng/repertoire-corpus`** (private): the cold backup. md as 160
   parquet shards, meta ledgers, and the irreplaceable raws (17,205
   journal-family + psyarxiv blobs, sha256-verified) as 70 shards. Plus a local
@@ -100,10 +102,12 @@ strings (psyarxiv ids use dots where dois use slashes).
 
 ## Serving
 
-`config/plugin/harness.ts` registers the `repertoire` tool (in-process plugin,
-no MCP): search (Voyage embed -> Vectorize query -> passages with refs), context
-(chunks around a ref), outline (paper's section skeleton). The style-check
-subagent is the armed consumer.
+`src/query.ts` is the serving path (the v1 harness plugin is gone);
+`--smoke` is the end-to-end acceptance check. The repertoire tool lands
+behind abstract-mcp per `docs/service.md`'s roadmap; no armed consumer
+until then. Rebuild recipe: `fetch-md.ts` pulls a doi list's md from R2,
+`chunk.ts`, `load-chunks.ts` (clear the table first), `embed.ts`,
+`insert-vectors.ts --fresh-index`, then verify the index count.
 
 Query contract (`src/query.ts`): Vectorize query with filter facets and
 --max-per-paper N (over-fetch, then cap); one D1 call chunks JOIN papers;
@@ -116,7 +120,9 @@ prose.
 - Vectorize: metadata cap 10,240 bytes (facets only, never payload); filtering
   must happen in the index (indexed properties), not post-fetch;
   `wrangler vectorize insert` silently drops vectors at scale, verify counts and
-  repair via REST /upsert in 250-vector batches.
+  repair via REST /upsert in 250-vector batches. `wrangler vectorize info`'s
+  vectorCount lags behind inserts (async mutation processing): re-check after a
+  minute before concluding drops.
 - Voyage contextualizedembeddings: manual chunking needs a FLAT list per
   document, 32K tokens TOTAL per call; response nests data[i].data[j].embedding.
 - D1: statement size limit bites at scale; after any bulk apply, verify with a
@@ -130,8 +136,8 @@ prose.
 
 ## Roadmap
 
-1. Vectorize re-embed from the current md (chunks table rebuilt, index recreated
-   fresh, new-index-then-swap).
+1. The repertoire tool behind abstract-mcp, possibly with a D1 FTS5 BM25 leg
+   and RRF fusion (surveyed 2026-10-16; owner ruling pending).
 2. pdf-tier math recovery: GPU docling formula enrichment or the olmOCR pass for
    the formula-heavy and scan tiers (parse-report.md quantifies).
 3. Annual increments per fetch.md recipes; new arXiv items fetch HTML directly.

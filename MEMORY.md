@@ -201,3 +201,20 @@ better home, it moves and leaves a pointer at most.
   per the owner's note: PI encodes the authority gradient (advisor the
   external oracle, PI the leading investigator, orchestrator the primary
   agent), and correct naming routes agent attention.
+- **2026-10-16**: the repertoire span rebuild closes the corpus desync
+  from the 2026-10-11 cutover. Owner ruling: the retrieval corpus is
+  journal papers only (psychometrika, bjmsp, jebs, jem: 6,985 papers,
+  ~298 MB md); repertoire is setting exemplars for the writer, not a
+  training index, so preprints stay stored for training but out of the
+  index. Full chain rebuilt: md pulled from R2 with the new fetch-md.ts
+  (the CF_S3 key pair proved stale, 401; the wrangler token path carried
+  6,985 objects with zero failures, and three raw/ probes sha256-verified
+  against D1 sources), re-chunked (231,625 chunks, ~74M tokens), D1
+  chunks reloaded, re-embedded (voyage-context-4, inside the free
+  allowance), Vectorize recreated in place (no consumers post-harness),
+  count-verified (231,625; vectorCount in wrangler vectorize info lags
+  asynchronously, so verify after a wait, not on the insert's heels), and
+  query.ts --smoke passed. Open follow-ups: the repertoire tool behind
+  abstract-mcp (surveyed hybrid BM25 via D1 FTS5 plus RRF fusion; owner
+  ruling pending), a fresh R2 S3 token, and the raw/ bucket cleanup
+  decision parked with the owner.

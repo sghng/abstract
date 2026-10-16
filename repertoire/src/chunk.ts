@@ -17,11 +17,15 @@
  *
  * Output: .cache/chunks/{doi_id}.json
  *   [{chunk_no, heading, section, line_start, line_end, text}]
+ *
+ * Input: .cache/md/ (the journal-family aggregate; fetch-md.ts populates
+ * it from r2://repertoire/md). The legacy flat repertoire/md + jem/md
+ * dirs were the first-build layout.
  */
 import { mkdir, readdir, writeFile } from "node:fs/promises";
 
 const ROOT = new URL("..", import.meta.url).pathname;
-const MD_DIRS = [`${ROOT}/md`, `${ROOT}/jem/md`];
+const MD_DIRS = [`${ROOT}/.cache/md`];
 const OUT_DIR = `${ROOT}/.cache/chunks`;
 const MAX_CHARS = 1900;
 

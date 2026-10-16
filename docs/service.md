@@ -85,6 +85,6 @@ run reports ok.
 
 ## Roadmap
 
-The repertoire query lands behind this service after the D1 span
-rebuild recorded in MEMORY.md. Skills and the project template gain
-their invocation lines only as proposed text (kernel rule).
+The repertoire query lands behind this service; the D1 span rebuild that
+gated it landed 2026-10-16 (docs/repertoire). Skills and the project
+template gain their invocation lines only as proposed text (kernel rule).
