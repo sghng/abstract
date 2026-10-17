@@ -58,9 +58,9 @@ default reading order; `-layout` interleaved columns and was removed
 `service/data/artifacts` (gitignored): `<id>.pdf`, `<id>.txt` (pages
 split by form feeds), `<id>.meta.json`.
 
-Run by hand: `bun service/src/index.ts`. In production the systemd
-user unit `~/.config/systemd/user/abstract-mcp.service` (pattern of
-`zotero-mcp`; the repo copy is `service/abstract-mcp.service`), with
+Run by hand: `bun service/src/index.ts`. In production a systemd
+user unit (`~/.config/systemd/user/abstract-mcp.service`, pattern of
+`zotero-mcp`; unit files live on the host, never in the repo), with
 EnvironmentFile `~/.config/abstract-mcp/env` (`ABSTRACT_PORT`,
 `ABSTRACT_HOST`, `ABSTRACT_TOKEN` optional bearer, `ABSTRACT_UPEMAIL`;
 for `paper_search`, optional `S2_API_KEYS` (comma-separated free keys,
@@ -77,8 +77,8 @@ line `abstract.sgh.ng -> centurion.sgh.ng`.
 Known limitation: one browser per profile directory; the smoke script
 and the service cannot run a fetch at the same time.
 
-Elsevier cooldown recheck: `service/recheck.ts` behind the
-`abstract-elsevier-recheck` user timer (6 h cadence, self-guarded to
+Elsevier cooldown recheck: `service/recheck.ts` behind a host-side
+user timer (6 h cadence, self-guarded to
 at most one real attempt per 24 h cooldown cycle); outcomes append to
 `service/data/logs/elsevier-recheck.jsonl`. Disable the timer once a
 run reports ok.
