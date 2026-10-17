@@ -201,6 +201,20 @@ better home, it moves and leaves a pointer at most.
   per the owner's note: PI encodes the authority gradient (advisor the
   external oracle, PI the leading investigator, orchestrator the primary
   agent), and correct naming routes agent attention.
+- **2026-10-17**: the cluster interface collapsed to its minimum after
+  wrapper prototyping. A qsub wrapper (crc run/get-node, Open Terminal
+  sessions, idle watchdogs) was built and e2e verified, then dropped by
+  PI decision: the interface is the `ssh crc` alias on Centurion (the
+  systemd crc-keeper service holds the autossh master, plain text
+  credentials in ~/.config/crc/env), frontend for burst compute, plain
+  qsub through the alias for real computation, with a per-project job
+  ledger (notes/cluster-jobs.md) mandated by the skill. Investigations
+  that decided it: frontend and compute nodes are the same EPYC 7543
+  silicon; the scheduler is pure fair-share so big asks starve after
+  campaigns (16 and 32 core probes pended 4 to 5 minutes); qacct is
+  admin-only, which explains every missing accounting record; long
+  queue jobs run days routinely, so holding cores is unremarkable. The
+  skill was rewritten to the two door form and landed.
 - **2026-10-16**: the repertoire span rebuild closes the corpus desync
   from the 2026-10-11 cutover. Owner ruling: the retrieval corpus is
   journal papers only (psychometrika, bjmsp, jebs, jem: 6,985 papers,
