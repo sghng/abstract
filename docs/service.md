@@ -14,6 +14,7 @@ streamable HTTP at `/mcp` on `127.0.0.1:4857`. MCP only; no REST face.
 | `paper_read` | page-anchored text range, the `read_pdf_pages` idiom |
 | `paper_find` | phrase to page hits with snippets; hyphenation and whitespace normalized, all-words-per-page fallback (`mode` says which); the verification idiom |
 | `paper_export` | base64 PDF, durable capture into `references/` only |
+| `repertoire_query` | academic writing style assistance: draft prose to published conventional phrasing from the journal corpus (psychometrika, bjmsp, jebs, jem); hybrid retrieval, dense (Vectorize) fused with BM25 (D1 `chunks_fts`) by RRF k=60, then a voyage rerank-3 stage; facet filters doi/journal/year/section. Not paper discovery; that is `paper_search` |
 
 Error codes: `doi_not_registered` (reserved or typo; the jemd.70061
 case), `publisher_missing` (DOI resolves, publisher 404s; the JEM
@@ -70,6 +71,9 @@ every key warm; supersedes single-key `S2_API_KEY`) and
 `OPENALEX_API_KEY` (free, $1/day usage budget; keyless works at
 $0.10/day and DOI singleton lookups stay free).
 Without keys both legs still run on their shared/keyless pools.
+For `repertoire_query`: `VOYAGE_API_KEY` (query embedding plus the
+rerank stage) and `CLOUDFLARE_API_TOKEN` (D1 and Vectorize REST);
+`CF_ACCOUNT_ID` and `D1_REPERTOIRE_ID` carry lab defaults in code.
 Ingress is Caddy at `https://abstract.sgh.ng/mcp` (`/mcp*` path
 convention, DNS-01); the name resolves via the unbound-back local-data
 line `abstract.sgh.ng -> centurion.sgh.ng`.
@@ -85,6 +89,7 @@ run reports ok.
 
 ## Roadmap
 
-The repertoire query lands behind this service; the D1 span rebuild that
-gated it landed 2026-10-16 (docs/repertoire). Skills and the project
-template gain their invocation lines only as proposed text (kernel rule).
+`repertoire_query` landed 2026-10-17 (hybrid dense + BM25, RRF,
+rerank-3; the D1 span rebuild that gated it landed 2026-10-16). Skills
+and the project template gain their invocation lines only as proposed
+text (kernel rule).

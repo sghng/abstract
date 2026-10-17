@@ -65,7 +65,10 @@ Ordered by fidelity, learned across the build:
   - `chunks`: 231,625 rows over the 6,985 journal-family papers (rebuilt
     2026-10-16 from the current md). The retrieval corpus is journal papers
     only; preprints stay stored for training but out of the index.
-    `assets`: legacy first-build table, pending retirement.
+    `chunks_fts`: full-content FTS5 over the chunk text, the BM25 leg
+    (text capped at 16K chars; oversized atomic tables would trip D1's
+    SQLITE_TOOBIG and carry no phrasing signal). `assets`: legacy
+    first-build table, pending retirement.
 - **R2 bucket `repertoire`**: `md/<doi_id>.md` (159,465 objects, 8.2 GiB,
   immutable once uploaded) and `raw/<doi_id>.<fmt>` (39,143 objects, ~47 GiB).
   Keys are derivable from D1 rows; bucket listing is an audit tool, not an
@@ -102,12 +105,15 @@ strings (psyarxiv ids use dots where dois use slashes).
 
 ## Serving
 
-`src/query.ts` is the serving path (the v1 harness plugin is gone);
-`--smoke` is the end-to-end acceptance check. The repertoire tool lands
-behind abstract-mcp per `docs/service.md`'s roadmap; no armed consumer
-until then. Rebuild recipe: `fetch-md.ts` pulls a doi list's md from R2,
-`chunk.ts`, `load-chunks.ts` (clear the table first), `embed.ts`,
-`insert-vectors.ts --fresh-index`, then verify the index count.
+`repertoire_query` on abstract-mcp is the serving path (landed
+2026-10-17): dense leg (Vectorize) + BM25 leg (`chunks_fts`) fused by
+RRF k=60, 50 per leg, pool of 20 through voyage rerank-3. Smoke:
+`bun service/smoke.ts repertoire <query>`. `src/query.ts` remains the
+CLI reference implementation (`--smoke` checks the span join against
+R2 md). Rebuild recipe: `fetch-md.ts` pulls a doi list's md from R2,
+`chunk.ts`, `load-chunks.ts` (full reload including chunks_fts),
+`embed.ts`, `insert-vectors.ts --fresh-index`, then verify the index
+count.
 
 Query contract (`src/query.ts`): Vectorize query with filter facets and
 --max-per-paper N (over-fetch, then cap); one D1 call chunks JOIN papers;
@@ -128,7 +134,9 @@ prose.
 - D1: statement size limit bites at scale; after any bulk apply, verify with a
   count query, not with the command's exit code. The live schema can drift from
   `schema.sql` (a CHECK constraint once predated the committed schema);
-  reconcile deliberately.
+  reconcile deliberately. D1's FTS5 build wants lowercase `fts5` in CREATE but
+  UPPERCASE boolean operators in MATCH: a lowercase `or` is silently searched
+  as a literal term, turning an OR chain into an AND (2026-10-17).
 - wrangler error greps must not match on `[ERROR]` (ANSI codes split the token);
   match on ERROR.
 - Compute-node egress (CRC) has broken IPv6: urllib waits out the v6 timeout

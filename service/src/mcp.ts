@@ -18,6 +18,7 @@ import { resolvePaper } from "./resolve.ts";
 import { fetchPaper } from "./fetcher.ts";
 import { readPages, findInPaper, exportPdf } from "./text.ts";
 import { searchPapers } from "./search.ts";
+import { repertoireQuery } from "./repertoire.ts";
 
 const TOOLS = [
   {
@@ -96,6 +97,25 @@ const TOOLS = [
       required: ["artifact"],
     },
   },
+  {
+    name: "repertoire_query",
+    description:
+      "Academic writing style assistance: draft prose in, published conventional phrasing out, retrieved from the lab's psychometrics journal corpus (psychometrika, bjmsp, jebs, jem). Hybrid retrieval: embedding similarity fused with keyword match, then reranked. Use when drafting or revising a passage and you need the field's conventional phrasing for a finding, method, or claim. Query in the register you want back: draft prose retrieves published prose. Not for finding papers or their metadata; that is paper_search.",
+    inputSchema: {
+      type: "object",
+      properties: {
+        query: { type: "string", description: "draft sentence or paragraph" },
+        top_k: { type: "integer", description: "results returned, default 8" },
+        max_per_paper: { type: "integer", description: "cap hits per paper; 1 = all hits distinct papers" },
+        year: { type: "integer" },
+        doi: { type: "string", description: "restrict to one paper, slash form 10.x/..." },
+        journal: { type: "string", description: "psychometrika | bjmsp | jebs | jem" },
+        section: { type: "string", description: "abstract | methods | results | discussion | conclusion" },
+        rerank: { type: "boolean", description: "voyage rerank-3 stage, default true" },
+      },
+      required: ["query"],
+    },
+  },
 ] as const;
 
 async function callTool(name: string, args: Record<string, unknown>): Promise<unknown> {
@@ -123,6 +143,16 @@ async function callTool(name: string, args: Record<string, unknown>): Promise<un
       return findInPaper(String(args.artifact), String(args.query));
     case "paper_export":
       return exportPdf(String(args.artifact));
+    case "repertoire_query":
+      return repertoireQuery(String(args.query), {
+        topK: int(args.top_k),
+        maxPerPaper: int(args.max_per_paper),
+        year: int(args.year),
+        doi: args.doi === undefined ? undefined : String(args.doi),
+        journal: args.journal === undefined ? undefined : String(args.journal),
+        section: args.section === undefined ? undefined : String(args.section),
+        rerank: args.rerank === undefined ? undefined : args.rerank === true,
+      });
     default:
       return { error: `unknown tool ${name}` };
   }

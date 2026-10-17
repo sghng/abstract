@@ -232,3 +232,22 @@ better home, it moves and leaves a pointer at most.
   abstract-mcp (surveyed hybrid BM25 via D1 FTS5 plus RRF fusion; owner
   ruling pending), a fresh R2 S3 token, and the raw/ bucket cleanup
   decision parked with the owner.
+- **2026-10-17**: repertoire_query lands in abstract-mcp, closing the
+  follow-up from the span rebuild. Owner rulings of the day: repertoire
+  is academic writing-style assistance, a tool family separate from
+  paper_* (which is literature discovery for lit review); the retrieval
+  stack stays handmade rather than an industry engine (Elasticsearch et
+  al.) because of cost and because the unique use case demands control
+  over embedding and reranking choices; the reranker is voyage rerank-3.
+  Hosting stays on centurion rather than a Cloudflare Worker: the paper
+  half is immovable (campus entitlement is network identity, plus the
+  persistent Chromium profile), and splitting families buys nothing.
+  Implementation: chunks_fts full-content FTS5 keyed by a stable FNV-1a
+  chunk_id shared with chunks; RRF k=60 over 50-per-leg candidates, pool
+  of 20 through the reranker; passages served from the FTS text.
+  Lessons landed in the corpus manual: D1 FTS5 boolean operators must be
+  UPPERCASE (lowercase or is searched as a literal term, silently
+  turning OR into AND), FTS text is capped at 16K chars (a 176K atomic
+  table tripped SQLITE_TOOBIG), and voyage's rerank REST response wraps
+  results in data, not results. Also today: the committed systemd units
+  were removed from the repo (host state, not doctrine).

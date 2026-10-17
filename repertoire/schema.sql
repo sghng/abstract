@@ -42,8 +42,17 @@ create table if not exists chunks (
   section text,
   line_start integer not null,
   line_end integer not null,
+  chunk_id integer,           -- FNV-1a-63 of doi#chunk_no; joins chunks_fts
   primary key (doi, chunk_no)
 );
+create unique index if not exists idx_chunks_id on chunks(chunk_id);
+
+-- chunks_fts: the BM25 leg of the hybrid query (2026-10-17). Full-content
+-- FTS5 over the chunk text ([formula] transform included); chunk_id joins
+-- chunks.chunk_id. Lowercase fts5, D1 rejects uppercase. D1 export is
+-- blocked while a virtual table exists: drop chunks_fts, export, then
+-- reload via load-chunks.ts --fresh.
+create virtual table if not exists chunks_fts using fts5(text, chunk_id unindexed);
 
 -- assets: one row per referenced figure/table/equation. handle is the
 -- short per-paper id in document order (fig01, tab01, math-0001); url is

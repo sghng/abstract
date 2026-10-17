@@ -8,6 +8,7 @@
  *   bun service/smoke.ts find <artifact> <phrase...>
  *   bun service/smoke.ts search <query> [k=v ...]   (limit=, year_from=,
  *                                           year_to=, min_citations=)
+ *   bun service/smoke.ts repertoire <query...>      (direct, bypasses MCP)
  *   bun service/smoke.ts mcp <doi>        (full MCP round trip against
  *                                           a running server)
  */
@@ -59,6 +60,11 @@ switch (cmd) {
     console.log(JSON.stringify(await searchPapers(rest[0], o), null, 1).slice(0, 4000));
     break;
   }
+  case "repertoire": {
+    const { repertoireQuery } = await import("./src/repertoire.ts");
+    console.log(JSON.stringify(await repertoireQuery(rest.join(" "), { topK: 5 }), null, 1).slice(0, 4000));
+    break;
+  }
   case "mcp": {
     const base = process.env.ABSTRACT_URL ?? "http://127.0.0.1:4857";
     const post = async (body: unknown) => {
@@ -90,5 +96,5 @@ switch (cmd) {
     break;
   }
   default:
-    console.log("usage: smoke resolve|fetch|read|find|search|mcp ...");
+    console.log("usage: smoke resolve|fetch|read|find|search|repertoire|mcp ...");
 }
