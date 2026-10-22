@@ -77,6 +77,19 @@ deliverable ships with a companion.
   alternatives that were live and how each was eliminated, tried and failed
   empirically, cited out of the running, or shown suboptimal for our case.
   Tickets name the open alternatives; reports record their dispositions.
+- **Two legs: evidence and citation.** A finding reported on one leg is
+  not yet a finding: every empirical result is written with the
+  published work that predicts, explains, bounds, or contrasts with it,
+  and every framing claim is positioned against its nearest published
+  neighbor. Treat papers as documentation — innate knowledge of a field
+  is as fallible as innate knowledge of an API, so consult the
+  literature at the rate you would consult docs, not at review time. Do
+  not reinvent wheels: what exists, reuse and cite; reinvent only when
+  the reinvention is the project's declared novelty. Before writing
+  "unexplored" or "novel," record the search that established the
+  silence (routes, queries, what was checked) — a documented silence is
+  itself the citation; an undocumented one is a gap a referee will fill
+  against us.
 - **Linear mirrors the work at milestone grain** (team SGH; the project
   mapping lives in `notes/orchestrator.md`). A thread gets one issue; phase
   turns and landed reports update it mechanically. A PI-authored issue is a
@@ -108,7 +121,12 @@ Patterns:
 - **Literature**: a quick sourced question goes to `literature-lookup`; a
   full corpus pass goes to `literature-review`.
 - **Experiments and analysis**: the `engineer` sidekick with the
-  four-element brief; the experiments skill holds the doctrine.
+  four-element brief; the experiments skill holds the doctrine. The
+  engineer implements, runs, and monitors — it never derives.
+- **Mathematics**: the `statistician` sidekick owns the mathematical
+  layer — model derivations, log-likelihoods, MLE and EM algorithms —
+  and hands the engineer fixed formulas to implement. Derivation work
+  never routes to the engineer.
 - **Design arbitration**: the `statistician` sidekick; it owns simulation
   design and tolerance-setting and rules on routed empirical failures.
 - **Word round-trips**: the `nlpatch` sidekick, mechanically, per the word
@@ -128,8 +146,8 @@ one-off shapes; a recurring shape earns a named sidekick.
 | `literature-lookup` | A quick, sourced answer over a topic. |
 | `literature-review` | A full structured pass over a defined corpus, producing a memo. |
 | `nlpatch`           | Mechanical Word round-trip: tracked changes in, response patch out. |
-| `engineer`          | Experiment and coding execution: simulations, analyses, scripts, model derivations with checks. Writes and runs code. |
-| `statistician`      | Design arbitration: simulation design, estimators, tolerances; rules on routed empirical failures. |
+| `engineer`          | Experiment execution and monitoring: implements, runs, and monitors simulations, analyses, and tooling; writes and runs code. NO mathematical derivations — those route to the statistician. |
+| `statistician`      | The mathematical layer and design arbitration: model derivations, log-likelihoods, MLE and EM algorithms, simulation design, estimators, tolerances; rules on routed empirical failures. |
 
 ## Review
 

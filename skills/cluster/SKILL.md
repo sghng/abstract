@@ -14,6 +14,10 @@ Docs at `docs.crc.nd.edu` (context7 `/websites/crc_nd_edu`).
 
 ## Access
 
+- **No local execution, ever (PI directive 2026-10-22).** The local
+  device writes files only — all runs (simulations, fits, checks, smoke,
+  diagnostics, analysis over stored parts) happen on the CRC. The PI's
+  server cannot hold the memory; local compute has destabilized it.
 - `ssh crc '<cmd>'` runs on the frontend. Use it for burst compute,
   smoke tests, compilation, benchmarks. Minutes-scale work only, the
   frontend is shared.
