@@ -17,6 +17,12 @@ Brief context: what is this ticket about, why does it matter.
 
 The central question this ticket addresses.
 
+## Decisions and Alternatives
+
+The choices this work must make, and for each the alternatives currently
+live: what would eliminate each one, an empirical test to run, a citation
+to find, or a reason it fits the case poorly.
+
 ## Todos
 
 ### Task 1: Task Name

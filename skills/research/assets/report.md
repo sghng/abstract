@@ -22,6 +22,13 @@ What was done, with enough detail to evaluate.
 
 Key findings with evidence (tables, figures).
 
+## Decisions and Alternatives
+
+Each decision the work made, the alternatives that were live, and how
+each was eliminated: tried and failed (with the evidence), cited out
+(with the source), or shown suboptimal for our case (with the reason).
+What survives, and why it fits.
+
 ## Narrative Implications
 
 How the results support or complicate the story.

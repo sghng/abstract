@@ -72,6 +72,11 @@ deliverable ships with a companion.
 - **Files are memory.** Sessions get compacted. Anything that matters (a
   decision, a finding, a discovered convention) lands in `notes/` before the
   turn ends.
+- **Convincing, not merely working.** A direction is convincing when it is
+  the outcome of consideration, not whim: every decision behind it names the
+  alternatives that were live and how each was eliminated, tried and failed
+  empirically, cited out of the running, or shown suboptimal for our case.
+  Tickets name the open alternatives; reports record their dispositions.
 - **Linear mirrors the work at milestone grain** (team SGH; the project
   mapping lives in `notes/orchestrator.md`). A thread gets one issue; phase
   turns and landed reports update it mechanically. A PI-authored issue is a

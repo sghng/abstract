@@ -34,6 +34,11 @@ because its executor is a fresh subagent that performs better and cheaper
 with specifics embedded. Surface every open question in the ticket; a
 question written down is acceptable, a hidden one is not. Permit surprises
 explicitly: unexpected findings belong in the report's Discovery Zone.
+A ticket names the decisions the work must make and the alternatives
+live for each. The report closes them out: for every decision, which
+alternatives were tried and failed, which were eliminated by citation
+or reason, and why the survivor fits the case. This record is the why
+of the work and the first mine for manuscript drafting.
 
 The report is the ticket's closing record, written for future sessions,
 not for the PI. What reaches the PI is the briefing: the report distilled.

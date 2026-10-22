@@ -15,4 +15,5 @@ The substance: verified claims with verbatim passages and page numbers
 
 ## Recommendations
 
-What the recipient should do with this.
+What the recipient should do with this, and which alternatives were
+considered and set aside.

@@ -6,8 +6,10 @@ date: YYYY-MM-DD
 
 ## Summary
 
-What happened, what it means, what needs a ruling. A few paragraphs,
-readable cold: no unexplained acronyms, decisions flagged as decisions.
+What happened, what it means, what needs a ruling. Where a decision
+closed, one line on why: the alternatives it beat, and how. A few
+paragraphs, readable cold: no unexplained acronyms, decisions flagged
+as decisions.
 
 ## Supplements
 

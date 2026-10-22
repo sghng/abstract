@@ -263,3 +263,22 @@ better home, it moves and leaves a pointer at most.
   pickup), the research skill's logistics carries the mechanics, each
   project's `notes/orchestrator.md` names its Linear project, and the
   template mounts the Linear MCP for every project.
+- **2026-10-22**: The convincing doctrine lands lab-wide, from the AI-use
+  harness considerations (Slina's raw record of the Oct 19-21 discussion,
+  banked in hindsight). Owner's definition: convincing means the direction
+  is the outcome of consideration, not whim; every decision names the
+  alternatives that were live and how each was eliminated, tried and
+  failed empirically, cited out of the running, or shown suboptimal for
+  the case. Working is not the bar, because research is not engineering:
+  the chosen approach must be shown the only one that works or the best
+  for the case, with evidence or citations, and the elimination record is
+  the why of the work and the first mine for manuscript drafting. Landed
+  as a kernel Never Forget bullet, a Loop paragraph in the research
+  skill, a Decisions and Alternatives section in the ticket and report
+  templates, smaller extensions in the memo and briefing templates, and
+  an executor paragraph in the engineer brief. An earlier
+  acceptance-criteria draft (predictions with tolerances, met/refuted
+  verdicts) was rejected by the owner as a spec sheet, engineering-shaped;
+  predictions with tolerances stay parked with the graded-response
+  ruling, and the doubt-attaches-to-artifacts kernel line remains
+  deferred.
