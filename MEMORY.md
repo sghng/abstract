@@ -282,3 +282,30 @@ better home, it moves and leaves a pointer at most.
   predictions with tolerances stay parked with the graded-response
   ruling, and the doubt-attaches-to-artifacts kernel line remains
   deferred.
+- **2026-10-22**: The writing skill gains a Drafting from Scratch
+  section, closing the process gap the style guide never covered: the
+  rules bound revision and review but said nothing about generation, so
+  agents defaulted to whole-document composition in one pass. The new
+  doctrine builds a manuscript section by section and paragraph by
+  paragraph, iterates at the smallest broken unit, runs the nodding
+  test after each section before opening the next, and drafts the body
+  first (method, results, discussion, introduction, abstract last).
+  Owner's order; the body-first drafting order was the assistant's
+  addition and survived review.
+- **2026-10-22, model routing**: the K3 quota runs out temporarily, so the
+  statistician moves off kimi k3-256k to GLM 5.3, the provider the other
+  executors already use. Together with the same round's effort change
+  (every GLM 5.3 and GLM 5.3 Flash pin drops from #max to the model
+  default, on the owner's order), this trades the statistician's
+  highest-leverage seat for quota relief: a deliberate, temporary
+  departure from the 2026-10-13 follow-up rationale, to be revisited when
+  the K3 quota returns. The same round moves every GLM pin off
+  zai-coding-plan to the plain zai provider, on the owner's order.
+- **2026-10-22, GLM quota**: GLM quota ran out too, so routing moves to
+  deepseek-v4.1-flash (`deepseek/deepseek-flash`, default effort) for
+  every sidekick and both built-in overrides; the statistician returns to
+  kimi k3-256k, matching the 2026-10-13 rationale (its rulings steer the
+  cheap executors). reviewer-external leaves deepseek-v4-pro for the same
+  cheap model, so the cold read no longer differs by vendor from its
+  fellows; restore it when quota allows. The prior routing entry's
+  "GLM 5.3 at default effort" holds only for the round it records.

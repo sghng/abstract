@@ -180,6 +180,25 @@ the story, then write the connections.
 Never let a draft drift from `story.md`. If the narrative must evolve, raise
 it rather than fork it.
 
+## Drafting from Scratch
+
+A manuscript is built, not composed. Draft one section at a time and
+settle it before moving on; a full-manuscript first pass trades control
+for speed and pays both back in revision. Within a section, build
+paragraph by paragraph, one idea each, developed in full, in story
+order.
+
+Iterate at the smallest unit that is broken. A sentence that stumbles
+is rewritten in place; a paragraph that rambles is split or merged; a
+section that loses the thread is reordered, never patched with
+transitions. Run the nodding test after each section before opening the
+next; the self-checks are the iteration loop, not a final gate.
+
+Draft the body first. Method and results are fixed by the record and
+carry the fewest choices; the discussion follows, then the
+introduction, once what the paper did and found is on the page; the
+abstract comes last, when the story the paper tells is final.
+
 ## Progressions
 
 An ordered set of methods or analyses is a progression the reader walks:
