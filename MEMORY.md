@@ -309,3 +309,12 @@ better home, it moves and leaves a pointer at most.
   cheap model, so the cold read no longer differs by vendor from its
   fellows; restore it when quota allows. The prior routing entry's
   "GLM 5.3 at default effort" holds only for the round it records.
+- **2026-10-22**: The repertoire_query deploy on centurion completed.
+  The blocker was never code (the unit runs bun against this repo's
+  working tree, so a restart picks up commits) but two missing env
+  keys; VOYAGE_API_KEY and CLOUDFLARE_API_TOKEN were added to
+  ~/.config/abstract-mcp/env, the unit restarted, and the tool verified
+  live through https://abstract.sgh.ng/mcp (7 tools listed, on-target
+  passages from psychometrika and bjmsp). Lesson: when the session is
+  on the deploy host, "user deploys" is stale; deploy is part of
+  implementation.
