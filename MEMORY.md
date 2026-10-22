@@ -318,3 +318,18 @@ better home, it moves and leaves a pointer at most.
   passages from psychometrika and bjmsp). Lesson: when the session is
   on the deploy host, "user deploys" is stale; deploy is part of
   implementation.
+- **2026-10-22**: The repertoire wiring lands, closing the gap behind
+  the owner's observation that agents rarely consult the corpus. Root
+  cause: the project template never mounted the abstract MCP server, so
+  research-project agents had no repertoire_query in their toolbelt,
+  and the repertoire skill pointed at the CLI two hops away in another
+  repo, which is also the dense-only path (the hybrid engine with the
+  BM25 leg and rerank lives only in the MCP tool). Fix: the template
+  mounts https://abstract.sgh.ng/mcp first in its mcp map, the
+  repertoire skill's Invocation leads with the tool and demotes the CLI
+  to scripts and bulk passes, and the writing skill's Repertoire
+  section gains concrete triggers (section opens, uncertain phrasing,
+  numbers and hedges) plus a frequency floor (query every section at
+  least once; the corpus check is part of drafting, not of revision).
+  Existing research repos still need the mcp entry in their own
+  configs, same rollout pattern as the Linear mappings.

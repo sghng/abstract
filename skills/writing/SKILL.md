@@ -141,10 +141,13 @@ analysis forward.
 
 ## Repertoire
 
-Consult the repertoire skill often for style reference while a deliverable
-is in generation. Query with the draft prose at hand, filtered to the target
-publication and in particular to the section being written, and match the
-register of the published passages that come back.
+Consult the repertoire while a deliverable is in generation, not after:
+when a section opens, when a phrasing is uncertain, when a sentence
+carries a number or a hedge. Query `repertoire_query` with the draft
+prose at hand, filtered to the target publication and in particular to
+the section being written, and match the register of the published
+passages that come back. Query every section at least once; the corpus
+check is part of drafting, not of revision.
 
 The corpus settles doubt: when unsure whether a word or phrase is plain,
 search it; a phrase the target venue publishes routinely is plain.

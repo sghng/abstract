@@ -13,6 +13,10 @@
   // Sidekick pins live in the agent markdown files.
 
   "mcp": {
+    "abstract": {
+      "type": "remote",
+      "url": "https://abstract.sgh.ng/mcp"
+    },
     "zotero": {
       "type": "remote",
       "url": "https://zotero.sgh.ng/mcp"

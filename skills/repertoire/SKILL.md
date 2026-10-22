@@ -10,15 +10,23 @@ description: >-
 
 # Repertoire
 
-The repertoire is the lab's corpus of published venue writing, served as a
-query script over a Vectorize index plus D1 metadata plus R2 markdown
+The repertoire is the lab's corpus of published venue writing, served as
+the abstract MCP server's `repertoire_query` tool over a Vectorize index
+plus D1 metadata plus R2 markdown
 stores. Query in the register you want back: draft prose retrieves published
 prose.
 
 ## Invocation
 
-Run from the abstract repo root (the script reads the repo's `.env` for
-VOYAGE_API_KEY and the Cloudflare token):
+Call `repertoire_query` on the abstract MCP server: the draft prose as
+`query`, plus `top_k`, `max_per_paper`, and the facet filters
+`section`, `journal`, `year`, `doi` as needed. The tool runs the
+hybrid engine, embedding similarity fused with keyword match, then
+reranked.
+
+The CLI remains for scripts and bulk passes, run from the abstract repo
+root (it reads the repo's `.env`; it is the dense-only path, no keyword
+leg):
 
 ```bash
 bun ~/dev/abstract/repertoire/src/query.ts "your draft sentence or paragraph"
