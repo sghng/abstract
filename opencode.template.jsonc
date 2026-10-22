@@ -33,9 +33,9 @@
 
   // Sidekicks mount as markdown files: init symlinks ~/dev/abstract/agents/
   // into the project's .opencode/agents/ (one symlink per file). Model pins
-  // live in the agent files: deepseek-v4.1-flash for every sidekick except
-  // the statistician, pinned to kimi k3-256k, whose rulings steer the cheap
-  // executors.
+  // live in the agent files: deepseek-v4.1-flash for most sidekicks; two
+  // hold kimi k3-256k, the statistician (its rulings steer the cheap
+  // executors) and the writer (prose style is model-sensitive).
 
   // Unpinned subagents inherit the session model, which is the expensive
   // orchestrator. Same-ID overrides pin the built-ins to the executor;

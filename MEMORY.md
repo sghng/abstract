@@ -318,6 +318,14 @@ better home, it moves and leaves a pointer at most.
   passages from psychometrika and bjmsp). Lesson: when the session is
   on the deploy host, "user deploys" is stale; deploy is part of
   implementation.
+- **2026-10-22**: The writer sidekick lands, pinned to
+  kimi-code-plan-global/k3-256k (owner ruling: prose style differs
+  sharply by model, so drafting earns a dedicated pin). Drafting was
+  the last recurring shape still routed to bare spawns; the kernel's
+  drafting pattern now names the writer, and the sidekicks table gains
+  its row. The brief carries the writing-skill load, the repertoire
+  frequency floor from the same day's wiring, and an explicit
+  no-fabrication guard.
 - **2026-10-22**: The repertoire wiring lands, closing the gap behind
   the owner's observation that agents rarely consult the corpus. Root
   cause: the project template never mounted the abstract MCP server, so

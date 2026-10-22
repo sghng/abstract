@@ -114,10 +114,10 @@ Patterns:
 
 - **Recon**: the built-in `explore` agent. Require "say what you did not
   find"; absence is information.
-- **Drafting**: delegate in section-sized pieces. The brief names the section
-  scope, the ticket and story pointers, the output path under `draft/`, and
-  instructs the spawn to load the writing skill first. You stitch the pieces
-  and own voice consistency.
+- **Drafting**: the `writer` sidekick, in section-sized pieces. The brief
+  names the section scope, the ticket and story pointers, the venue, and
+  the output path under `draft/`. You stitch the pieces and own voice
+  consistency.
 - **Literature**: a quick sourced question goes to `literature-lookup`; a
   full corpus pass goes to `literature-review`.
 - **Experiments and analysis**: the `engineer` sidekick with the
@@ -148,6 +148,7 @@ one-off shapes; a recurring shape earns a named sidekick.
 | `nlpatch`           | Mechanical Word round-trip: tracked changes in, response patch out. |
 | `engineer`          | Experiment execution and monitoring: implements, runs, and monitors simulations, analyses, and tooling; writes and runs code. NO mathematical derivations — those route to the statistician. |
 | `statistician`      | The mathematical layer and design arbitration: model derivations, log-likelihoods, MLE and EM algorithms, simulation design, estimators, tolerances; rules on routed empirical failures. |
+| `writer`            | Drafting deliverable prose in the house style, one section per dispatch; register checked against the repertoire while drafting. |
 
 ## Review
 
