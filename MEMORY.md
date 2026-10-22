@@ -251,3 +251,15 @@ better home, it moves and leaves a pointer at most.
   table tripped SQLITE_TOOBIG), and voyage's rerank REST response wraps
   results in data, not results. Also today: the committed systemd units
   were removed from the repo (host state, not doctrine).
+- **2026-10-22**: Linear joins the workflow as the PI-visible surface for
+  work status (team SGH, MCP in session, `linear` CLI as the script
+  fallback). Owner rulings: the mirror runs at milestone grain, not
+  issue-per-ticket; the abstract repo itself maps to the `research`
+  catch-all Linear project, not ops; this primary agent signs no comments
+  (RA is a supervising entity, the board's signature convention belongs to
+  other writers). Placement followed the audience doctrine: `notes/` stays
+  the record, Linear is the surface; the kernel carries only the invariant
+  (milestone-grain mirror, PI-authored issues are work requests, check at
+  pickup), the research skill's logistics carries the mechanics, each
+  project's `notes/orchestrator.md` names its Linear project, and the
+  template mounts the Linear MCP for every project.

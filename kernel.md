@@ -72,6 +72,11 @@ deliverable ships with a companion.
 - **Files are memory.** Sessions get compacted. Anything that matters (a
   decision, a finding, a discovered convention) lands in `notes/` before the
   turn ends.
+- **Linear mirrors the work at milestone grain** (team SGH; the project
+  mapping lives in `notes/orchestrator.md`). A thread gets one issue; phase
+  turns and landed reports update it mechanically. A PI-authored issue is a
+  work request that crystallizes into a ticket. Check open issues at pickup.
+  Linear is the surface; `notes/` stays the record.
 
 ## Delegation
 

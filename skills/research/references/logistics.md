@@ -35,6 +35,25 @@ log. `orchestrator.md` holds standing rulings and open loops: distilled
 in place. Events found in the story or the working memory are evicted to
 the log.
 
+## Linear Mirror
+
+Linear (team SGH) is the PI-visible surface for work status; `notes/` stays
+the record. Each project names its Linear project in `notes/orchestrator.md`;
+threads without their own Linear project live in the `research` catch-all.
+The mirror runs at milestone grain, and status writes are mechanical:
+
+- A research thread opens: one issue in its Linear project, a line plus a
+  pointer to the story or ticket.
+- A phase turns or a report lands: a one-line comment on the thread's
+  issue; status moves with the thread.
+- A PI-authored issue is a work request: it crystallizes into a ticket
+  through the usual interview, and the ticket NNN goes back onto the issue.
+
+Use the Linear MCP in session; the `linear` CLI is the script fallback.
+Linear carries status plus a pointer; narrative stays in `notes/`. This
+agent does not sign comments; the board's signature convention belongs to
+other writers.
+
 ## Notes Index
 
 `notes/index.md` is the vault's entry point: one line per standing note,
