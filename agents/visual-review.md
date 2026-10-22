@@ -5,7 +5,7 @@ description: >-
   failure-mode notes, for generation screening and visual-gate calibration.
   Read-only.
 mode: subagent
-model: zai-coding-plan/glm-5.3-flash#max
+model: deepseek/deepseek-flash
 permissions:
   - action: subagent
     resource: "*"

@@ -5,7 +5,7 @@ description: >-
   the scope, the aspects, and the round (collegial or adversarial).
   Read-only.
 mode: subagent
-model: deepseek/deepseek-v4-pro
+model: deepseek/deepseek-flash
 permissions:
   - action: subagent
     resource: "*"

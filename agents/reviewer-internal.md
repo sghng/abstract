@@ -5,7 +5,7 @@ description: >-
   repertoire, consistency against the notes, statistics completeness.
   Read-only; the brief names the aspects to run.
 mode: subagent
-model: zai-coding-plan/glm-5.3#max
+model: deepseek/deepseek-flash
 permissions:
   - action: subagent
     resource: "*"

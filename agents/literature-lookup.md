@@ -4,7 +4,7 @@ description: >-
   X, whether claim Y has support, what the library already holds. Compact
   reply with citations, never an artifact. Read-only.
 mode: subagent
-model: zai-coding-plan/glm-5.3#max
+model: deepseek/deepseek-flash
 permissions:
   - action: subagent
     resource: "*"
