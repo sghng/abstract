@@ -17,8 +17,8 @@ visible edits a human applies in Word.
 
 ## Export: Typst to Word
 
-`abstract typ2docx <file.typ>` in the old harness was the command; in the
-skills setup, run the converter directly from the abstract repo:
+`abstract typ2docx <file.typ>` is the command; the converter also runs
+directly from the abstract repo:
 
 ```bash
 bun ~/dev/abstract/typ2docx/cli.ts <file.typ>

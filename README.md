@@ -17,7 +17,8 @@ Status: early. See `MEMORY.md` for the design rationale and decision tail,
 - `skills/` -- the skill library; `staging/` holds the immature (lint)
 - `agents/` -- sidekick briefs (markdown agent files)
 - `opencode.template.jsonc` -- the project mount (instructions + skills + mcp)
-- `src/cli.ts` -- the `abstract` CLI, init only
+- `src/cli.ts` -- the `abstract` CLI: `init`, plus a thin dispatch to
+  `typ2docx/cli.ts`
 - `typ2docx/`, `tools/`, `lint/` -- the Word converter, the reference-stock
   patches, the experimental style linter
 - `repertoire/` -- the convention corpus pipeline and query path
@@ -37,6 +38,9 @@ Then scaffold a research project:
 abstract init <dir>   # writes opencode.jsonc, symlinks the sidekick briefs
                       # into .opencode/agents/, scaffolds the notes skeleton
 ```
+
+`abstract typ2docx <file.typ>` converts a draft to Word; the same converter
+runs directly as `bun typ2docx/cli.ts <file.typ>`.
 
 Open the project in OpenCode. The kernel and the skill library mount from
 the project's config; sidekicks resolve through the symlink farm. Files are

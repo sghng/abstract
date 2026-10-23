@@ -6,6 +6,9 @@
  * resolved to this clone), symlinks the sidekick briefs into
  * <dir>/.opencode/agents/, and scaffolds the notes skeleton. Never
  * overwrites an existing config.
+ *
+ * abstract typ2docx <file.typ>: dispatches to typ2docx/cli.ts, which stays
+ * directly runnable as a bun script.
  */
 import {
   existsSync,
@@ -21,10 +24,17 @@ import path from "node:path";
 import { fileURLToPath } from "node:url";
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
-const [cmd, dir] = process.argv.slice(2);
+const [cmd, dir, ...rest] = process.argv.slice(2);
+
+if (cmd === "typ2docx") {
+  const { typeToDocx } = await import("../typ2docx/cli.ts");
+  await typeToDocx([dir, ...rest].filter((a): a is string => a !== undefined));
+  process.exit(0);
+}
 
 if (cmd !== "init" || !dir) {
   console.log("usage: abstract init <dir>");
+  console.log("       abstract typ2docx <file.typ> [--no-floats] [--max-passes N]");
   process.exit(cmd ? 1 : 0);
 }
 

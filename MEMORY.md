@@ -103,6 +103,12 @@ better home, it moves and leaves a pointer at most.
   repertoire and pi-era arcs were dropped as superseded by `docs/repertoire/`
   and the history docs. Commit hygiene rule adopted from the owner: a
   change and its documentation land in one commit.
+- **2026-10-22**: the typ2docx CLI comes back, thin. Deleting the harness
+  dropped the `abstract typ2docx` dispatch and, with it,
+  `typ2docx/cli.ts`'s `import.meta.main` guard, so the skill's own
+  `bun typ2docx/cli.ts` line exited 0 and wrote nothing. The guard is
+  restored and `src/cli.ts` dispatches `typ2docx` to it; `init` stays the
+  only command with logic of its own.
 - **2026-10-11**: the harness restructure direction is set: the
   infrastructure (central server, persistent roles, binder) is replaced
   by a skills plus config repo consumed through OpenCode's own discovery
@@ -309,6 +315,13 @@ better home, it moves and leaves a pointer at most.
   cheap model, so the cold read no longer differs by vendor from its
   fellows; restore it when quota allows. The prior routing entry's
   "GLM 5.3 at default effort" holds only for the round it records.
+- **2026-10-22, quota shift back**: GLM quota returned, so all sidekicks
+  and both built-in overrides go back to GLM 5.3 over the plain zai
+  provider, with nlpatch and visual-review on glm-5.3-flash. The
+  statistician and the writer both keep kimi k3-256k, each on its own pin.
+  reviewer-external stays on glm-5.3 rather than returning to
+  deepseek-v4-pro, so the cold read no longer differs by vendor; that
+  remains the standing cost trade.
 - **2026-10-22**: The repertoire_query deploy on centurion completed.
   The blocker was never code (the unit runs bun against this repo's
   working tree, so a restart picks up commits) but two missing env

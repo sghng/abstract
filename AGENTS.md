@@ -23,8 +23,9 @@ role sessions. This file is for agents developing this repository.
 - `opencode.template.jsonc` -- the project mount: skills and mcp. No
   session-model pin, that stays the user's choice; the built-in subagents
   pin to the executor model so bare spawns never run the session model.
-- `src/cli.ts` -- the `abstract` CLI, init only: `abstract init <dir>`
-  scaffolds a research project (config, agent symlinks, notes skeleton).
+- `src/cli.ts` -- the `abstract` CLI: `abstract init <dir>` scaffolds a
+  research project (config, agent symlinks, notes skeleton); `abstract
+  typ2docx` dispatches to the converter.
 - `typ2docx/` -- the Typst-to-Word converter, invoked by the word skill;
   `tools/` holds the reference-stock patch series.
 - `lint/` -- the style linter (Jev-judged rule set), experimental; driven
